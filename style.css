@@ -1295,3 +1295,9 @@ input[type=number] {
   }
 }
 
+/* Global Utilities */
+.hidden {
+  display: none !important;
+}
+
+

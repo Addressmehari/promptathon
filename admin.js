@@ -11,8 +11,20 @@ import { initFirebaseFromEnv } from "./firebase-config.js";
 let db = null;
 let allTeams = [];
 let pendingDeleteId = null;
+let cachedAdminAuth = null;
+let isAuthenticated = false;
 
-// DOM Elements
+// DOM Elements - Authentication
+const adminLoginScreen = document.getElementById("admin-login-screen");
+const adminDashboardScreen = document.getElementById("admin-dashboard-screen");
+const adminLoginForm = document.getElementById("admin-login-form");
+const adminUsernameInput = document.getElementById("admin-username");
+const adminPasswordInput = document.getElementById("admin-password");
+const loginErrorBanner = document.getElementById("login-error-banner");
+const loginErrorText = document.getElementById("login-error-text");
+const adminLogoutBtn = document.getElementById("admin-logout-btn");
+
+// DOM Elements - Dashboard
 const statTotalTeams = document.getElementById("stat-total-teams");
 const statLatestTeam = document.getElementById("stat-latest-team");
 const statLatestTime = document.getElementById("stat-latest-time");
@@ -355,21 +367,115 @@ function setupRealtimeListener() {
   );
 }
 
-// Initialize Firebase from .env and then start realtime listener
-initFirebaseFromEnv()
-  .then(({ db: firestoreDb, config }) => {
-    db = firestoreDb;
-    console.log("Firebase initialized in Admin for project:", config.projectId);
+// ==========================================
+// Authentication & Session Logic
+// ==========================================
+function showLoginError(msg) {
+  loginErrorText.textContent = msg;
+  loginErrorBanner.classList.remove("hidden");
+}
+
+function clearLoginError() {
+  loginErrorBanner.classList.add("hidden");
+  loginErrorText.textContent = "";
+}
+
+function unlockDashboard() {
+  isAuthenticated = true;
+  adminLoginScreen.classList.add("hidden");
+  adminDashboardScreen.classList.remove("hidden");
+  clearLoginError();
+
+  if (db && !unsubscribe) {
     setupRealtimeListener();
+  }
+}
+
+function lockDashboard() {
+  isAuthenticated = false;
+  adminDashboardScreen.classList.add("hidden");
+  adminLoginScreen.classList.remove("hidden");
+
+  if (unsubscribe) {
+    unsubscribe();
+    unsubscribe = null;
+  }
+}
+
+function checkExistingSession() {
+  const isAuth = sessionStorage.getItem("promptathon_admin_auth") === "true";
+  if (isAuth) {
+    unlockDashboard();
+  } else {
+    lockDashboard();
+  }
+}
+
+// Handle Admin Login Submission
+adminLoginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  clearLoginError();
+
+  const enteredUser = adminUsernameInput.value.trim();
+  const enteredPass = adminPasswordInput.value;
+
+  if (!enteredUser || !enteredPass) {
+    showLoginError("Please enter both username/email and password.");
+    return;
+  }
+
+  if (!cachedAdminAuth) {
+    showLoginError("Configuration is still loading. Please try again.");
+    return;
+  }
+
+  const expectedEmail = (cachedAdminAuth.email || "").toLowerCase();
+  const expectedPassword = cachedAdminAuth.password || "";
+
+  // Accepts matching email, 'admin', or username portion of email
+  const userMatches =
+    enteredUser.toLowerCase() === expectedEmail ||
+    enteredUser.toLowerCase() === "admin" ||
+    (expectedEmail.includes("@") && enteredUser.toLowerCase() === expectedEmail.split("@")[0]);
+
+  const passMatches = enteredPass === expectedPassword;
+
+  if (userMatches && passMatches) {
+    sessionStorage.setItem("promptathon_admin_auth", "true");
+    unlockDashboard();
+    showToast("Welcome to Admin Dashboard!", "success");
+    adminLoginForm.reset();
+  } else {
+    showLoginError("Invalid username or password. Please try again.");
+    adminPasswordInput.value = "";
+    adminPasswordInput.focus();
+  }
+});
+
+adminUsernameInput.addEventListener("input", clearLoginError);
+adminPasswordInput.addEventListener("input", clearLoginError);
+
+// Handle Admin Logout
+adminLogoutBtn.addEventListener("click", () => {
+  sessionStorage.removeItem("promptathon_admin_auth");
+  lockDashboard();
+  showToast("Logged out successfully.", "success");
+  clearLoginError();
+  adminUsernameInput.focus();
+});
+
+// Initialize Firebase from env.js / .env
+initFirebaseFromEnv()
+  .then(({ db: firestoreDb, config, adminAuth }) => {
+    db = firestoreDb;
+    cachedAdminAuth = adminAuth;
+    console.log("Firebase initialized in Admin for project:", config.projectId);
+    
+    // Verify session
+    checkExistingSession();
   })
   .catch((err) => {
     console.error("Firebase initialization failed in Admin:", err);
-    showError(err.message || "Failed to initialize Firebase from .env configuration.");
-    teamsTbody.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align:center; padding: 32px; color: #fca5a5;">
-          ${escapeHtml(err.message || "Failed to load .env configuration.")}
-        </td>
-      </tr>
-    `;
+    showLoginError(err.message || "Failed to initialize Firebase from configuration.");
+    showError(err.message || "Failed to initialize Firebase from configuration.");
   });

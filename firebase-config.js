@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 /**
- * Parse .env format string into key-value pairs
+ * Parse .env format string into key-value pairs (fallback)
  * @param {string} text 
  * @returns {Record<string, string>}
  */
@@ -22,26 +22,40 @@ function parseEnv(text) {
 }
 
 /**
- * Loads configuration from .env and initializes Firebase & Firestore
- * @returns {Promise<{ app: any, db: any, config: any }>}
+ * Loads configuration from env.js or .env and initializes Firebase & Firestore
+ * @returns {Promise<{ app: any, db: any, config: any, adminAuth: { email: string, password: string } }>}
  */
 export async function initFirebaseFromEnv() {
-  // If window.location.protocol is file:, warn user about local file restrictions
-  if (window.location.protocol === "file:") {
-    throw new Error(
-      "Browsers block loading .env via file:// URL. Please serve the project via a local web server (e.g. VS Code Live Server or 'npx serve')."
-    );
+  let env = null;
+
+  // 1. Primary method: Load from env.js (browser-friendly ES module, bypasses server dotfile restrictions)
+  try {
+    const envModule = await import("./env.js");
+    if (envModule && envModule.ENV) {
+      env = envModule.ENV;
+    }
+  } catch (err) {
+    // env.js not present or failed to load, proceed to fallback
   }
 
-  const response = await fetch(".env");
-  if (!response.ok) {
-    throw new Error(
-      `Unable to load .env file (HTTP ${response.status}). Ensure a valid .env file exists in the root directory.`
-    );
+  // 2. Fallback method: Fetch .env (works if server permits dotfile requests)
+  if (!env && window.location.protocol !== "file:") {
+    try {
+      const response = await fetch(".env");
+      if (response.ok) {
+        const envContent = await response.text();
+        env = parseEnv(envContent);
+      }
+    } catch (err) {
+      // fetch blocked or failed
+    }
   }
 
-  const envContent = await response.text();
-  const env = parseEnv(envContent);
+  if (!env) {
+    throw new Error(
+      "Configuration not found. Please ensure 'env.js' exists in your root folder (see env.example.js)."
+    );
+  }
 
   const firebaseConfig = {
     apiKey: env.FIREBASE_API_KEY,
@@ -53,14 +67,19 @@ export async function initFirebaseFromEnv() {
     measurementId: env.FIREBASE_MEASUREMENT_ID,
   };
 
+  const adminAuth = {
+    email: env.ADMIN_EMAIL || "",
+    password: env.ADMIN_PASSWORD || "",
+  };
+
   if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
     throw new Error(
-      "Invalid .env configuration: FIREBASE_API_KEY and FIREBASE_PROJECT_ID are required."
+      "Invalid configuration: FIREBASE_API_KEY and FIREBASE_PROJECT_ID are required in env.js."
     );
   }
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  return { app, db, config: firebaseConfig };
+  return { app, db, config: firebaseConfig, adminAuth };
 }

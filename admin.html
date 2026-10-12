@@ -20,7 +20,96 @@
   <div class="ambient-glow glow-2"></div>
   <div class="bg-grid-overlay"></div>
 
-  <div class="admin-wrapper">
+  <!-- Admin Authentication Gate -->
+  <main class="page-container" id="admin-login-screen">
+    <div class="card-wrapper" style="max-width: 440px; margin: 40px auto;">
+      <section class="registration-card">
+        <header class="card-header">
+          <div class="event-badge">
+            <span class="pulse-dot"></span>
+            <span>RESTRICTED ACCESS</span>
+          </div>
+          <h1 class="main-title">Admin Sign In</h1>
+          <p class="subtitle">Enter your admin credentials to access the Promptathon dashboard.</p>
+        </header>
+
+        <form id="admin-login-form" class="registration-form" novalidate>
+          <!-- Username / Email Field -->
+          <div class="form-group">
+            <label for="admin-username" class="field-label">
+              <span>Username or Email</span>
+              <span class="required-badge">*</span>
+            </label>
+            <div class="input-wrapper">
+              <svg class="input-icon svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <input 
+                type="text" 
+                id="admin-username" 
+                name="username" 
+                placeholder="e.g. admin or admin@promptathon.com" 
+                required 
+                autocomplete="username"
+              >
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="form-group">
+            <label for="admin-password" class="field-label">
+              <span>Password</span>
+              <span class="required-badge">*</span>
+            </label>
+            <div class="input-wrapper">
+              <svg class="input-icon svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <input 
+                type="password" 
+                id="admin-password" 
+                name="password" 
+                placeholder="Enter admin password" 
+                required 
+                autocomplete="current-password"
+              >
+            </div>
+          </div>
+
+          <!-- Error Alert Banner -->
+          <div id="login-error-banner" class="error-banner hidden" role="alert">
+            <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span id="login-error-text">Invalid username or password.</span>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="login-btn" class="submit-button">
+            <span class="btn-text">Authenticate & Enter</span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+
+          <!-- Back to Registration Link -->
+          <div style="text-align: center; margin-top: 14px;">
+            <a href="index.html" class="nav-link-btn" style="justify-content: center; width: 100%; text-decoration: none;">
+              &larr; Back to Registration Portal
+            </a>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <!-- Admin Main Dashboard (Protected) -->
+  <div class="admin-wrapper hidden" id="admin-dashboard-screen">
     <!-- Top Navigation -->
     <header class="admin-navbar">
       <div class="nav-brand">
@@ -31,6 +120,14 @@
         <h1 class="nav-title">Admin Dashboard</h1>
       </div>
       <div class="nav-actions">
+        <button id="admin-logout-btn" class="nav-link-btn" title="Sign out from Admin" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); cursor: pointer;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon" style="width: 14px; height: 14px;">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Log Out</span>
+        </button>
         <a href="index.html" class="nav-link-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon">
             <line x1="19" y1="12" x2="5" y2="12"></line>

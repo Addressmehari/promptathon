@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Promptathon 2026</title>
+  <meta name="description" content="Admin dashboard to view and manage all registered teams for Promptathon.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-body">
+  <!-- Ambient background glow -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="bg-grid-overlay"></div>
+
+  <div class="admin-wrapper">
+    <!-- Top Navigation -->
+    <header class="admin-navbar">
+      <div class="nav-brand">
+        <div class="event-badge">
+          <span class="pulse-dot"></span>
+          <span>PROMPTATHON 2026</span>
+        </div>
+        <h1 class="nav-title">Admin Dashboard</h1>
+      </div>
+      <div class="nav-actions">
+        <a href="index.html" class="nav-link-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-icon">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Registration Page</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Metrics Overview -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">TOTAL REGISTERED TEAMS</span>
+          <div class="stat-icon-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="stat-value" id="stat-total-teams">0</div>
+        <span class="stat-subtext">Live synchronized from Firestore</span>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">LATEST REGISTRATION</span>
+          <div class="stat-icon-box accent">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="stat-value text-truncate" id="stat-latest-team">None yet</div>
+        <span class="stat-subtext" id="stat-latest-time">Waiting for first submission</span>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">DATABASE SYNC</span>
+          <div class="stat-icon-box success">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+        </div>
+        <div class="stat-value sync-status" id="stat-sync-status">
+          <span class="pulse-dot"></span> Live
+        </div>
+        <span class="stat-subtext">Collection: <code>registrations</code></span>
+      </div>
+    </section>
+
+    <!-- Controls Toolbar (Search, Filter, Export) -->
+    <section class="admin-toolbar">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="Search by team number or team name..." 
+          autocomplete="off"
+        >
+        <button id="clear-search-btn" class="clear-search hidden" title="Clear search">&times;</button>
+      </div>
+
+      <div class="toolbar-actions">
+        <div class="select-wrapper">
+          <select id="sort-select" title="Sort teams">
+            <option value="num-asc">Team Number (Lowest first)</option>
+            <option value="num-desc">Team Number (Highest first)</option>
+            <option value="time-desc">Recently Registered</option>
+            <option value="name-asc">Team Name (A - Z)</option>
+          </select>
+        </div>
+
+        <button id="export-csv-btn" class="action-btn" title="Download spreadsheet of registered teams">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Export CSV</span>
+        </button>
+
+        <button id="refresh-btn" class="action-btn icon-only" title="Force Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Main Table Container -->
+    <section class="table-container-card">
+      <div class="table-header-info">
+        <h2 class="section-heading">Registered Teams List</h2>
+        <span class="showing-count" id="showing-count">Loading teams...</span>
+      </div>
+
+      <!-- State: Error Notice -->
+      <div id="admin-error-box" class="error-banner hidden" role="alert">
+        <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="admin-error-text">Failed to fetch registrations.</span>
+      </div>
+
+      <!-- Table Structure -->
+      <div class="table-responsive">
+        <table class="teams-table" id="teams-table">
+          <thead>
+            <tr>
+              <th class="col-num">Team #</th>
+              <th class="col-name">Team Name</th>
+              <th class="col-time">Registration Time</th>
+              <th class="col-id">Doc ID</th>
+              <th class="col-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="teams-tbody">
+            <!-- Loading placeholder rows -->
+            <tr class="placeholder-row">
+              <td colspan="5">
+                <div class="table-loader">
+                  <div class="btn-loader"></div>
+                  <span>Connecting to Firestore database...</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-icon-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <h3>No teams found</h3>
+        <p id="empty-state-desc">Teams registered via the registration portal will appear here in real-time.</p>
+        <a href="index.html" class="secondary-button empty-action">Go to Registration Page</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal-backdrop hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-icon-warning">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <h3>Delete Team Registration?</h3>
+      </div>
+      <p class="modal-body">
+        Are you sure you want to remove <strong id="delete-target-name">this team</strong> from the event records? This action cannot be undone.
+      </p>
+      <div class="modal-footer">
+        <button id="cancel-delete-btn" class="secondary-button">Cancel</button>
+        <button id="confirm-delete-btn" class="danger-button">Delete Team</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Admin logic with Firebase -->
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

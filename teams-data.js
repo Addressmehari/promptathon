@@ -1,0 +1,339 @@
+// Official Promptathon 2026 Pre-registered Roster
+export const PRE_REGISTERED_TEAMS = [
+  {
+    "originalId": "TEAM-004",
+    "teamId": "PRMT-004-DOOM",
+    "teamName": "TEAM DOOM",
+    "leaderName": "KALIDOSS",
+    "participants": "NITHISH. P, MUTHU. M",
+    "password": "2951"
+  },
+  {
+    "originalId": "TEAM-005",
+    "teamId": "PRMT-005-AIQUEENS",
+    "teamName": "AI queens",
+    "leaderName": "Nithya shree",
+    "participants": "Jethisha, Vignesh",
+    "password": "6234"
+  },
+  {
+    "originalId": "TEAM-006",
+    "teamId": "PRMT-006-NINJAS",
+    "teamName": "Neural Ninjas",
+    "leaderName": "Jayasri.S",
+    "participants": "Nikitha. K, Indhu. N",
+    "password": "9233"
+  },
+  {
+    "originalId": "TEAM-007",
+    "teamId": "PRMT-007-CRACKERS",
+    "teamName": "Code Crackers",
+    "leaderName": "Monish kumar .V",
+    "participants": "Lashvein.M, Kishanthan.K",
+    "password": "9385"
+  },
+  {
+    "originalId": "TEAM-008",
+    "teamId": "PRMT-008-DD",
+    "teamName": "DD",
+    "leaderName": "T DHANALAKSHMI",
+    "participants": "A DEEPTI",
+    "password": "2681"
+  },
+  {
+    "originalId": "TEAM-009",
+    "teamId": "PRMT-009-ARAZZ",
+    "teamName": "ARAZZ",
+    "leaderName": "Bala Vignesh",
+    "participants": "Abishek, Yogesh",
+    "password": "4658"
+  },
+  {
+    "originalId": "TEAM-010",
+    "teamId": "PRMT-010-SIRASH",
+    "teamName": "Sirash",
+    "leaderName": "SINDHUJA S",
+    "participants": "RASHMITHA K",
+    "password": "7891"
+  },
+  {
+    "originalId": "TEAM-011",
+    "teamId": "PRMT-011-PROMPTCRAF",
+    "teamName": "Promptcraft",
+    "leaderName": "Devapriya.R",
+    "participants": "Gokul S, A.E.Elstin Marvin",
+    "password": "9975"
+  },
+  {
+    "originalId": "TEAM-012",
+    "teamId": "PRMT-012-SHARP",
+    "teamName": "Team Sharp",
+    "leaderName": "Naveen kumar",
+    "participants": "Raihaan, Nithish",
+    "password": "9042"
+  },
+  {
+    "originalId": "TEAM-013",
+    "teamId": "PRMT-013-HONEYBEES",
+    "teamName": "HONEY BEES",
+    "leaderName": "TAMIL KUMAR.VK",
+    "participants": "MUTHU KANNAN .K, VENKAT RAMAN.S",
+    "password": "8226"
+  },
+  {
+    "originalId": "TEAM-014",
+    "teamId": "PRMT-014-RGB",
+    "teamName": "RGB",
+    "leaderName": "RUSAHIL RAJESH",
+    "participants": "Bavith yathra",
+    "password": "4931"
+  },
+  {
+    "originalId": "TEAM-016",
+    "teamId": "PRMT-016-Z",
+    "teamName": "Team Z",
+    "leaderName": "NIRMALYA PS",
+    "participants": "PRIYANKA K, PUNITHA S",
+    "password": "1041"
+  },
+  {
+    "originalId": "TEAM-017",
+    "teamId": "PRMT-017-TROUBLE",
+    "teamName": "Triple trouble",
+    "leaderName": "Yazhini M",
+    "participants": "Dhakshatha L, Hashini S",
+    "password": "2322"
+  },
+  {
+    "originalId": "TEAM-018",
+    "teamId": "PRMT-018-SQUARE",
+    "teamName": "Sharu square",
+    "leaderName": "Charulatha S",
+    "participants": "Rakshitha Sharubala R",
+    "password": "2814"
+  },
+  {
+    "originalId": "TEAM-019",
+    "teamId": "PRMT-019-LUNA",
+    "teamName": "Luna",
+    "leaderName": "Shivani S K",
+    "participants": "Jaya Ranjani  K",
+    "password": "5706"
+  },
+  {
+    "originalId": "TEAM-020",
+    "teamId": "PRMT-020-TRIOTITANS",
+    "teamName": "Trio titans",
+    "leaderName": "Hakkim Sikkandhar S",
+    "participants": "Jagathratchan R.M, Abhinav sabaris",
+    "password": "2606"
+  },
+  {
+    "originalId": "TEAM-021",
+    "teamId": "PRMT-021-KALAMITY",
+    "teamName": "KALAMITY",
+    "leaderName": "M G KAMALI",
+    "participants": "DEVA PRADHANYA R, G B GOUTHAM KRISHNA",
+    "password": "8367"
+  },
+  {
+    "originalId": "TEAM-022",
+    "teamId": "PRMT-022-TECHBOYS",
+    "teamName": "TECH BOYS",
+    "leaderName": "Gautam ganesh mr",
+    "participants": "Guruprasath m, Daniel joshua j",
+    "password": "1188"
+  },
+  {
+    "originalId": "TEAM-023",
+    "teamId": "PRMT-023-ASTRAX",
+    "teamName": "AstraX",
+    "leaderName": "Kaviya.P",
+    "participants": "Aswitha.S",
+    "password": "9032"
+  },
+  {
+    "originalId": "TEAM-024",
+    "teamId": "PRMT-024-PROMPTOPIA",
+    "teamName": "Promptopia",
+    "leaderName": "Ponmagal",
+    "participants": "Nithiya jothi RD, JAI SHREE S",
+    "password": "6148"
+  },
+  {
+    "originalId": "TEAM-025",
+    "teamId": "PRMT-025-MATHAPU",
+    "teamName": "Kambi mathapu",
+    "leaderName": "KAVINKUMAR V",
+    "participants": "Sarfaraz Ahmed K, Rakesh S",
+    "password": "4444"
+  },
+  {
+    "originalId": "TEAM-026",
+    "teamId": "PRMT-026-AURA17",
+    "teamName": "Aura17",
+    "leaderName": "Prakatheesha.K.R",
+    "participants": "Vetrivel Vinoth.V",
+    "password": "7508"
+  },
+  {
+    "originalId": "TEAM-027",
+    "teamId": "PRMT-027-KD",
+    "teamName": "KD",
+    "leaderName": "Dharshika.A",
+    "participants": "Kanishga.G",
+    "password": "5120"
+  },
+  {
+    "originalId": "TEAM-028",
+    "teamId": "PRMT-028-307",
+    "teamName": "Team 307",
+    "leaderName": "SAVARI ANISH.A",
+    "participants": "MOHAMMAD NAYEEM.K, MOHAMMAD ASHRAF.M",
+    "password": "6696"
+  },
+  {
+    "originalId": "TEAM-029",
+    "teamId": "PRMT-029-PROMT",
+    "teamName": "Team promt",
+    "leaderName": "Allwin hasinth",
+    "participants": "Dharun k, MOHAMED FAWAZ S",
+    "password": "6843"
+  },
+  {
+    "originalId": "TEAM-030",
+    "teamId": "PRMT-030-SLAYERS",
+    "teamName": "PROMPT SLAYERS",
+    "leaderName": "Ansar ali",
+    "participants": "Ashik hussain, ARUL SURIYAN",
+    "password": "7166"
+  },
+  {
+    "originalId": "TEAM-031",
+    "teamId": "PRMT-031-NEOPULSE",
+    "teamName": "Neo Pulse",
+    "leaderName": "RAMANA GOKULAN N.M",
+    "participants": "Sowndhar rajan s, Mohammad azarudeen .k",
+    "password": "9414"
+  },
+  {
+    "originalId": "TEAM-032",
+    "teamId": "PRMT-032-NEURALNOVA",
+    "teamName": "Neural nova",
+    "leaderName": "Sri Sabarish D",
+    "participants": "Meiyappan S, Mohan Babu S",
+    "password": "2250"
+  },
+  {
+    "originalId": "TEAM-033",
+    "teamId": "PRMT-033-SPARK",
+    "teamName": "Spark",
+    "leaderName": "Kabeer Hijaz",
+    "participants": "Kamalesh kannan KM, Kishore E",
+    "password": "6577"
+  },
+  {
+    "originalId": "TEAM-034",
+    "teamId": "PRMT-034-NEURALTRIO",
+    "teamName": "NEURAL TRIO",
+    "leaderName": "R.DHANISKA DEVI",
+    "participants": "M A BHARATHI SRI, M.KEERTHANA",
+    "password": "2469"
+  },
+  {
+    "originalId": "TEAM-035",
+    "teamId": "PRMT-035-PERU",
+    "teamName": "ADANGAPPA MOONU PERU",
+    "leaderName": "ASWIN S",
+    "participants": "Gunal D, GURU MOORTHY D",
+    "password": "9815"
+  },
+  {
+    "originalId": "TEAM-037",
+    "teamId": "PRMT-037-TIMEPASS",
+    "teamName": "Time pass",
+    "leaderName": "Kavisanthos R",
+    "participants": "Kailash P, Dinesh S",
+    "password": "5786"
+  },
+  {
+    "originalId": "TEAM-038",
+    "teamId": "PRMT-038-TRIVEXA",
+    "teamName": "Trivexa",
+    "leaderName": "Mahavidyasree.K",
+    "participants": "Rudhrasree, Nivarthani",
+    "password": "5712"
+  },
+  {
+    "originalId": "TEAM-039",
+    "teamId": "PRMT-039-BLAST",
+    "teamName": "Team Blast",
+    "leaderName": "Arsha vidhya Meenatchi",
+    "participants": "Joshna",
+    "password": "8494"
+  },
+  {
+    "originalId": "TEAM-040",
+    "teamId": "PRMT-040-IMAGYNX",
+    "teamName": "IMAGYNX",
+    "leaderName": "Harsha priyan A",
+    "participants": "Azghar ali J, Bharathraj S",
+    "password": "3308"
+  },
+  {
+    "originalId": "TEAM-041",
+    "teamId": "PRMT-041-SQUAD",
+    "teamName": "SYNTAX SQUAD",
+    "leaderName": "P R LALITH CHANDRA",
+    "participants": "SIDDAVATAM SANTHOSH, YEDDULA VISHNU DEVA ROYAL",
+    "password": "6062"
+  },
+  {
+    "originalId": "TEAM-043",
+    "teamId": "PRMT-043-MINDS",
+    "teamName": "LATENT MINDS",
+    "leaderName": "KEERTHANA V",
+    "participants": "GOKULA VARSHINI M",
+    "password": "1405"
+  },
+  {
+    "originalId": "TEAM-044",
+    "teamId": "PRMT-044-GREENFLAG",
+    "teamName": "Green flag",
+    "leaderName": "Dhanush",
+    "participants": "Akilen, Farhan",
+    "password": "7043"
+  },
+  {
+    "originalId": "TEAM-045",
+    "teamId": "PRMT-045-67",
+    "teamName": "TEAM 67",
+    "leaderName": "K Thilak",
+    "participants": "R Bavatharani",
+    "password": "6956"
+  },
+  {
+    "originalId": "TEAM-046",
+    "teamId": "PRMT-046-PENGAL",
+    "teamName": "Queen pengal",
+    "leaderName": "Dharshini.s",
+    "participants": "Jamal Haseena Fathima.S .k",
+    "password": "8554"
+  },
+  {
+    "originalId": "TEAM-047",
+    "teamId": "PRMT-047-TERRA",
+    "teamName": "TERRA",
+    "leaderName": "Kaviya p",
+    "participants": "Neshika sri v",
+    "password": "7917"
+  },
+  {
+    "originalId": "TEAM-049",
+    "teamId": "PRMT-049-COSMIC",
+    "teamName": "COSMIC",
+    "leaderName": "ASIKA M",
+    "participants": "BHAVADHARANI T",
+    "password": "2485"
+  }
+];

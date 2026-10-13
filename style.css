@@ -5,40 +5,41 @@
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Space Grotesk', monospace;
 
-  /* Color Palette */
-  --bg-dark: #0a0c16;
-  --bg-card: rgba(18, 22, 38, 0.75);
-  --bg-card-border: rgba(255, 255, 255, 0.12);
-  --bg-card-hover: rgba(255, 255, 255, 0.18);
+  /* Color Palette - Minimal Pastel Sage (Zero Gradients) */
+  --bg-dark: #0e1215;
+  --bg-card: rgba(18, 23, 28, 0.96);
+  --bg-card-border: rgba(255, 255, 255, 0.08);
+  --bg-card-hover: rgba(255, 255, 255, 0.12);
   
-  --primary-accent: #6366f1;
-  --primary-accent-light: #818cf8;
-  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-  --primary-glow: rgba(99, 102, 241, 0.35);
+  --primary-accent: #86efac;
+  --primary-accent-light: #bbf7d0;
+  --primary-accent-contrast: #062b18;
+  --primary-gradient: #86efac;
+  --primary-glow: rgba(134, 239, 172, 0.15);
 
-  --text-main: #f8fafc;
+  --text-main: #f1f5f9;
   --text-muted: #94a3b8;
   --text-subtle: #64748b;
 
-  --input-bg: rgba(15, 23, 42, 0.6);
-  --input-border: rgba(148, 163, 184, 0.2);
-  --input-focus-border: #818cf8;
-  --input-focus-glow: rgba(129, 140, 248, 0.25);
+  --input-bg: rgba(12, 16, 20, 0.9);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-focus-border: #86efac;
+  --input-focus-glow: rgba(134, 239, 172, 0.2);
 
-  --error-bg: rgba(239, 68, 68, 0.15);
-  --error-border: rgba(239, 68, 68, 0.4);
+  --error-bg: rgba(254, 202, 202, 0.08);
+  --error-border: rgba(248, 113, 113, 0.25);
   --error-text: #fca5a5;
 
-  --success-color: #10b981;
-  --success-glow: rgba(16, 185, 129, 0.3);
+  --success-color: #86efac;
+  --success-glow: rgba(134, 239, 172, 0.2);
 
-  --radius-lg: 24px;
-  --radius-md: 14px;
-  --radius-sm: 8px;
-  --radius-full: 9999px;
+  --radius-lg: 4px;
+  --radius-md: 3px;
+  --radius-sm: 2px;
+  --radius-full: 4px;
 
-  --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(99, 102, 241, 0.12);
-  --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-card: 0 16px 36px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  --transition-smooth: all 0.2s ease;
 }
 
 /* ==========================================================================
@@ -66,54 +67,43 @@ body {
 }
 
 /* Background Atmosphere */
+/* Background Atmosphere (Ultra-minimal) */
 .ambient-glow {
   position: fixed;
   border-radius: 50%;
-  filter: blur(120px);
+  filter: blur(140px);
   z-index: 0;
   pointer-events: none;
-  opacity: 0.5;
-  animation: pulseAmbient 10s ease-in-out infinite alternate;
+  opacity: 0.12;
 }
 
 .glow-1 {
-  width: 500px;
-  height: 500px;
-  top: -100px;
-  left: -100px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.35), transparent 70%);
+  width: 450px;
+  height: 450px;
+  top: -80px;
+  left: -80px;
+  background: radial-gradient(circle, rgba(134, 239, 172, 0.08), transparent 70%);
 }
 
 .glow-2 {
-  width: 600px;
-  height: 600px;
-  bottom: -150px;
-  right: -150px;
-  background: radial-gradient(circle, rgba(236, 72, 153, 0.25), transparent 70%);
-  animation-delay: -5s;
+  width: 500px;
+  height: 500px;
+  bottom: -100px;
+  right: -100px;
+  background: radial-gradient(circle, rgba(134, 239, 172, 0.05), transparent 70%);
 }
 
 .glow-3 {
-  width: 350px;
-  height: 350px;
-  top: 40%;
-  left: 60%;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent 70%);
-}
-
-@keyframes pulseAmbient {
-  0% { transform: scale(1) translate(0, 0); opacity: 0.4; }
-  50% { transform: scale(1.1) translate(20px, -20px); opacity: 0.6; }
-  100% { transform: scale(0.95) translate(-10px, 15px); opacity: 0.45; }
+  display: none;
 }
 
 .bg-grid-overlay {
   position: fixed;
   inset: 0;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
   z-index: 0;
   pointer-events: none;
 }
@@ -123,93 +113,82 @@ body {
    ========================================================================== */
 .page-container {
   width: 100%;
-  max-width: 520px;
+  max-width: 440px;
   position: relative;
   z-index: 1;
 }
 
 .card-wrapper {
-  perspective: 1000px;
+  width: 100%;
 }
 
 /* ==========================================================================
-   Glassmorphic Card Styles
+   Ultra-Minimal Card Styles
    ========================================================================== */
 .registration-card,
 .success-card {
-  background: var(--bg-card);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--bg-card-border);
+  background: rgba(13, 16, 26, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: var(--radius-lg);
-  padding: 40px 36px;
-  box-shadow: var(--shadow-card);
+  padding: 32px 28px;
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.6);
   transition: var(--transition-smooth);
-  animation: cardFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: cardFadeIn 0.3s ease-out forwards;
 }
 
 @keyframes cardFadeIn {
   from {
     opacity: 0;
-    transform: translateY(24px) scale(0.98);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
 /* Header */
 .card-header {
-  text-align: center;
-  margin-bottom: 32px;
+  text-align: left;
+  margin-bottom: 24px;
 }
 
 .event-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(129, 140, 248, 0.35);
-  border-radius: var(--radius-full);
-  font-size: 0.75rem;
+  gap: 6px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--primary-accent-light);
-  margin-bottom: 16px;
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+  color: #94a3b8;
+  margin-bottom: 12px;
 }
 
 .pulse-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background: #22c55e;
   border-radius: 50%;
-  box-shadow: 0 0 8px #22c55e;
-  animation: dotBlink 1.8s infinite;
-}
-
-@keyframes dotBlink {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
 }
 
 .main-title {
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: #ffffff;
+  margin-bottom: 6px;
 }
 
 .subtitle {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  line-height: 1.5;
+  color: var(--text-subtle);
+  font-size: 0.84rem;
+  line-height: 1.45;
 }
 
 /* ==========================================================================
@@ -267,29 +246,29 @@ body {
 
 .input-wrapper input {
   width: 100%;
-  padding: 14px 16px 14px 44px;
-  background: var(--input-bg);
-  border: 1px solid var(--input-border);
+  padding: 11px 14px 11px 40px;
+  background: rgba(10, 13, 22, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md);
   color: var(--text-main);
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: 0.92rem;
   outline: none;
   transition: var(--transition-smooth);
 }
 
 .input-wrapper input::placeholder {
-  color: rgba(148, 163, 184, 0.45);
+  color: rgba(148, 163, 184, 0.35);
 }
 
 .input-wrapper input:hover {
-  border-color: rgba(148, 163, 184, 0.4);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .input-wrapper input:focus {
-  border-color: var(--input-focus-border);
-  box-shadow: 0 0 0 4px var(--input-focus-glow);
-  background: rgba(15, 23, 42, 0.85);
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 1px var(--primary-accent);
+  background: rgba(16, 22, 28, 0.95);
 }
 
 /* Remove number arrows */
@@ -303,7 +282,7 @@ input[type=number] {
 }
 
 .field-helper {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--text-subtle);
 }
 
@@ -313,66 +292,62 @@ input[type=number] {
 .error-banner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: var(--error-bg);
-  border: 1px solid var(--error-border);
-  border-radius: var(--radius-md);
-  color: var(--error-text);
-  font-size: 0.88rem;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-sm);
+  color: #fca5a5;
+  font-size: 0.82rem;
   animation: shake 0.35s ease;
 }
 
 .alert-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
 }
 
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 
 /* ==========================================================================
-   Submit Button
+   Submit Button (Solid Pastel Sage - No Gradients)
    ========================================================================== */
 .submit-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  padding: 16px 24px;
-  background: var(--primary-gradient);
-  background-size: 200% 200%;
-  border: none;
+  padding: 12px 18px;
+  background: var(--primary-accent);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-md);
-  color: #ffffff;
+  color: var(--primary-accent-contrast);
   font-family: var(--font-sans);
-  font-size: 1.05rem;
+  font-size: 0.92rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 10px 25px -5px var(--primary-glow);
+  box-shadow: none;
   transition: var(--transition-smooth);
   position: relative;
-  overflow: hidden;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .submit-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 32px -4px rgba(99, 102, 241, 0.5);
-  background-position: right center;
+  background: var(--primary-accent-light);
 }
 
 .submit-button:active:not(:disabled) {
-  transform: translateY(0);
+  background: #6ee7b7;
 }
 
 .submit-button:disabled {
-  opacity: 0.7;
+  opacity: 0.5;
   cursor: not-allowed;
   filter: grayscale(0.2);
 }
@@ -465,12 +440,12 @@ input[type=number] {
 
 /* Pass Ticket Styling */
 .pass-ticket {
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(18, 23, 28, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md);
   padding: 24px;
   text-align: left;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 12px 24px -8px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.5);
   position: relative;
   overflow: hidden;
   margin-bottom: 24px;
@@ -482,8 +457,8 @@ input[type=number] {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: var(--primary-gradient);
+  height: 3px;
+  background: var(--primary-accent);
 }
 
 .ticket-header {
@@ -1271,9 +1246,9 @@ input[type=number] {
 }
 
 .top-admin-link:hover {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: var(--primary-accent-light);
-  color: #ffffff;
+  background: rgba(134, 239, 172, 0.08);
+  border-color: var(--primary-accent);
+  color: var(--primary-accent);
 }
 
 @media (max-width: 640px) {
@@ -1299,5 +1274,246 @@ input[type=number] {
 .hidden {
   display: none !important;
 }
+
+/* ==========================================================================
+   Password Toggle Button
+   ========================================================================== */
+.password-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-smooth);
+}
+
+.password-toggle-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================================================
+   Team Workspace Dashboard Layout
+   ========================================================================== */
+.workspace-wrapper {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.workspace-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  padding: 20px 28px;
+  background: rgba(18, 22, 38, 0.85);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.team-identity-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.workspace-team-title {
+  font-family: var(--font-sans);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--radius-full);
+  color: #fca5a5;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   Pass Ticket Refinements for Workspace
+   ========================================================================== */
+.pass-card-panel .pass-ticket {
+  width: 100%;
+}
+
+.ticket-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 12px 0;
+}
+
+.ticket-col.full-width {
+  width: 100%;
+}
+
+.leader-value {
+  color: var(--primary-accent) !important;
+  font-weight: 700;
+}
+
+.participants-value {
+  font-size: 0.85rem !important;
+  color: var(--text-main);
+  line-height: 1.4;
+  white-space: normal !important;
+}
+
+.status-verified {
+  background: rgba(134, 239, 172, 0.12) !important;
+  color: #86efac !important;
+  border: 1px solid rgba(134, 239, 172, 0.3) !important;
+}
+
+/* ==========================================================================
+   Challenge Card & Submission Station
+   ========================================================================== */
+.challenge-card {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-card);
+}
+
+.challenge-header {
+  margin-bottom: 24px;
+}
+
+.challenge-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.challenge-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  background: rgba(134, 239, 172, 0.08);
+  border: 1px solid rgba(134, 239, 172, 0.25);
+  color: #86efac;
+  border-radius: var(--radius-full);
+}
+
+.round-indicator {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  background: rgba(147, 197, 253, 0.08);
+  border: 1px solid rgba(147, 197, 253, 0.25);
+  color: #93c5fd;
+  border-radius: var(--radius-full);
+}
+
+.challenge-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 6px;
+}
+
+.challenge-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.challenge-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.textarea-wrapper textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  resize: vertical;
+  padding: 12px 14px;
+}
+
+.receipt-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: var(--radius-md);
+  color: #a7f3d0;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.receipt-icon {
+  width: 20px;
+  height: 20px;
+  color: #34d399;
+  flex-shrink: 0;
+}
+
+.receipt-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.receipt-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.receipt-time {
+  font-size: 0.75rem;
+  color: #6ee7b7;
+}
+
 
 

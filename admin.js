@@ -171,20 +171,26 @@ function renderTable() {
     tdNum.className = "col-num";
     tdNum.innerHTML = `<span class="team-badge">#${escapeHtml(String(team.teamNumber))}</span>`;
 
-    // Team Name Column
+    // Team Name & Leader Column
     const tdName = document.createElement("td");
     tdName.className = "col-name";
-    tdName.innerHTML = `<span class="team-name-cell">${escapeHtml(team.teamName)}</span>`;
+    const leaderHtml = team.leaderName ? `<div style="font-size: 0.75rem; color: #86efac; margin-top: 3px;">Leader: ${escapeHtml(team.leaderName)}</div>` : '';
+    tdName.innerHTML = `<span class="team-name-cell">${escapeHtml(team.teamName)}</span>${leaderHtml}`;
+
+    // Team ID Column
+    const tdId = document.createElement("td");
+    tdId.className = "col-id";
+    tdId.innerHTML = `<code class="doc-code" style="font-weight: 700; color: #86efac;">${escapeHtml(team.teamId || team.id)}</code>`;
+
+    // Access PIN Column
+    const tdPin = document.createElement("td");
+    tdPin.className = "col-pin";
+    tdPin.innerHTML = team.password ? `<span style="display:inline-block; padding: 2px 8px; background: rgba(134, 239, 172, 0.1); border: 1px solid rgba(134, 239, 172, 0.25); border-radius: 3px; font-family: var(--font-mono); font-weight: 700; color: #86efac;">${escapeHtml(team.password)}</span>` : '<span style="color:#64748b;">-</span>';
 
     // Registration Time Column
     const tdTime = document.createElement("td");
     tdTime.className = "col-time";
     tdTime.textContent = formatTimestamp(team);
-
-    // Document ID Column
-    const tdId = document.createElement("td");
-    tdId.className = "col-id";
-    tdId.innerHTML = `<code class="doc-code">${escapeHtml(team.id.slice(0, 10))}...</code>`;
 
     // Actions Column
     const tdActions = document.createElement("td");
@@ -205,8 +211,9 @@ function renderTable() {
 
     tr.appendChild(tdNum);
     tr.appendChild(tdName);
-    tr.appendChild(tdTime);
     tr.appendChild(tdId);
+    tr.appendChild(tdPin);
+    tr.appendChild(tdTime);
     tr.appendChild(tdActions);
 
     fragment.appendChild(tr);
@@ -276,15 +283,19 @@ exportCsvBtn.addEventListener("click", () => {
   }
 
   const csvRows = [
-    ["Team Number", "Team Name", "Registration Time", "Document ID"]
+    ["Team Number", "Creative Team ID", "Original ID", "Team Name", "Team Leader", "Participants", "Access PIN", "Registration Time"]
   ];
 
   allTeams.forEach(t => {
     csvRows.push([
-      `"${t.teamNumber}"`,
+      `"${t.teamNumber || ""}"`,
+      `"${t.teamId || t.id}"`,
+      `"${t.originalId || ""}"`,
       `"${(t.teamName || "").replace(/"/g, '""')}"`,
-      `"${formatTimestamp(t)}"`,
-      `"${t.id}"`
+      `"${(t.leaderName || "").replace(/"/g, '""')}"`,
+      `"${(t.participants || "").replace(/"/g, '""')}"`,
+      `"${t.password || ""}"`,
+      `"${formatTimestamp(t)}"`
     ]);
   });
 

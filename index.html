@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>College Event Registration | Promptathon</title>
-  <meta name="description" content="Register your team for Promptathon college event with Team Number and Team Name.">
+  <title>Team Login | Promptathon 2026</title>
+  <meta name="description" content="Exclusive login portal for pre-registered teams of Promptathon 2026.">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,85 +34,83 @@
   </a>
 
   <main class="page-container">
-    <div class="card-wrapper">
-      <!-- Registration Card -->
-      <section class="registration-card" id="registration-card">
+    <!-- ========================================== -->
+    <!-- 1. TEAM LOGIN SCREEN (Strict Auth Only)    -->
+    <!-- ========================================== -->
+    <div class="card-wrapper" id="login-container">
+      <section class="registration-card" id="login-card">
         <header class="card-header">
           <div class="event-badge">
             <span class="pulse-dot"></span>
             <span>PROMPTATHON 2026</span>
           </div>
-          <h1 class="main-title">Team Registration</h1>
-          <p class="subtitle">Enter your team details below to confirm your spot in the competition.</p>
+          <h1 class="main-title">Team Sign In</h1>
+          <p class="subtitle">Enter your assigned Team ID and 4-digit PIN.</p>
         </header>
 
-        <form id="registration-form" class="registration-form" novalidate>
-          <!-- Team Number Field -->
+        <form id="team-login-form" class="registration-form" novalidate>
+          <!-- Team ID Field -->
           <div class="form-group">
-            <label for="team-number" class="field-label">
-              <span>Team Number</span>
-              <span class="required-badge">*</span>
+            <label for="team-id-input" class="field-label">
+              <span>Team ID</span>
             </label>
             <div class="input-wrapper">
               <span class="input-icon">#</span>
               <input 
-                type="number" 
-                id="team-number" 
-                name="teamNumber" 
-                placeholder="e.g. 42" 
-                min="1" 
-                max="9999" 
+                type="text" 
+                id="team-id-input" 
+                name="teamId" 
+                placeholder="e.g. PRMT-004-DOOM or TEAM-004" 
                 required 
-                autocomplete="off"
+                autocomplete="username"
+                autocapitalize="characters"
               >
             </div>
-            <p class="field-helper" id="team-number-helper">Assigned unique team identifier</p>
           </div>
 
-          <!-- Team Name Field -->
+          <!-- Password / PIN Field -->
           <div class="form-group">
-            <label for="team-name" class="field-label">
-              <span>Team Name</span>
-              <span class="required-badge">*</span>
+            <label for="team-password-input" class="field-label">
+              <span>Access PIN</span>
             </label>
             <div class="input-wrapper">
               <svg class="input-icon svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
               <input 
-                type="text" 
-                id="team-name" 
-                name="teamName" 
-                placeholder="e.g. Neural Ninjas" 
-                maxlength="50" 
+                type="password" 
+                id="team-password-input" 
+                name="password" 
+                placeholder="4-digit PIN (e.g. 2951)" 
+                maxlength="10" 
                 required 
-                autocomplete="off"
+                autocomplete="current-password"
+                inputmode="numeric"
               >
+              <button type="button" id="toggle-pin-btn" class="password-toggle-btn" title="Show/Hide PIN" aria-label="Show or hide password">
+                <svg id="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
             </div>
-            <p class="field-helper" id="team-name-helper">Your official event squad name</p>
           </div>
 
-          <!-- Error Alert Container -->
-          <div id="form-error-banner" class="error-banner hidden" role="alert">
+          <!-- Error Alert Banner -->
+          <div id="login-error-banner" class="error-banner hidden" role="alert">
             <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="8" x2="12" y2="12"></line>
               <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
-            <span id="error-message-text">Please complete all fields correctly.</span>
+            <span id="login-error-text">Invalid credentials. Access is restricted to pre-registered teams.</span>
           </div>
 
           <!-- Submit Button -->
-          <button type="submit" id="submit-btn" class="submit-button">
-            <span class="btn-text">Register Team</span>
-            <span class="btn-loader hidden" id="btn-loader"></span>
-            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
+          <button type="submit" id="login-submit-btn" class="submit-button">
+            <span class="btn-text">Sign In &rarr;</span>
+            <span class="btn-loader hidden" id="login-btn-loader"></span>
           </button>
         </form>
 
@@ -122,59 +120,181 @@
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
             </svg>
-            <span>Connected to Firebase Firestore</span>
+            <span>Pre-Registered Teams Only • 42 Teams</span>
           </div>
         </footer>
       </section>
+    </div>
 
-      <!-- Success Confirmation Pass / Ticket (shown after registration) -->
-      <section class="success-card hidden" id="success-card" aria-live="polite">
-        <div class="success-header">
-          <div class="checkmark-circle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-              <polyline points="20 6 9 17 4 12"></polyline>
+    <!-- ========================================== -->
+    <!-- 2. TEAM WORKSPACE SCREEN (Protected)       -->
+    <!-- ========================================== -->
+    <div class="workspace-wrapper hidden" id="team-workspace">
+      <!-- Top Workspace Nav / Identity Header -->
+      <header class="workspace-header">
+        <div class="team-identity-cluster">
+          <div class="event-badge">
+            <span class="pulse-dot"></span>
+            <span id="workspace-team-badge">PRMT-004-DOOM</span>
+          </div>
+          <h1 class="workspace-team-title" id="workspace-team-name">TEAM DOOM</h1>
+        </div>
+
+        <div class="workspace-actions">
+          <button type="button" id="team-logout-btn" class="logout-btn" title="Sign out of team portal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg>
-          </div>
-          <h2>Registration Confirmed!</h2>
-          <p>Your team has been successfully registered for Promptathon.</p>
-        </div>
-
-        <div class="pass-ticket">
-          <div class="ticket-header">
-            <span class="ticket-badge">OFFICIAL EVENT PASS</span>
-            <span class="ticket-event">PROMPTATHON 2026</span>
-          </div>
-          <div class="ticket-body">
-            <div class="ticket-data-row">
-              <div class="ticket-col">
-                <span class="label">TEAM NUMBER</span>
-                <span class="value team-num-value" id="display-team-number">#--</span>
-              </div>
-              <div class="ticket-col">
-                <span class="label">TEAM NAME</span>
-                <span class="value team-name-value" id="display-team-name">--</span>
-              </div>
-            </div>
-            <div class="ticket-footer-row">
-              <span class="timestamp-label" id="display-timestamp">Registered on: Just now</span>
-              <span class="status-pill">Active</span>
-            </div>
-          </div>
-          <div class="ticket-barcode">
-            <div class="barcode-lines"></div>
-            <span class="barcode-text" id="display-doc-id">DOC: READY</span>
-          </div>
-        </div>
-
-        <div class="action-buttons">
-          <button type="button" id="register-another-btn" class="secondary-button">
-            Register Another Team
+            <span>Sign Out</span>
           </button>
-          <a href="admin.html" class="nav-link-btn" style="text-decoration:none;">
-            View All Teams (Admin)
-          </a>
         </div>
-      </section>
+      </header>
+
+      <!-- Workspace Content Grid -->
+      <div class="workspace-grid">
+        <!-- Left Column: Official Digital Team Pass -->
+        <section class="pass-card-panel">
+          <div class="pass-ticket">
+            <div class="ticket-header">
+              <span class="ticket-badge">OFFICIAL EVENT BADGE</span>
+              <span class="ticket-event">PROMPTATHON 2026</span>
+            </div>
+            <div class="ticket-body">
+              <div class="ticket-data-row">
+                <div class="ticket-col">
+                  <span class="label">TEAM ID</span>
+                  <span class="value team-num-value" id="pass-team-id">PRMT-004-DOOM</span>
+                </div>
+                <div class="ticket-col">
+                  <span class="label">ORIGINAL ID</span>
+                  <span class="value" id="pass-original-id">TEAM-004</span>
+                </div>
+              </div>
+
+              <div class="ticket-divider"></div>
+
+              <div class="ticket-data-row">
+                <div class="ticket-col full-width">
+                  <span class="label">TEAM LEADER</span>
+                  <span class="value leader-value" id="pass-leader-name">KALIDOSS</span>
+                </div>
+              </div>
+
+              <div class="ticket-data-row">
+                <div class="ticket-col full-width">
+                  <span class="label">PARTICIPANTS</span>
+                  <span class="value participants-value" id="pass-participants">NITHISH. P, MUTHU. M</span>
+                </div>
+              </div>
+
+              <div class="ticket-footer-row">
+                <span class="timestamp-label" id="pass-status-time">Roster: Verified in Database</span>
+                <span class="status-pill status-verified">✓ Active Team</span>
+              </div>
+            </div>
+            <div class="ticket-barcode">
+              <div class="barcode-lines"></div>
+              <span class="barcode-text" id="pass-barcode-text">AUTHENTICATED CONTESTANT</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Column: Challenge & Submission Hub -->
+        <section class="submission-panel">
+          <div class="challenge-card">
+            <div class="challenge-header">
+              <div class="challenge-title-row">
+                <span class="challenge-tag">ACTIVE CHALLENGE</span>
+                <span class="round-indicator">ROUND 1</span>
+              </div>
+              <h2 class="challenge-heading">Prompt Engineering Challenge</h2>
+              <p class="challenge-desc">
+                Craft and submit your system prompts, engineered techniques, and output artifacts below.
+              </p>
+            </div>
+
+            <!-- Submission Form -->
+            <form id="challenge-submission-form" class="challenge-form">
+              <!-- Solution Title -->
+              <div class="form-group">
+                <label for="sub-title" class="field-label">
+                  <span>Solution Title</span>
+                  <span class="required-badge">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <input 
+                    type="text" 
+                    id="sub-title" 
+                    placeholder="e.g. Multi-Turn Chain of Thought Optimizer" 
+                    required 
+                    autocomplete="off"
+                  >
+                </div>
+              </div>
+
+              <!-- Engineered Prompt Content -->
+              <div class="form-group">
+                <label for="sub-prompt" class="field-label">
+                  <span>Engineered Prompt / Strategy</span>
+                  <span class="required-badge">*</span>
+                </label>
+                <div class="input-wrapper textarea-wrapper">
+                  <textarea 
+                    id="sub-prompt" 
+                    rows="6" 
+                    placeholder="Paste your engineered prompt, persona instructions, few-shot examples, or system context here..." 
+                    required
+                  ></textarea>
+                </div>
+                <p class="field-helper">Include system instructions, constraints, and reasoning steps</p>
+              </div>
+
+              <!-- Output Link / Demo / GitHub -->
+              <div class="form-group">
+                <label for="sub-link" class="field-label">
+                  <span>Output URL / Artifact Link (Optional)</span>
+                </label>
+                <div class="input-wrapper">
+                  <svg class="input-icon svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                  <input 
+                    type="url" 
+                    id="sub-link" 
+                    placeholder="https://github.com/... or Google Drive / live demo link" 
+                    autocomplete="off"
+                  >
+                </div>
+              </div>
+
+              <!-- Submission Feedback / Receipt -->
+              <div id="submission-receipt" class="receipt-banner hidden">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="receipt-icon">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <div class="receipt-details">
+                  <span class="receipt-title">Solution Submitted to Judges!</span>
+                  <span class="receipt-time" id="receipt-timestamp">Submitted on: --</span>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" id="submit-challenge-btn" class="submit-button">
+                <span class="btn-text" id="challenge-btn-text">Submit Round 1 Solution</span>
+                <span class="btn-loader hidden" id="sub-loader"></span>
+                <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </form>
+          </div>
+        </section>
+      </div>
     </div>
   </main>
 

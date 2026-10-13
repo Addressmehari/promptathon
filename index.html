@@ -24,20 +24,11 @@
   <div class="ambient-glow glow-3"></div>
   <div class="bg-grid-overlay"></div>
 
-  <!-- Admin link shortcut -->
-  <a href="admin.html" class="top-admin-link" title="Open Admin Dashboard">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-      <circle cx="12" cy="7" r="4"></circle>
-    </svg>
-    <span>Admin Dashboard &rarr;</span>
-  </a>
-
   <main class="page-container">
     <!-- ========================================== -->
     <!-- 1. TEAM LOGIN SCREEN (Strict Auth Only)    -->
     <!-- ========================================== -->
-    <div class="card-wrapper" id="login-container">
+    <div class="login-wrapper" id="login-container">
       <section class="registration-card" id="login-card">
         <header class="card-header">
           <div class="event-badge">
@@ -128,174 +119,291 @@
 
     <!-- ========================================== -->
     <!-- 2. TEAM WORKSPACE SCREEN (Protected)       -->
+    <!-- Box A: Team Score | Box B: Progression Map | Box C: Big Challenge Ground -->
     <!-- ========================================== -->
     <div class="workspace-wrapper hidden" id="team-workspace">
-      <!-- Top Workspace Nav / Identity Header -->
-      <header class="workspace-header">
-        <div class="team-identity-cluster">
-          <div class="event-badge">
-            <span class="pulse-dot"></span>
-            <span id="workspace-team-badge">PRMT-004-DOOM</span>
+
+      <!-- TOP ROW: Box A (Score & Identity) + Box B (Progression Map & HP) -->
+      <div class="workspace-top-row">
+
+        <!-- BOX A: TEAM IDENTITY & OVERALL SCORE -->
+        <section class="portal-card box-a-card" aria-label="Team Score and Identity">
+          <div class="box-a-header">
+            <button type="button" id="open-sidebar-btn" class="drawer-toggle-btn" title="Open Team Badge & Roster (Menu)">
+              <svg class="three-dots-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                <circle cx="12" cy="5" r="2.2"></circle>
+                <circle cx="12" cy="12" r="2.2"></circle>
+                <circle cx="12" cy="19" r="2.2"></circle>
+              </svg>
+              <span class="toggle-btn-text">Badge</span>
+            </button>
+            <div class="event-badge">
+              <span class="pulse-dot"></span>
+              <span id="workspace-team-badge">PRMT-004-DOOM</span>
+            </div>
           </div>
-          <h1 class="workspace-team-title" id="workspace-team-name">TEAM DOOM</h1>
-        </div>
 
-        <div class="workspace-actions">
-          <button type="button" id="team-logout-btn" class="logout-btn" title="Sign out of team portal">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-              <polyline points="16 17 21 12 16 7"></polyline>
-              <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-            <span>Sign Out</span>
-          </button>
-        </div>
-      </header>
-
-      <!-- Workspace Content Grid -->
-      <div class="workspace-grid">
-        <!-- Left Column: Official Digital Team Pass -->
-        <section class="pass-card-panel">
-          <div class="pass-ticket">
-            <div class="ticket-header">
-              <span class="ticket-badge">OFFICIAL EVENT BADGE</span>
-              <span class="ticket-event">PROMPTATHON 2026</span>
+          <div class="box-a-body">
+            <div class="team-title-wrap">
+              <span class="team-label-mini">AUTHENTICATED CONTESTANT</span>
+              <h1 class="workspace-team-title" id="workspace-team-name">TEAM DOOM</h1>
             </div>
-            <div class="ticket-body">
-              <div class="ticket-data-row">
-                <div class="ticket-col">
-                  <span class="label">TEAM ID</span>
-                  <span class="value team-num-value" id="pass-team-id">PRMT-004-DOOM</span>
-                </div>
-                <div class="ticket-col">
-                  <span class="label">ORIGINAL ID</span>
-                  <span class="value" id="pass-original-id">TEAM-004</span>
-                </div>
-              </div>
 
-              <div class="ticket-divider"></div>
-
-              <div class="ticket-data-row">
-                <div class="ticket-col full-width">
-                  <span class="label">TEAM LEADER</span>
-                  <span class="value leader-value" id="pass-leader-name">KALIDOSS</span>
-                </div>
+            <!-- OVERALL SCORE DISPLAY (BOX A) -->
+            <div class="top-score-container">
+              <div class="top-score-header">
+                <span class="top-score-tag">OVERALL SCORE</span>
+                <span class="top-rank-pill">RANK #4 / 42</span>
               </div>
-
-              <div class="ticket-data-row">
-                <div class="ticket-col full-width">
-                  <span class="label">PARTICIPANTS</span>
-                  <span class="value participants-value" id="pass-participants">NITHISH. P, MUTHU. M</span>
-                </div>
+              <div class="top-score-display">
+                <span class="top-score-value" id="team-score-num">85</span>
+                <span class="top-score-denom">/ 100 PTS</span>
+                <span class="top-status-badge">QUALIFIED</span>
               </div>
-
-              <div class="ticket-footer-row">
-                <span class="timestamp-label" id="pass-status-time">Roster: Verified in Database</span>
-                <span class="status-pill status-verified">✓ Active Team</span>
-              </div>
-            </div>
-            <div class="ticket-barcode">
-              <div class="barcode-lines"></div>
-              <span class="barcode-text" id="pass-barcode-text">AUTHENTICATED CONTESTANT</span>
             </div>
           </div>
         </section>
 
-        <!-- Right Column: Challenge & Submission Hub -->
-        <section class="submission-panel">
-          <div class="challenge-card">
-            <div class="challenge-header">
-              <div class="challenge-title-row">
-                <span class="challenge-tag">ACTIVE CHALLENGE</span>
-                <span class="round-indicator">ROUND 1</span>
-              </div>
-              <h2 class="challenge-heading">Prompt Engineering Challenge</h2>
-              <p class="challenge-desc">
-                Craft and submit your system prompts, engineered techniques, and output artifacts below.
-              </p>
+        <!-- BOX B: MISSION PROGRESSION MAP & HEALTHBAR -->
+        <section class="portal-card box-b-card" aria-label="Mission Progression Map">
+          <div class="box-b-header">
+            <div class="healthbar-title-group">
+              <span class="healthbar-title">MISSION PROGRESSION MAP</span>
+              <span class="healthbar-status-badge">STOP 0 // ROUND 1 ACTIVE</span>
             </div>
-
-            <!-- Submission Form -->
-            <form id="challenge-submission-form" class="challenge-form">
-              <!-- Solution Title -->
-              <div class="form-group">
-                <label for="sub-title" class="field-label">
-                  <span>Solution Title</span>
-                  <span class="required-badge">*</span>
-                </label>
-                <div class="input-wrapper">
-                  <input 
-                    type="text" 
-                    id="sub-title" 
-                    placeholder="e.g. Multi-Turn Chain of Thought Optimizer" 
-                    required 
-                    autocomplete="off"
-                  >
-                </div>
+            <div class="box-b-actions">
+              <div class="healthbar-stats">
+                <span class="hp-label">HP:</span>
+                <span class="hp-value">100%</span>
               </div>
-
-              <!-- Engineered Prompt Content -->
-              <div class="form-group">
-                <label for="sub-prompt" class="field-label">
-                  <span>Engineered Prompt / Strategy</span>
-                  <span class="required-badge">*</span>
-                </label>
-                <div class="input-wrapper textarea-wrapper">
-                  <textarea 
-                    id="sub-prompt" 
-                    rows="6" 
-                    placeholder="Paste your engineered prompt, persona instructions, few-shot examples, or system context here..." 
-                    required
-                  ></textarea>
-                </div>
-                <p class="field-helper">Include system instructions, constraints, and reasoning steps</p>
-              </div>
-
-              <!-- Output Link / Demo / GitHub -->
-              <div class="form-group">
-                <label for="sub-link" class="field-label">
-                  <span>Output URL / Artifact Link (Optional)</span>
-                </label>
-                <div class="input-wrapper">
-                  <svg class="input-icon svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                  </svg>
-                  <input 
-                    type="url" 
-                    id="sub-link" 
-                    placeholder="https://github.com/... or Google Drive / live demo link" 
-                    autocomplete="off"
-                  >
-                </div>
-              </div>
-
-              <!-- Submission Feedback / Receipt -->
-              <div id="submission-receipt" class="receipt-banner hidden">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="receipt-icon">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              <button type="button" id="team-logout-btn" class="logout-btn" title="Sign out of team portal">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
                 </svg>
-                <div class="receipt-details">
-                  <span class="receipt-title">Solution Submitted to Judges!</span>
-                  <span class="receipt-time" id="receipt-timestamp">Submitted on: --</span>
-                </div>
-              </div>
-
-              <!-- Submit Button -->
-              <button type="submit" id="submit-challenge-btn" class="submit-button">
-                <span class="btn-text" id="challenge-btn-text">Submit Round 1 Solution</span>
-                <span class="btn-loader hidden" id="sub-loader"></span>
-                <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
+                <span>Sign Out</span>
               </button>
-            </form>
+            </div>
+          </div>
+
+          <!-- Gaming/Mission Healthbar Track -->
+          <div class="healthbar-track-wrapper">
+            <div class="healthbar-track">
+              <div class="healthbar-fill" style="width: 25%;"></div>
+            </div>
+
+            <!-- 4 Checkpoint Stops -->
+            <div class="health-stops-grid">
+              <!-- Stop 0 (Round 1) -->
+              <div class="health-stop stop-active" data-stop="0">
+                <div class="stop-top">
+                  <span class="stop-tag">STOP 0</span>
+                  <span class="stop-status-pill active">● Active</span>
+                </div>
+                <div class="stop-name">Round 1</div>
+                <p class="stop-desc">Prompt Craft & Persona</p>
+              </div>
+
+              <!-- Stop 1 (Round 2) -->
+              <div class="health-stop stop-upcoming" data-stop="1">
+                <div class="stop-top">
+                  <span class="stop-tag">STOP 1</span>
+                  <span class="stop-status-pill upcoming">Next</span>
+                </div>
+                <div class="stop-name">Round 2</div>
+                <p class="stop-desc">Multi-Turn Reasoning</p>
+              </div>
+
+              <!-- Stop 2 (Round 3) -->
+              <div class="health-stop stop-locked" data-stop="2">
+                <div class="stop-top">
+                  <span class="stop-tag">STOP 2</span>
+                  <span class="stop-status-pill locked">Locked</span>
+                </div>
+                <div class="stop-name">Round 3</div>
+                <p class="stop-desc">Agentic Tool Routing</p>
+              </div>
+
+              <!-- Stop 3 (Round 4) -->
+              <div class="health-stop stop-locked" data-stop="3">
+                <div class="stop-top">
+                  <span class="stop-tag">STOP 3</span>
+                  <span class="stop-status-pill locked">Final</span>
+                </div>
+                <div class="stop-name">Round 4</div>
+                <p class="stop-desc">Grand Finale Showcase</p>
+              </div>
+            </div>
           </div>
         </section>
+
       </div>
+
+      <!-- BOX C: FULL WIDTH BIG SPACE - PROMPT ENGINEERING CHALLENGE GROUND -->
+      <section class="portal-card box-c-card" aria-label="Prompt Engineering Challenge Ground">
+        <div class="challenge-header">
+          <div class="challenge-title-row">
+            <span class="challenge-tag">ACTIVE CHALLENGE GROUND</span>
+            <span class="round-indicator">ROUND 1</span>
+          </div>
+          <h2 class="challenge-heading">Prompt Engineering Challenge Ground</h2>
+          <p class="challenge-desc">
+            Craft and submit your system prompts, engineered techniques, and output artifacts below.
+          </p>
+        </div>
+
+        <!-- Submission Form -->
+        <form id="challenge-submission-form" class="challenge-form">
+          <!-- Solution Title -->
+          <div class="form-group">
+            <label for="sub-title" class="field-label">
+              <span>Solution Title</span>
+              <span class="required-badge">*</span>
+            </label>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="sub-title" 
+                placeholder="e.g. Multi-Turn Chain of Thought Optimizer" 
+                required 
+                autocomplete="off"
+              >
+            </div>
+          </div>
+
+          <!-- Engineered Prompt Content -->
+          <div class="form-group">
+            <label for="sub-prompt" class="field-label">
+              <span>Engineered Prompt / Strategy</span>
+              <span class="required-badge">*</span>
+            </label>
+            <div class="input-wrapper textarea-wrapper">
+              <textarea 
+                id="sub-prompt" 
+                rows="7" 
+                placeholder="Paste your engineered prompt, persona instructions, few-shot examples, or system context here..." 
+                required
+              ></textarea>
+            </div>
+            <p class="field-helper">Include system instructions, constraints, and reasoning steps</p>
+          </div>
+
+          <!-- Output Link / Demo / GitHub -->
+          <div class="form-group">
+            <label for="sub-link" class="field-label">
+              <span>Output URL / Artifact Link (Optional)</span>
+            </label>
+            <div class="input-wrapper">
+              <svg class="input-icon svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+              <input 
+                type="url" 
+                id="sub-link" 
+                placeholder="https://github.com/... or Google Drive / live demo link" 
+                autocomplete="off"
+              >
+            </div>
+          </div>
+
+          <!-- Submission Feedback / Receipt -->
+          <div id="submission-receipt" class="receipt-banner hidden">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="receipt-icon">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <div class="receipt-details">
+              <span class="receipt-title">Solution Submitted to Judges!</span>
+              <span class="receipt-time" id="receipt-timestamp">Submitted on: --</span>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="submit-challenge-btn" class="submit-button">
+            <span class="btn-text" id="challenge-btn-text">Submit Round 1 Solution</span>
+            <span class="btn-loader hidden" id="sub-loader"></span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </form>
+      </section>
+
     </div>
+
+    <!-- ========================================== -->
+    <!-- TRUE OFFCANVAS SLIDING SIDEBAR (Left side) -->
+    <!-- Opens via 3-dot button in Box A            -->
+    <!-- ========================================== -->
+    <div id="sidebar-overlay" class="sidebar-overlay hidden" aria-hidden="true"></div>
+    <aside id="team-sidebar-drawer" class="sidebar-drawer" aria-label="Official Event Badge and Roster">
+      <div class="drawer-header">
+        <div class="drawer-title-group">
+          <span class="drawer-tag">OFFICIAL EVENT ROSTER</span>
+          <h2 class="drawer-heading">Team Badge & Pass</h2>
+        </div>
+        <button type="button" id="close-sidebar-btn" class="drawer-close-btn" title="Close Sidebar (Esc)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        <!-- Official Digital Team Pass -->
+        <div class="pass-ticket drawer-ticket">
+          <div class="ticket-header">
+            <span class="ticket-badge">OFFICIAL EVENT BADGE</span>
+            <span class="ticket-event">PROMPTATHON 2026</span>
+          </div>
+          <div class="ticket-body">
+            <div class="ticket-data-row">
+              <div class="ticket-col">
+                <span class="label">TEAM ID</span>
+                <span class="value team-num-value" id="pass-team-id">PRMT-004-DOOM</span>
+              </div>
+              <div class="ticket-col">
+                <span class="label">ORIGINAL ID</span>
+                <span class="value" id="pass-original-id">TEAM-004</span>
+              </div>
+            </div>
+
+            <div class="ticket-divider"></div>
+
+            <div class="ticket-data-row">
+              <div class="ticket-col full-width">
+                <span class="label">TEAM LEADER</span>
+                <span class="value leader-value" id="pass-leader-name">KALIDOSS</span>
+              </div>
+            </div>
+
+            <div class="ticket-data-row">
+              <div class="ticket-col full-width">
+                <span class="label">PARTICIPANTS</span>
+                <span class="value participants-value" id="pass-participants">NITHISH. P, MUTHU. M</span>
+              </div>
+            </div>
+
+            <div class="ticket-footer-row">
+              <span class="timestamp-label" id="pass-status-time">Roster: Verified in Database</span>
+              <span class="status-pill status-verified">✓ Active Team</span>
+            </div>
+          </div>
+          <div class="ticket-barcode">
+            <div class="barcode-lines"></div>
+            <span class="barcode-text" id="pass-barcode-text">AUTHENTICATED CONTESTANT</span>
+          </div>
+        </div>
+
+        <div class="drawer-footer-info">
+          <p class="drawer-hint">Press <kbd>Esc</kbd> or click outside to close this panel</p>
+        </div>
+      </div>
+    </aside>
   </main>
 
   <!-- Toast Notification Container -->

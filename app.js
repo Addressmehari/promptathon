@@ -2,24 +2,29 @@
 import { 
   doc, 
   getDoc, 
+  getDocs,
+  collection,
+  query,
+  where,
   updateDoc, 
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { initFirebaseFromEnv } from "./firebase-config.js";
-import { PRE_REGISTERED_TEAMS } from "./teams-data.js";
 
 // State
 let db = null;
 let currentTeam = null;
 
-// Initialize Firebase from env
-initFirebaseFromEnv()
+// Initialize Firebase directly from environment config
+const firebaseReady = initFirebaseFromEnv()
   .then(({ db: firestoreDb, config }) => {
     db = firestoreDb;
-    console.log("Firebase connected successfully in Team Portal:", config.projectId);
+    console.log("Connected to Firestore database:", config.projectId);
+    return firestoreDb;
   })
   .catch((err) => {
-    console.warn("Firebase initialization warning (local roster verification active):", err.message);
+    console.error("Firebase connection error:", err.message);
+    throw err;
   });
 
 // DOM Elements - Login
@@ -98,20 +103,166 @@ togglePinBtn.addEventListener("click", () => {
   const newType = currentType === "password" ? "text" : "password";
   teamPasswordInput.setAttribute("type", newType);
   
-  togglePinBtn.style.color = newType === "text" ? "#818cf8" : "var(--text-muted)";
+  togglePinBtn.style.color = newType === "text" ? "var(--primary-accent)" : "var(--text-muted)";
 });
 
-// Find Team in Pre-Registered Roster
-function findTeamInRoster(inputIdentifier) {
+// ==========================================
+// True Sliding Sidebar Drawer (3-Dot Trigger)
+// ==========================================
+const openSidebarBtn = document.getElementById("open-sidebar-btn");
+const closeSidebarBtn = document.getElementById("close-sidebar-btn");
+const teamSidebarDrawer = document.getElementById("team-sidebar-drawer");
+const sidebarOverlay = document.getElementById("sidebar-overlay");
+
+function openSidebar() {
+  if (teamSidebarDrawer && sidebarOverlay) {
+    sidebarOverlay.classList.remove("hidden");
+    requestAnimationFrame(() => {
+      sidebarOverlay.classList.add("visible");
+      teamSidebarDrawer.classList.add("open");
+    });
+  }
+}
+
+function closeSidebar() {
+  if (teamSidebarDrawer && sidebarOverlay) {
+    sidebarOverlay.classList.remove("visible");
+    teamSidebarDrawer.classList.remove("open");
+    setTimeout(() => {
+      if (!teamSidebarDrawer.classList.contains("open")) {
+        sidebarOverlay.classList.add("hidden");
+      }
+    }, 320);
+  }
+}
+
+if (openSidebarBtn) openSidebarBtn.addEventListener("click", openSidebar);
+if (closeSidebarBtn) closeSidebarBtn.addEventListener("click", closeSidebar);
+if (sidebarOverlay) sidebarOverlay.addEventListener("click", closeSidebar);
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && teamSidebarDrawer && teamSidebarDrawer.classList.contains("open")) {
+    closeSidebar();
+  }
+});
+
+// Interactive Healthbar Stops (Mockup Round Inspection)
+const healthStops = document.querySelectorAll(".health-stop");
+healthStops.forEach(stop => {
+  stop.addEventListener("click", () => {
+    const stopNum = stop.getAttribute("data-stop");
+    const roundName = stop.querySelector(".stop-name").textContent;
+    const roundDesc = stop.querySelector(".stop-desc").textContent;
+    
+    if (stopNum === "0") {
+      showToast(`Stop 0 [${roundName}]: Active Challenge! Submit your prompt below.`, "success");
+    } else if (stopNum === "1") {
+      showToast(`Stop 1 [${roundName}]: ${roundDesc} (Unlocks after Round 1 evaluation).`, "info");
+    } else {
+      showToast(`Stop ${stopNum} [${roundName}]: ${roundDesc} (Locked stage).`, "warning");
+    }
+  });
+});
+
+// Fetch and match team strictly from Firestore database collection "registrations"
+async function findTeamInDb(inputIdentifier) {
+  const firestoreDb = db || await firebaseReady;
   const clean = inputIdentifier.trim().toUpperCase();
-  
-  return PRE_REGISTERED_TEAMS.find(t => 
-    t.teamId.toUpperCase() === clean ||
-    t.originalId.toUpperCase() === clean ||
-    // Also matches "PRMT-004" or raw numbers like "4" or "004"
-    t.teamId.toUpperCase().startsWith(`PRMT-${clean}`) ||
-    t.originalId.toUpperCase() === `TEAM-${clean}`
-  );
+
+  // 1. Direct fetch by Document ID (teamId, e.g. "PRMT-004-DOOM")
+  try {
+    const directSnap = await getDoc(doc(firestoreDb, "registrations", clean));
+    if (directSnap.exists()) {
+      const data = directSnap.data();
+      return {
+        teamId: data.teamId || directSnap.id,
+        originalId: data.originalId || "",
+        teamName: data.teamName || "",
+        leaderName: data.leaderName || "",
+        participants: data.participants || "",
+        password: String(data.password || ""),
+        score: data.score || 85
+      };
+    }
+  } catch (e) {
+    console.warn("Direct doc fetch error:", e.message);
+  }
+
+  // 2. Query collection "registrations" for originalId (e.g. "TEAM-004")
+  try {
+    const qOriginal = query(collection(firestoreDb, "registrations"), where("originalId", "==", clean));
+    const snapOriginal = await getDocs(qOriginal);
+    if (!snapOriginal.empty) {
+      const d = snapOriginal.docs[0];
+      const data = d.data();
+      return {
+        teamId: data.teamId || d.id,
+        originalId: data.originalId || "",
+        teamName: data.teamName || "",
+        leaderName: data.leaderName || "",
+        participants: data.participants || "",
+        password: String(data.password || ""),
+        score: data.score || 85
+      };
+    }
+  } catch (e) {
+    console.warn("OriginalId query error:", e.message);
+  }
+
+  // 3. Fallback: Search all registration docs for normalized number or partial ID
+  try {
+    const allDocs = await getDocs(collection(firestoreDb, "registrations"));
+    for (const d of allDocs.docs) {
+      const data = d.data();
+      const tId = (data.teamId || d.id).toUpperCase();
+      const oId = (data.originalId || "").toUpperCase();
+
+      if (tId === clean || oId === clean) {
+        return {
+          teamId: data.teamId || d.id,
+          originalId: data.originalId || "",
+          teamName: data.teamName || "",
+          leaderName: data.leaderName || "",
+          participants: data.participants || "",
+          password: String(data.password || ""),
+          score: data.score || 85
+        };
+      }
+
+      if (tId.startsWith(`PRMT-${clean}`) || oId === `TEAM-${clean}`) {
+        return {
+          teamId: data.teamId || d.id,
+          originalId: data.originalId || "",
+          teamName: data.teamName || "",
+          leaderName: data.leaderName || "",
+          participants: data.participants || "",
+          password: String(data.password || ""),
+          score: data.score || 85
+        };
+      }
+
+      // If user typed only a number like "4" or "004"
+      const numMatch = clean.match(/\d+/);
+      if (numMatch) {
+        const padded = `TEAM-${numMatch[0].padStart(3, "0")}`;
+        if (oId === padded || tId.includes(`-${numMatch[0].padStart(3, "0")}-`)) {
+          return {
+            teamId: data.teamId || d.id,
+            originalId: data.originalId || "",
+            teamName: data.teamName || "",
+            leaderName: data.leaderName || "",
+            participants: data.participants || "",
+            password: String(data.password || ""),
+            score: data.score || 85
+          };
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Firestore scan error:", e);
+  }
+
+  return null;
 }
 
 // Switch to Workspace
@@ -127,6 +278,12 @@ function unlockWorkspace(teamData) {
   passLeaderName.textContent = teamData.leaderName || "N/A";
   passParticipants.textContent = teamData.participants || "Team Members";
 
+  // Score display (mockup / remote)
+  const teamScoreNum = document.getElementById("team-score-num");
+  if (teamScoreNum && teamData.score) {
+    teamScoreNum.textContent = teamData.score;
+  }
+
   // Check for any previous submission
   loadTeamSubmission(teamData.teamId);
 
@@ -138,6 +295,7 @@ function unlockWorkspace(teamData) {
 
 // Switch back to Login
 function lockWorkspace() {
+  closeSidebar();
   currentTeam = null;
   sessionStorage.removeItem("promptathon_active_team");
   teamWorkspace.classList.add("hidden");
@@ -219,48 +377,18 @@ teamLoginForm.addEventListener("submit", async (e) => {
   setLoginLoading(true);
 
   try {
-    let matchedTeam = null;
+    // 1. Fetch directly from Firestore collection "registrations"
+    const matchedTeam = await findTeamInDb(enteredId);
 
-    // 1. Check verified local pre-registered roster first
-    const rosterMatch = findTeamInRoster(enteredId);
-    
-    // 2. Also query Firestore if connected
-    if (db) {
-      try {
-        const targetDocId = rosterMatch ? rosterMatch.teamId : enteredId.toUpperCase();
-        const docRef = doc(db, "registrations", targetDocId);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const remoteData = docSnap.data();
-          matchedTeam = {
-            teamId: remoteData.teamId || targetDocId,
-            originalId: remoteData.originalId || "",
-            teamName: remoteData.teamName || "",
-            leaderName: remoteData.leaderName || "",
-            participants: remoteData.participants || "",
-            password: String(remoteData.password || "")
-          };
-        }
-      } catch (remoteErr) {
-        console.warn("Firestore query error (falling back to roster):", remoteErr.message);
-      }
-    }
-
-    // Fallback to verified roster if Firestore doc wasn't loaded
-    if (!matchedTeam && rosterMatch) {
-      matchedTeam = rosterMatch;
-    }
-
-    // STRICT CHECK: Team must exist in the official dataset
+    // 2. Check team existence in the database
     if (!matchedTeam) {
-      showLoginError("Team ID not found. Only pre-registered teams in the official Promptathon roster can log in.");
+      showLoginError("Team ID not found in database. Only pre-registered teams can log in.");
       teamIdInput.focus();
       return;
     }
 
-    // STRICT CHECK: Password (PIN) must match exactly
-    if (String(matchedTeam.password) !== enteredPass) {
+    // 3. Check PIN / password against database
+    if (String(matchedTeam.password).trim() !== enteredPass) {
       showLoginError("Incorrect 4-digit PIN for this team. Please check your assigned credentials.");
       teamPasswordInput.value = "";
       teamPasswordInput.focus();
@@ -269,12 +397,12 @@ teamLoginForm.addEventListener("submit", async (e) => {
 
     // AUTHENTICATION SUCCESSFUL!
     unlockWorkspace(matchedTeam);
-    showToast(`Welcome, ${matchedTeam.teamName}!`, "success");
+    showToast(`Welcome, ${matchedTeam.teamName || matchedTeam.teamId}!`, "success");
     triggerConfetti();
 
   } catch (err) {
     console.error("Authentication error:", err);
-    showLoginError("An unexpected error occurred during verification. Please try again.");
+    showLoginError("Database error during verification. Please check your connection and try again.");
   } finally {
     setLoginLoading(false);
   }
@@ -355,17 +483,24 @@ teamLogoutBtn.addEventListener("click", () => {
   showToast("Logged out from team workspace.", "success");
 });
 
-// Check existing active team session
+// Check existing active team session against database
 const savedSession = sessionStorage.getItem("promptathon_active_team");
 if (savedSession) {
   try {
     const parsedTeam = JSON.parse(savedSession);
-    // Verify it exists in authorized dataset
-    if (findTeamInRoster(parsedTeam.teamId)) {
-      unlockWorkspace(parsedTeam);
-    } else {
-      sessionStorage.removeItem("promptathon_active_team");
-    }
+    firebaseReady
+      .then(async () => {
+        const liveTeam = await findTeamInDb(parsedTeam.teamId);
+        if (liveTeam) {
+          unlockWorkspace(liveTeam);
+        } else {
+          sessionStorage.removeItem("promptathon_active_team");
+        }
+      })
+      .catch(() => {
+        // Fallback to cached session if offline
+        unlockWorkspace(parsedTeam);
+      });
   } catch (e) {
     sessionStorage.removeItem("promptathon_active_team");
   }

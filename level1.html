@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Round 1: Creative Canvas | Promptathon 2026</title>
+  <meta name="description" content="Round 1 Creative Canvas (Visual Storytelling) challenge arena for Promptathon 2026.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="bg-grid-overlay"></div>
+
+  <main class="level-page-container">
+    <!-- Top Header with Team Session & Exit Button -->
+    <header class="level-top-header">
+      <div class="level-team-info">
+        <span class="level-badge-tag" id="level-team-badge">AUTHENTICATING...</span>
+        <span class="level-team-title" id="level-team-name">Loading team...</span>
+      </div>
+
+      <div class="level-actions">
+        <!-- Exit to Dashboard (Loads in same tab, preserving session) -->
+        <a href="index.html" class="exit-level-btn" id="exit-btn" title="Return to Portal Dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Exit Round</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Level Arena Card -->
+    <section class="level-arena-card">
+      <div class="level-arena-header">
+        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
+          <span class="level-number-pill">ROUND 1 // CREATIVE CANVAS</span>
+          <span class="level-badge-tag" style="background: rgba(255, 255, 255, 0.05); color: #ffffff; border-color: rgba(255, 255, 255, 0.15);">⏱ 15 Minutes</span>
+          <span class="level-badge-tag" style="background: rgba(134, 239, 172, 0.1); color: #86efac; border-color: rgba(134, 239, 172, 0.3);">Format: Image Generation Prompt (Midjourney / DALL-E)</span>
+        </div>
+        <h1 class="level-heading">Creative Canvas (Visual Storytelling)</h1>
+        <p class="level-description">
+          Craft an evocative, ultra-detailed text-to-image prompt. Select your assigned theme below, integrate the required visual elements, and engineer camera angles, lighting conditions, and rendering styles.
+        </p>
+      </div>
+
+      <!-- Theme Selector Pills -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-subtle); letter-spacing: 0.06em;">CHOOSE YOUR ASSIGNED THEME:</span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;" id="theme-selector-grid">
+          <button type="button" class="theme-btn active" data-theme="1">
+            <span class="theme-btn-num">Theme 1</span>
+            <span class="theme-btn-title">Futuristic Chennai 2090</span>
+          </button>
+          <button type="button" class="theme-btn" data-theme="2">
+            <span class="theme-btn-num">Theme 2</span>
+            <span class="theme-btn-title">Cyberpunk College Canteen</span>
+          </button>
+          <button type="button" class="theme-btn" data-theme="3">
+            <span class="theme-btn-num">Theme 3</span>
+            <span class="theme-btn-title">Ancient Temple Ruins</span>
+          </button>
+          <button type="button" class="theme-btn" data-theme="4">
+            <span class="theme-btn-num">Theme 4</span>
+            <span class="theme-btn-title">Orbital Research Station</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Theme Briefing Box -->
+      <div class="level-task-box" id="theme-brief-box">
+        <div class="level-task-title" id="theme-brief-title">THEME 1: FUTURISTIC CHENNAI STREET IN 2090</div>
+        <p class="level-task-content" id="theme-brief-desc" style="margin-bottom: 10px;">
+          <strong>Required Elements:</strong> Flying auto-rickshaws, Tamil neon signage, solar high-rises, golden hour, wet asphalt.
+        </p>
+        <p style="font-size: 0.8rem; color: var(--text-subtle); margin: 0;">
+          💡 <em>Pro-Tip: Specify camera angles (low-angle, wide-angle), lighting quality (volumetric, reflections), and visual aesthetics (Unreal Engine 5, 8K render, photorealistic depth of field).</em>
+        </p>
+      </div>
+
+      <!-- Prompt Input Area -->
+      <div class="form-group">
+        <label for="level-prompt-input" class="field-label">
+          <span>Engineered Image Generation Prompt</span>
+          <span class="required-badge">*</span>
+        </label>
+        <textarea 
+          id="level-prompt-input" 
+          class="level-textarea" 
+          rows="8" 
+          placeholder="Craft your image prompt here... (e.g. A low-angle wide-angle cinematic shot of a bustling futuristic Chennai street in the year 2090. Flying chrome auto-rickshaws hovering above wet reflective asphalt...)"
+        ></textarea>
+      </div>
+
+      <!-- Level Actions -->
+      <div class="level-footer-actions">
+        <button type="button" id="submit-level-btn" class="submit-button" style="width: auto; padding: 14px 40px;">
+          <span class="btn-text">Submit Round 1 Prompt &rarr;</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Script for Theme Toggle & Session Guard -->
+  <script>
+    // Theme data from ROUND 1.docx
+    const THEMES = {
+      1: {
+        title: "THEME 1: FUTURISTIC CHENNAI STREET IN 2090",
+        elements: "Flying auto-rickshaws, Tamil neon signage, solar high-rises, golden hour, wet asphalt."
+      },
+      2: {
+        title: "THEME 2: CYBERPUNK COLLEGE CANTEEN",
+        elements: "Robotic canteen staff, filter coffee/dosa, students with cybernetics & holograms, magenta/cyan steam."
+      },
+      3: {
+        title: "THEME 3: ANCIENT BIO-LUMINESCENT TEMPLE RUINS",
+        elements: "Dravidian temple in dense forest, stone guardian beast awakening, bioluminescent god-rays."
+      },
+      4: {
+        title: "THEME 4: DEEP SPACE ORBITAL RESEARCH STATION",
+        elements: "Astronaut in gold-visor suit, panoramic observation dome, planetary rings, harsh high-contrast lighting."
+      }
+    };
+
+    const themeButtons = document.querySelectorAll(".theme-btn");
+    const themeTitleEl = document.getElementById("theme-brief-title");
+    const themeDescEl = document.getElementById("theme-brief-desc");
+
+    themeButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        themeButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const tid = btn.getAttribute("data-theme");
+        if (THEMES[tid]) {
+          themeTitleEl.textContent = THEMES[tid].title;
+          themeDescEl.innerHTML = `<strong>Required Elements:</strong> ${THEMES[tid].elements}`;
+        }
+      });
+    });
+  </script>
+
+  <!-- Level 1 Submission & Session Controller -->
+  <script type="module">
+    import { initLevelPage } from "./level-submission.js";
+    initLevelPage(1);
+  </script>
+</body>
+</html>

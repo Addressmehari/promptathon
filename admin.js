@@ -283,7 +283,7 @@ exportCsvBtn.addEventListener("click", () => {
   }
 
   const csvRows = [
-    ["Team Number", "Creative Team ID", "Original ID", "Team Name", "Team Leader", "Participants", "Access PIN", "Registration Time"]
+    ["Team Number", "Creative Team ID", "Original ID", "Team Name", "Team Leader", "Participants", "Access PIN", "Registration Time", "Level 1 Response", "Level 2 Response", "Level 3 Response", "Level 4 Response"]
   ];
 
   allTeams.forEach(t => {
@@ -295,7 +295,11 @@ exportCsvBtn.addEventListener("click", () => {
       `"${(t.leaderName || "").replace(/"/g, '""')}"`,
       `"${(t.participants || "").replace(/"/g, '""')}"`,
       `"${t.password || ""}"`,
-      `"${formatTimestamp(t)}"`
+      `"${formatTimestamp(t)}"`,
+      `"${(t.lvl1?.resp || t.level_1_response || t["level-1-response"] || "").replace(/"/g, '""')}"`,
+      `"${(t.lvl2?.resp || t.level_2_response || t["level-2-response"] || "").replace(/"/g, '""')}"`,
+      `"${(t.lvl3?.resp || t.level_3_response || t["level-3-response"] || "").replace(/"/g, '""')}"`,
+      `"${(t.lvl4?.resp || t.level_4_response || t["level-4-response"] || "").replace(/"/g, '""')}"`
     ]);
   });
 

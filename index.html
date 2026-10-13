@@ -193,43 +193,43 @@
               <div class="healthbar-fill" style="width: 25%;"></div>
             </div>
 
-            <!-- 4 Checkpoint Stops -->
+            <!-- 4 Checkpoint Stops (Selectable & Choosable) -->
             <div class="health-stops-grid">
               <!-- Stop 0 (Round 1) -->
-              <div class="health-stop stop-active" data-stop="0">
+              <div class="health-stop stop-selected stop-active" data-stop="0" data-level="1" title="Select Round 1">
                 <div class="stop-top">
                   <span class="stop-tag">STOP 0</span>
-                  <span class="stop-status-pill active">● Active</span>
+                  <span class="stop-status-pill active">Selected</span>
                 </div>
                 <div class="stop-name">Round 1</div>
-                <p class="stop-desc">Prompt Craft & Persona</p>
+                <p class="stop-desc">Creative Canvas (Visual Storytelling)</p>
               </div>
 
               <!-- Stop 1 (Round 2) -->
-              <div class="health-stop stop-upcoming" data-stop="1">
+              <div class="health-stop" data-stop="1" data-level="2" title="Select Round 2">
                 <div class="stop-top">
                   <span class="stop-tag">STOP 1</span>
-                  <span class="stop-status-pill upcoming">Next</span>
+                  <span class="stop-status-pill upcoming">Select</span>
                 </div>
                 <div class="stop-name">Round 2</div>
-                <p class="stop-desc">Multi-Turn Reasoning</p>
+                <p class="stop-desc">The Debugger (Prompt Optimization)</p>
               </div>
 
               <!-- Stop 2 (Round 3) -->
-              <div class="health-stop stop-locked" data-stop="2">
+              <div class="health-stop" data-stop="2" data-level="3" title="Select Round 3">
                 <div class="stop-top">
                   <span class="stop-tag">STOP 2</span>
-                  <span class="stop-status-pill locked">Locked</span>
+                  <span class="stop-status-pill upcoming">Select</span>
                 </div>
                 <div class="stop-name">Round 3</div>
-                <p class="stop-desc">Agentic Tool Routing</p>
+                <p class="stop-desc">The Text Simulator (Game Engine)</p>
               </div>
 
               <!-- Stop 3 (Round 4) -->
-              <div class="health-stop stop-locked" data-stop="3">
+              <div class="health-stop" data-stop="3" data-level="4" title="Select Round 4">
                 <div class="stop-top">
                   <span class="stop-tag">STOP 3</span>
-                  <span class="stop-status-pill locked">Final</span>
+                  <span class="stop-status-pill upcoming">Select</span>
                 </div>
                 <div class="stop-name">Round 4</div>
                 <p class="stop-desc">Grand Finale Showcase</p>
@@ -240,96 +240,15 @@
 
       </div>
 
-      <!-- BOX C: FULL WIDTH BIG SPACE - PROMPT ENGINEERING CHALLENGE GROUND -->
-      <section class="portal-card box-c-card" aria-label="Prompt Engineering Challenge Ground">
-        <div class="challenge-header">
-          <div class="challenge-title-row">
-            <span class="challenge-tag">ACTIVE CHALLENGE GROUND</span>
-            <span class="round-indicator">ROUND 1</span>
-          </div>
-          <h2 class="challenge-heading">Prompt Engineering Challenge Ground</h2>
-          <p class="challenge-desc">
-            Craft and submit your system prompts, engineered techniques, and output artifacts below.
-          </p>
-        </div>
-
-        <!-- Submission Form -->
-        <form id="challenge-submission-form" class="challenge-form">
-          <!-- Solution Title -->
-          <div class="form-group">
-            <label for="sub-title" class="field-label">
-              <span>Solution Title</span>
-              <span class="required-badge">*</span>
-            </label>
-            <div class="input-wrapper">
-              <input 
-                type="text" 
-                id="sub-title" 
-                placeholder="e.g. Multi-Turn Chain of Thought Optimizer" 
-                required 
-                autocomplete="off"
-              >
-            </div>
-          </div>
-
-          <!-- Engineered Prompt Content -->
-          <div class="form-group">
-            <label for="sub-prompt" class="field-label">
-              <span>Engineered Prompt / Strategy</span>
-              <span class="required-badge">*</span>
-            </label>
-            <div class="input-wrapper textarea-wrapper">
-              <textarea 
-                id="sub-prompt" 
-                rows="7" 
-                placeholder="Paste your engineered prompt, persona instructions, few-shot examples, or system context here..." 
-                required
-              ></textarea>
-            </div>
-            <p class="field-helper">Include system instructions, constraints, and reasoning steps</p>
-          </div>
-
-          <!-- Output Link / Demo / GitHub -->
-          <div class="form-group">
-            <label for="sub-link" class="field-label">
-              <span>Output URL / Artifact Link (Optional)</span>
-            </label>
-            <div class="input-wrapper">
-              <svg class="input-icon svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-              </svg>
-              <input 
-                type="url" 
-                id="sub-link" 
-                placeholder="https://github.com/... or Google Drive / live demo link" 
-                autocomplete="off"
-              >
-            </div>
-          </div>
-
-          <!-- Submission Feedback / Receipt -->
-          <div id="submission-receipt" class="receipt-banner hidden">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="receipt-icon">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-            <div class="receipt-details">
-              <span class="receipt-title">Solution Submitted to Judges!</span>
-              <span class="receipt-time" id="receipt-timestamp">Submitted on: --</span>
-            </div>
-          </div>
-
-          <!-- Submit Button -->
-          <button type="submit" id="submit-challenge-btn" class="submit-button">
-            <span class="btn-text" id="challenge-btn-text">Submit Round 1 Solution</span>
-            <span class="btn-loader hidden" id="sub-loader"></span>
-            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </button>
-        </form>
+      <!-- BOX C: FULL WIDTH BIG SPACE - START LEVEL BUTTON ALONE -->
+      <section class="portal-card box-c-card" aria-label="Level Action Ground">
+        <button type="button" id="start-level-btn" class="start-level-button">
+          <span class="start-btn-text" id="start-btn-text">Start Level 1</span>
+          <svg class="start-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
       </section>
 
     </div>

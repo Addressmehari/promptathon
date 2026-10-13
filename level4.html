@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Round 4: Grand Finale Showcase | Promptathon 2026</title>
+  <meta name="description" content="Round 4 Grand Finale Showcase arena for Promptathon 2026.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="bg-grid-overlay"></div>
+
+  <main class="level-page-container">
+    <!-- Top Header with Team Session & Exit Button -->
+    <header class="level-top-header">
+      <div class="level-team-info">
+        <span class="level-badge-tag" id="level-team-badge">AUTHENTICATING...</span>
+        <span class="level-team-title" id="level-team-name">Loading team...</span>
+      </div>
+
+      <div class="level-actions">
+        <!-- Exit to Dashboard (Loads in same tab, preserving session) -->
+        <a href="index.html" class="exit-level-btn" id="exit-btn" title="Return to Portal Dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Exit Round</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Level Arena Card -->
+    <section class="level-arena-card">
+      <div class="level-arena-header">
+        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
+          <span class="level-number-pill" style="color: #fde047; border-color: rgba(253, 224, 71, 0.35); background: rgba(253, 224, 71, 0.08);">ROUND 4 // GRAND FINALE SHOWCASE</span>
+          <span class="level-badge-tag" style="background: rgba(255, 255, 255, 0.05); color: #ffffff; border-color: rgba(255, 255, 255, 0.15);">⏱ 20 Minutes</span>
+          <span class="level-badge-tag" style="background: rgba(253, 224, 71, 0.15); color: #fde047; border-color: rgba(253, 224, 71, 0.35);">Format: End-to-End Autonomous Agentic Pipeline</span>
+        </div>
+        <h1 class="level-heading">Grand Finale Championship Showcase</h1>
+        <p class="level-description">
+          Synthesize all prompt engineering mastery: Visual Storytelling (Round 1), Constrained Optimization (Round 2), and Deterministic State Control (Round 3) into an autonomous, jury-defensible AI product.
+        </p>
+      </div>
+
+      <!-- Problem Statement Box -->
+      <div class="level-task-box">
+        <div class="level-task-title" style="color: #fde047;">FINALE DIRECTIVE // MULTI-MODAL MASTER ORCHESTRATOR</div>
+        <p class="level-task-content" style="margin-bottom: 8px;">
+          Build a complete Master System Prompt for an autonomous multi-modal AI copilot. Your prompt must accept multi-format inputs, handle strict latency & negative constraints, execute tool routing, and deliver deterministic JSON output.
+        </p>
+        <p style="font-size: 0.8rem; color: var(--text-subtle); margin: 0;">
+          🏆 <em>Jury Evaluation Criteria: Prompt robustness against adversarial edge cases, schema validity, originality of problem formulation, and real-time execution quality.</em>
+        </p>
+      </div>
+
+      <!-- Prompt Input Area -->
+      <div class="form-group">
+        <label for="level-prompt-input" class="field-label">
+          <span>Master Orchestration System Prompt</span>
+          <span class="required-badge">*</span>
+        </label>
+        <textarea 
+          id="level-prompt-input" 
+          class="level-textarea" 
+          rows="10" 
+          placeholder="[MASTER_AI_CONTROLLER_PROMPT]
+Define role architecture, tool dispatch constraints, multi-step chain of verification, and final presentation output..."
+        ></textarea>
+      </div>
+
+      <!-- Level Actions -->
+      <div class="level-footer-actions">
+        <button type="button" id="submit-level-btn" class="submit-button" style="width: auto; padding: 14px 44px; background: #fde047; color: #1a1600; font-weight: 800;">
+          <span class="btn-text">Submit Grand Finale Project &rarr;</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Level 4 Submission & Session Controller -->
+  <script type="module">
+    import { initLevelPage } from "./level-submission.js";
+    initLevelPage(4);
+  </script>
+</body>
+</html>

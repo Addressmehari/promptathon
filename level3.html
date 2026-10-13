@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Round 3: The Text Simulator | Promptathon 2026</title>
+  <meta name="description" content="Round 3 The Text Simulator (Interactive Game Engine) arena for Promptathon 2026.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="bg-grid-overlay"></div>
+
+  <main class="level-page-container">
+    <!-- Top Header with Team Session & Exit Button -->
+    <header class="level-top-header">
+      <div class="level-team-info">
+        <span class="level-badge-tag" id="level-team-badge">AUTHENTICATING...</span>
+        <span class="level-team-title" id="level-team-name">Loading team...</span>
+      </div>
+
+      <div class="level-actions">
+        <!-- Exit to Dashboard (Loads in same tab, preserving session) -->
+        <a href="index.html" class="exit-level-btn" id="exit-btn" title="Return to Portal Dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Exit Round</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Level Arena Card -->
+    <section class="level-arena-card">
+      <div class="level-arena-header">
+        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
+          <span class="level-number-pill">ROUND 3 // THE TEXT SIMULATOR</span>
+          <span class="level-badge-tag" style="background: rgba(255, 255, 255, 0.05); color: #ffffff; border-color: rgba(255, 255, 255, 0.15);">⏱ 15 Minutes</span>
+          <span class="level-badge-tag" style="background: rgba(134, 239, 172, 0.1); color: #86efac; border-color: rgba(134, 239, 172, 0.3);">Format: Master System Prompt with State & Rules</span>
+        </div>
+        <h1 class="level-heading">The Text Simulator (Interactive Game Engine)</h1>
+        <p class="level-description">
+          Construct a deterministic game master system prompt with numerical state tracking (HUD), branching turn cycles, win/loss conditions, and anti-cheat guardrails.
+        </p>
+      </div>
+
+      <!-- Simulation Engine Selector -->
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-subtle); letter-spacing: 0.06em;">CHOOSE YOUR ASSIGNED SIMULATOR SCENARIO:</span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">
+          <button type="button" class="theme-btn active" data-sim="1">
+            <span class="theme-btn-num">Scenario 1</span>
+            <span class="theme-btn-title">College Fest Manager</span>
+          </button>
+          <button type="button" class="theme-btn" data-sim="2">
+            <span class="theme-btn-num">Scenario 2</span>
+            <span class="theme-btn-title">Orbital Station Survival</span>
+          </button>
+          <button type="button" class="theme-btn" data-sim="3">
+            <span class="theme-btn-num">Scenario 3</span>
+            <span class="theme-btn-title">AI Startup Founder</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Simulation Briefing Box -->
+      <div class="level-task-box" id="sim-brief-box">
+        <div class="level-task-title" id="sim-title">SCENARIO 1: COLLEGE FEST MANAGEMENT SIMULATOR</div>
+        <p class="level-task-content" id="sim-desc" style="margin-bottom: 10px;">
+          <strong>Starting State:</strong> 100 Initial Points | 5 Turns to Win | 0 Points = Loss (Fest Canceled) | Exactly 3 tactical choices per turn (A, B, C).
+        </p>
+        <p style="font-size: 0.8rem; color: var(--text-subtle); margin: 0;" id="sim-rules">
+          ⚡ <em>Mandatory Rules: Display HUD [Score: X/100 | Turn: Y/5]. End on Turn 5 if Score > 0 with victory message. Include guardrail against non-A/B/C input.</em>
+        </p>
+      </div>
+
+      <!-- Prompt Input Area -->
+      <div class="form-group">
+        <label for="level-prompt-input" class="field-label">
+          <span>Master System Prompt & Engine Rules</span>
+          <span class="required-badge">*</span>
+        </label>
+        <textarea 
+          id="level-prompt-input" 
+          class="level-textarea" 
+          rows="10" 
+          placeholder="You are the Game Master for 'College Fest Management Simulator'.
+Follow these deterministic simulation rules:
+1. Setup: [Score: 100 Points, Turn: 1/5]...
+2. Every Turn: Print HUD, present crisis, offer 3 choices (A, B, C)...
+3. Win/Loss Conditions...
+4. Anti-Cheat guardrails..."
+        ></textarea>
+      </div>
+
+      <!-- Level Actions -->
+      <div class="level-footer-actions">
+        <button type="button" id="submit-level-btn" class="submit-button" style="width: auto; padding: 14px 40px;">
+          <span class="btn-text">Submit Round 3 Engine &rarr;</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Script for Simulator Toggle & Session Guard -->
+  <script>
+    // Simulator data from ROUND 1.docx
+    const SIMS = {
+      1: {
+        title: "SCENARIO 1: COLLEGE FEST MANAGEMENT SIMULATOR",
+        state: "100 Initial Points | 5 Turns to Win | 0 Points = Loss (Fest Canceled) | Exactly 3 tactical choices per turn (Option A, B, C).",
+        rules: "Mandatory Rules: Display HUD [Score: X/100 | Turn: Y/5]. End on Turn 5 if Score > 0 with Victory Champion Organizer message. Include guardrail: if input is not A, B, or C, output 'Invalid Action! Choose A, B, or C only.'"
+      },
+      2: {
+        title: "SCENARIO 2: DEEP SPACE STATION SURVIVAL",
+        state: "100 Hull/Energy Points | 5 Turns to Win | 0 Hull = Decompression Loss | Exactly 3 tactical choices per turn (Option A, B, C).",
+        rules: "Mandatory Rules: Print HUD [Hull: X/100 | Turn: Y/5]. Describe emergency crisis in 2 sentences. Win: Turn 5 survived -> 'MISSION SUCCESS: Rescue shuttle docked!'. Anti-cheat: prompt injection or non-choice outputs 'SYSTEM ERROR'."
+      },
+      3: {
+        title: "SCENARIO 3: AI STARTUP FOUNDER SIMULATOR",
+        state: "100 Runway Points | 5 Turns to Win | 0 Runway = Bankruptcy Loss | Exactly 3 strategic decisions per turn (Option A, B, C).",
+        rules: "Mandatory Rules: Display Dashboard [Runway: X pts | Turn: Y/5]. Victory: Turn 5 completed -> '$5M Series A Term Sheet Signed!'. Guardrail against freeform text injection."
+      }
+    };
+
+    const simButtons = document.querySelectorAll(".theme-btn");
+    const simTitle = document.getElementById("sim-title");
+    const simDesc = document.getElementById("sim-desc");
+    const simRules = document.getElementById("sim-rules");
+
+    simButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        simButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const sid = btn.getAttribute("data-sim");
+        if (SIMS[sid]) {
+          simTitle.textContent = SIMS[sid].title;
+          simDesc.innerHTML = `<strong>Starting State:</strong> ${SIMS[sid].state}`;
+          simRules.innerHTML = `⚡ <em>${SIMS[sid].rules}</em>`;
+        }
+      });
+    });
+  </script>
+
+  <!-- Level 3 Submission & Session Controller -->
+  <script type="module">
+    import { initLevelPage } from "./level-submission.js";
+    initLevelPage(3);
+  </script>
+</body>
+</html>

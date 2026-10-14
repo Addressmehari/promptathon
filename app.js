@@ -158,6 +158,23 @@ function isLevelCompleted(lvl) {
   );
 }
 
+function isLevelViolated(lvl) {
+  if (!currentTeam) return false;
+  return Boolean(
+    currentTeam[`lvl${lvl}`]?.violated === "true" ||
+    currentTeam[`lvl${lvl}`]?.violated === true ||
+    (currentTeam[`level_${lvl}_strikes`] >= 3)
+  );
+}
+
+function isLevelStarted(lvl) {
+  if (!currentTeam) return false;
+  return Boolean(
+    currentTeam[`level_${lvl}_startedAt`] ||
+    currentTeam[`lvl${lvl}`]?.startedAt
+  );
+}
+
 function isLevelUnlocked(lvl) {
   if (lvl === 1) return true;
   return isLevelCompleted(lvl - 1);
@@ -168,12 +185,20 @@ function updateStopIndicators() {
     const levelNum = parseInt(s.getAttribute("data-level"), 10);
     const completed = isLevelCompleted(levelNum);
     const unlocked = isLevelUnlocked(levelNum);
+    const started = isLevelStarted(levelNum);
+    const violated = isLevelViolated(levelNum);
     const pill = s.querySelector(".stop-status-pill");
     const isSelected = (selectedLevel === levelNum);
 
-    s.classList.remove("stop-locked", "stop-completed");
+    s.classList.remove("stop-locked", "stop-completed", "stop-violated");
 
-    if (!unlocked) {
+    if (violated) {
+      s.classList.add("stop-violated");
+      if (pill) {
+        pill.className = "stop-status-pill violated";
+        pill.textContent = "🚨 Violated";
+      }
+    } else if (!unlocked) {
       s.classList.add("stop-locked");
       if (pill) {
         pill.className = "stop-status-pill locked";
@@ -185,6 +210,11 @@ function updateStopIndicators() {
         pill.className = isSelected ? "stop-status-pill active" : "stop-status-pill completed";
         pill.textContent = "✓ Submitted";
       }
+    } else if (started) {
+      if (pill) {
+        pill.className = isSelected ? "stop-status-pill active" : "stop-status-pill upcoming";
+        pill.textContent = isSelected ? "In Progress" : "⏳ Running";
+      }
     } else {
       if (pill) {
         pill.className = isSelected ? "stop-status-pill active" : "stop-status-pill upcoming";
@@ -193,23 +223,35 @@ function updateStopIndicators() {
     }
   });
 
-  // Update Box C button text according to selected round's unlock & submission status
+  // Update Box C button text according to selected round's unlock, submission, and violation status
   const selectedCompleted = isLevelCompleted(selectedLevel);
   const selectedUnlocked = isLevelUnlocked(selectedLevel);
+  const selectedStarted = isLevelStarted(selectedLevel);
+  const selectedViolated = isLevelViolated(selectedLevel);
 
   if (startBtnText && startLevelBtn) {
-    if (!selectedUnlocked) {
+    startLevelBtn.classList.remove("btn-locked", "btn-violated");
+
+    if (selectedViolated) {
+      startLevelBtn.classList.add("btn-locked", "btn-violated");
+      startLevelBtn.style.cursor = "not-allowed";
+      startLevelBtn.style.opacity = "0.8";
+      startBtnText.textContent = `Level ${selectedLevel} Locked (3 Violations Triggered 🚨)`;
+    } else if (selectedCompleted) {
+      startLevelBtn.classList.add("btn-locked", "btn-submitted-locked");
+      startLevelBtn.style.cursor = "not-allowed";
+      startLevelBtn.style.opacity = "0.85";
+      startBtnText.textContent = `Level ${selectedLevel} Submitted & Locked 🔒`;
+    } else if (!selectedUnlocked) {
       startLevelBtn.classList.add("btn-locked");
       startLevelBtn.style.cursor = "not-allowed";
       startLevelBtn.style.opacity = "0.6";
       startBtnText.textContent = `Level ${selectedLevel} Locked (Complete Level ${selectedLevel - 1} First)`;
-    } else if (selectedCompleted) {
-      startLevelBtn.classList.remove("btn-locked");
+    } else if (selectedStarted) {
       startLevelBtn.style.cursor = "pointer";
       startLevelBtn.style.opacity = "1";
-      startBtnText.textContent = `Review Level ${selectedLevel} (Submitted 🔒)`;
+      startBtnText.textContent = `Continue Level ${selectedLevel} (In Progress ⏳) \u2192`;
     } else {
-      startLevelBtn.classList.remove("btn-locked");
       startLevelBtn.style.cursor = "pointer";
       startLevelBtn.style.opacity = "1";
       startBtnText.textContent = `Start Level ${selectedLevel} \u2192`;
@@ -259,6 +301,14 @@ if (startLevelBtn) {
   startLevelBtn.addEventListener("click", () => {
     if (!currentTeam) {
       showToast("Please sign in with your team credentials first.", "error");
+      return;
+    }
+    if (isLevelViolated(selectedLevel)) {
+      showToast(`Level ${selectedLevel} is permanently locked due to Safe-Browsing rule violations (3 strikes).`, "error");
+      return;
+    }
+    if (isLevelCompleted(selectedLevel)) {
+      showToast(`Level ${selectedLevel} has already been submitted and is locked. You cannot enter even to view.`, "warning");
       return;
     }
     if (!isLevelUnlocked(selectedLevel)) {
@@ -372,16 +422,6 @@ async function findTeamInDb(inputIdentifier) {
 
 let teamDocUnsubscribe = null;
 
-function calculateTeamScore(data) {
-  if (!data) return 0;
-  let total = 0;
-  for (let lvl = 1; lvl <= 4; lvl++) {
-    const s = data[`lvl${lvl}`]?.score;
-    if (typeof s === "number") total += s;
-  }
-  return total;
-}
-
 // Switch to Workspace
 function unlockWorkspace(teamData) {
   currentTeam = { ...teamData };
@@ -395,12 +435,6 @@ function unlockWorkspace(teamData) {
   passOriginalId.textContent = currentTeam.originalId;
   passLeaderName.textContent = currentTeam.leaderName || "N/A";
   passParticipants.textContent = currentTeam.participants || "Team Members";
-
-  // Score display (computed strictly from lvl1..lvl4 scores)
-  const teamScoreNum = document.getElementById("team-score-num");
-  if (teamScoreNum) {
-    teamScoreNum.textContent = calculateTeamScore(currentTeam);
-  }
 
   // Update visual state of level stops to show which ones are already completed
   updateStopIndicators();
@@ -432,9 +466,6 @@ function unlockWorkspace(teamData) {
           }
         }
         sessionStorage.setItem("promptathon_active_team", JSON.stringify(currentTeam));
-        if (teamScoreNum) {
-          teamScoreNum.textContent = calculateTeamScore(currentTeam);
-        }
         updateStopIndicators();
       }
     }, (err) => {

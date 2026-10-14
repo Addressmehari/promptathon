@@ -22,7 +22,7 @@
   <div class="bg-grid-overlay"></div>
 
   <main class="level-page-container">
-    <!-- Top Header with Team Session & Exit Button -->
+    <!-- Top Header with Team Session & Proctored Status -->
     <header class="level-top-header">
       <div class="level-team-info">
         <span class="level-badge-tag" id="level-team-badge">AUTHENTICATING...</span>
@@ -30,14 +30,21 @@
       </div>
 
       <div class="level-actions">
-        <!-- Exit to Dashboard (Loads in same tab, preserving session) -->
-        <a href="index.html" class="exit-level-btn" id="exit-btn" title="Return to Portal Dashboard">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
+        <!-- Live Countdown Timer -->
+        <div class="level-timer-badge" id="level-timer-badge" title="40-Minute Countdown Timer">
+          <svg class="timer-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
-          <span>Exit Round</span>
-        </a>
+          <span class="timer-label">TIME LEFT:</span>
+          <span class="timer-digits" id="level-timer-clock">40:00</span>
+        </div>
+
+        <!-- Safe-Browsing Strikes Badge -->
+        <div class="level-strikes-badge" id="level-strikes-badge" title="Safe-Browsing Proctored Mode (Max 3 Strikes)">
+          <span class="strikes-label">STRIKES:</span>
+          <span class="strikes-count" id="strikes-count-display">0/3</span>
+        </div>
       </div>
     </header>
 
@@ -46,7 +53,7 @@
       <div class="level-arena-header">
         <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
           <span class="level-number-pill">ROUND 2 // THE DEBUGGER</span>
-          <span class="level-badge-tag" style="background: rgba(255, 255, 255, 0.05); color: #ffffff; border-color: rgba(255, 255, 255, 0.15);">⏱ 15 Minutes</span>
+          <span class="level-badge-tag" style="background: rgba(255, 255, 255, 0.05); color: #ffffff; border-color: rgba(255, 255, 255, 0.15);">⏱ 40 Minutes</span>
           <span class="level-badge-tag" style="background: rgba(134, 239, 172, 0.1); color: #86efac; border-color: rgba(134, 239, 172, 0.3);">Format: Engineered System / User Prompts</span>
         </div>
         <h1 class="level-heading">The Debugger (Prompt Optimization & Fixes)</h1>
@@ -67,89 +74,83 @@
       <!-- 3 Scenario Input Cards -->
       <div class="scenarios-container">
 
-        <!-- Scenario 1 -->
+        <!-- Scenario 1: Corporate Emergency Leave -->
         <article class="scenario-card" id="card-scenario-1">
           <div class="scenario-card-header">
             <span class="scenario-tag">SCENARIO 1 // CORPORATE EMERGENCY LEAVE</span>
             <span class="scenario-status-pill" id="scenario-1-status">Pending</span>
           </div>
-          <div class="scenario-brief-box">
-            <div style="margin-bottom: 8px; padding: 8px 12px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; border-radius: 2px;">
-              <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #fca5a5; font-weight: 700; display: block;">BROKEN PROMPT (TO FIX):</span>
-              <span style="font-size: 0.92rem; color: #ffffff; font-family: var(--font-mono);">"Write a leave letter."</span>
-            </div>
-            <div class="scenario-brief-content">
-              <strong>Required Constraints:</strong> Corporate professional tone, strictly under 50 words, mandatory sections ([Subject], [Reason], [Handover], [Signature]), forbidden words: <code>'sick'</code>, <code>'sorry'</code>.
+
+          <div class="scenario-brief-box" style="margin-bottom: 12px; padding: 12px 16px;">
+            <div class="scenario-brief-content" style="margin-bottom: 0;">
+              <strong>Task:</strong> Optimize the vague prompt <code>"Write a leave letter"</code> to be professional, under 50 words, without using <code>'sick'</code> or <code>'sorry'</code>.
             </div>
           </div>
+
           <div class="form-group" style="margin-bottom: 0;">
             <label for="scenario-1-input" class="field-label">
-              <span>Scenario 1 Optimized Prompt</span>
+              <span>Your Optimized Prompt (Input)</span>
               <span class="required-badge">*</span>
             </label>
             <textarea 
               id="scenario-1-input" 
               class="level-textarea" 
-              rows="6" 
-              placeholder="Write your optimized, engineered prompt here including role, structure, and negative constraints..."
+              rows="5" 
+              placeholder="Write your optimized prompt here..."
             ></textarea>
           </div>
         </article>
 
-        <!-- Scenario 2 -->
+        <!-- Scenario 2: Product Feature Spec -->
         <article class="scenario-card" id="card-scenario-2">
           <div class="scenario-card-header">
             <span class="scenario-tag">SCENARIO 2 // PRODUCT FEATURE SPEC (JSON ONLY)</span>
             <span class="scenario-status-pill" id="scenario-2-status">Pending</span>
           </div>
-          <div class="scenario-brief-box">
-            <div style="margin-bottom: 8px; padding: 8px 12px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; border-radius: 2px;">
-              <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #fca5a5; font-weight: 700; display: block;">BROKEN PROMPT (TO FIX):</span>
-              <span style="font-size: 0.92rem; color: #ffffff; font-family: var(--font-mono);">"Tell me about a new AI feature for a mobile app."</span>
-            </div>
-            <div class="scenario-brief-content">
-              <strong>Required Constraints:</strong> Valid parseable raw JSON only (no markdown fences, no conversational text), exact schema keys (<code>feature_name</code>, <code>target_users</code>, <code>tech_stack</code>, <code>latency_target_ms</code>), latency_target_ms strictly &lt; 100.
+
+          <div class="scenario-brief-box" style="margin-bottom: 12px; padding: 12px 16px;">
+            <div class="scenario-brief-content" style="margin-bottom: 0;">
+              <strong>Task:</strong> Optimize <code>"Tell me about a new AI feature"</code> to output valid raw JSON with keys: <code>feature_name</code>, <code>target_users</code>, <code>tech_stack</code>, and <code>latency_target_ms</code>.
             </div>
           </div>
+
           <div class="form-group" style="margin-bottom: 0;">
             <label for="scenario-2-input" class="field-label">
-              <span>Scenario 2 Optimized Prompt</span>
+              <span>Your Optimized Prompt (Input)</span>
               <span class="required-badge">*</span>
             </label>
             <textarea 
               id="scenario-2-input" 
               class="level-textarea" 
-              rows="6" 
-              placeholder="Write your engineered prompt demanding pure JSON schema output with strict keys..."
+              rows="5" 
+              placeholder="Write your optimized prompt here..."
             ></textarea>
           </div>
         </article>
 
-        <!-- Scenario 3 -->
+        <!-- Scenario 3: Startup Investor Pitch -->
         <article class="scenario-card" id="card-scenario-3">
           <div class="scenario-card-header">
             <span class="scenario-tag">SCENARIO 3 // STARTUP INVESTOR PITCH</span>
             <span class="scenario-status-pill" id="scenario-3-status">Pending</span>
           </div>
-          <div class="scenario-brief-box">
-            <div style="margin-bottom: 8px; padding: 8px 12px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; border-radius: 2px;">
-              <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #fca5a5; font-weight: 700; display: block;">BROKEN PROMPT (TO FIX):</span>
-              <span style="font-size: 0.92rem; color: #ffffff; font-family: var(--font-mono);">"Summarize our green energy startup idea for investors."</span>
-            </div>
-            <div class="scenario-brief-content">
-              <strong>Required Constraints:</strong> Exactly 3 bullet points (• Problem, • Proprietary Solution, • Fund Ask), strictly under 60 words total, forbidden buzzwords: <code>'disruptive'</code>, <code>'revolutionize'</code>, <code>'game-changer'</code>.
+
+          <div class="scenario-brief-box" style="margin-bottom: 12px; padding: 12px 16px;">
+            <div class="scenario-brief-content" style="margin-bottom: 0;">
+              <strong>Task:</strong> Optimize <code>"Summarize our startup idea"</code> into exactly 3 bullets under 60 words, without buzzwords like <code>'disruptive'</code> or <code>'game-changer'</code>.
             </div>
           </div>
+
           <div class="form-group" style="margin-bottom: 0;">
             <label for="scenario-3-input" class="field-label">
-              <span>Scenario 3 Optimized Prompt</span>
+              <span>Your Optimized Prompt (Input)</span>
               <span class="required-badge">*</span>
             </label>
             <textarea 
               id="scenario-3-input" 
               class="level-textarea" 
-              rows="6" 
-              placeholder="Write your prompt enforcing the 3 bullet points structure, strict word count, and negative buzzword filters..."
+              rows="5" 
+              placeholder="Write your optimized prompt here..."
             ></textarea>
           </div>
         </article>

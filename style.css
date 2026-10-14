@@ -2676,4 +2676,948 @@ input[type=number] {
   margin: 0;
 }
 
+/* Target Output Display Box for Reverse Prompting */
+.target-output-card {
+  background: rgba(16, 24, 34, 0.95);
+  border: 1px solid rgba(134, 239, 172, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 14px 0 18px 0;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 16px rgba(0, 0, 0, 0.3);
+}
 
+.target-output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.target-output-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #86efac;
+  text-transform: uppercase;
+}
+
+.target-output-body {
+  background: rgba(6, 10, 14, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xs);
+  padding: 14px 18px;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  color: #e2e8f0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  user-select: all;
+}
+
+.target-output-body.emoji-display {
+  font-size: 2.2rem;
+  letter-spacing: 0.4em;
+  text-align: center;
+  padding: 16px 20px;
+}
+
+.target-output-body.code-display {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  color: #38bdf8;
+  font-size: 0.88rem;
+}
+
+/* ========================================== */
+/* Level Arena Live Countdown Timer          */
+/* ========================================== */
+.level-timer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(12, 16, 20, 0.9);
+  border: 1px solid rgba(134, 239, 172, 0.35);
+  border-radius: var(--radius-sm);
+  color: #86efac;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.level-timer-badge .timer-icon {
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
+.level-timer-badge .timer-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.level-timer-badge .timer-digits {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #86efac;
+  letter-spacing: 0.06em;
+}
+
+/* Warning state (< 10 minutes) */
+.level-timer-badge.timer-warning {
+  border-color: rgba(253, 224, 71, 0.5);
+  background: rgba(253, 224, 71, 0.08);
+  color: #fde047;
+}
+
+.level-timer-badge.timer-warning .timer-digits {
+  color: #fde047;
+}
+
+/* Critical urgent state (< 5 minutes) */
+.level-timer-badge.timer-critical {
+  border-color: rgba(248, 113, 113, 0.6);
+  background: rgba(248, 113, 113, 0.12);
+  color: #fca5a5;
+  animation: timerPulse 1.5s infinite ease-in-out;
+}
+
+.level-timer-badge.timer-critical .timer-digits {
+  color: #ef4444;
+}
+
+/* Expired state */
+.level-timer-badge.timer-expired {
+  border-color: rgba(239, 68, 68, 0.7);
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+/* Finished / Submitted state */
+.level-timer-badge.timer-finished {
+  border-color: rgba(134, 239, 172, 0.3);
+  background: rgba(134, 239, 172, 0.08);
+  color: #86efac;
+}
+
+.level-timer-badge.timer-finished .timer-label {
+  display: none;
+}
+
+@keyframes timerPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 14px 2px rgba(239, 68, 68, 0.25);
+  }
+}
+
+/* ========================================== */
+/* Safe-Browsing & Proctoring Controls        */
+/* ========================================== */
+.level-strikes-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(12, 16, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  color: #94a3b8;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.level-strikes-badge .strikes-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.level-strikes-badge .strikes-count {
+  font-weight: 800;
+  color: #f1f5f9;
+}
+
+.level-strikes-badge.strike-1 {
+  border-color: rgba(253, 224, 71, 0.5);
+  background: rgba(253, 224, 71, 0.1);
+  color: #fde047;
+}
+
+.level-strikes-badge.strike-1 .strikes-count {
+  color: #fde047;
+}
+
+.level-strikes-badge.strike-2 {
+  border-color: rgba(249, 115, 22, 0.6);
+  background: rgba(249, 115, 22, 0.15);
+  color: #fb923c;
+  animation: timerPulse 1.5s infinite;
+}
+
+.level-strikes-badge.strike-2 .strikes-count {
+  color: #fb923c;
+}
+
+.level-strikes-badge.strike-3,
+.level-strikes-badge.strike-violated {
+  border-color: rgba(239, 68, 68, 0.7);
+  background: rgba(239, 68, 68, 0.22);
+  color: #ef4444;
+}
+
+.level-strikes-badge.strike-3 .strikes-count,
+.level-strikes-badge.strike-violated .strikes-count {
+  color: #ef4444;
+}
+
+/* Mission Map Disqualification & Violation States */
+.health-stop.stop-violated {
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+.health-stop.stop-violated .stop-tag {
+  color: #ef4444 !important;
+}
+
+.stop-status-pill.violated {
+  background: rgba(239, 68, 68, 0.22) !important;
+  color: #fca5a5 !important;
+  border: 1px solid rgba(239, 68, 68, 0.45) !important;
+}
+
+.start-level-button.btn-violated {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+  color: #fca5a5 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+.start-level-button.btn-locked {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: var(--text-subtle) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.start-level-button.btn-locked:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.start-level-button.btn-submitted-locked {
+  background: rgba(134, 239, 172, 0.1) !important;
+  border-color: rgba(134, 239, 172, 0.35) !important;
+  color: #86efac !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.start-level-button.btn-submitted-locked:hover {
+  background: rgba(134, 239, 172, 0.12) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Proctored Arena Modal Overlay */
+.proctor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(8, 11, 15, 0.94);
+  backdrop-filter: blur(10px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.proctor-modal {
+  max-width: 540px;
+  width: 100%;
+  background: #0e1217;
+  border: 1px solid rgba(134, 239, 172, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 32px 36px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8), 0 0 32px rgba(134, 239, 172, 0.1);
+  text-align: center;
+  animation: fadeInModal 0.25s ease;
+}
+
+.proctor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 12px;
+  background: rgba(134, 239, 172, 0.12);
+  color: #86efac;
+  border: 1px solid rgba(134, 239, 172, 0.3);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+
+.proctor-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.proctor-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.proctor-rules-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.proctor-rules-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.proctor-rules-list li strong {
+  color: #ffffff;
+}
+
+.proctor-enter-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: #86efac;
+  color: #062b18;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 800;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.proctor-enter-btn:hover {
+  background: #bbf7d0;
+  box-shadow: 0 0 16px rgba(134, 239, 172, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Violation Alert Popup */
+.violation-popup-modal {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100000;
+  background: rgba(18, 12, 12, 0.97);
+  border: 1.5px solid rgba(239, 68, 68, 0.6);
+  border-radius: var(--radius-md);
+  padding: 18px 26px;
+  box-shadow: 0 12px 32px rgba(239, 68, 68, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 560px;
+  width: 90%;
+  animation: slideDownAlert 0.3s ease;
+}
+
+.violation-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.violation-content {
+  flex-grow: 1;
+}
+
+.violation-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ef4444;
+  margin-bottom: 4px;
+}
+
+.violation-message {
+  font-size: 0.82rem;
+  color: #f1f5f9;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.violation-strike-dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.violation-dot {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+
+.violation-dot.hit {
+  background: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+@keyframes slideDownAlert {
+  from {
+    transform: translate(-50%, -40px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Violation Disqualification Dialogue Modal */
+.proctor-modal.violation-modal {
+  border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.85), 0 0 35px rgba(239, 68, 68, 0.2);
+  animation: modalShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes modalShake {
+  0% { transform: scale(0.96) translate(0, 0); }
+  20% { transform: scale(1.01) translate(-6px, 0); }
+  40% { transform: scale(1.01) translate(6px, 0); }
+  60% { transform: scale(1) translate(-3px, 0); }
+  80% { transform: scale(1) translate(3px, 0); }
+  100% { transform: scale(1) translate(0, 0); }
+}
+
+.proctor-badge.violation-badge {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.violation-title {
+  color: #f87171 !important;
+}
+
+.violation-card-box {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  margin: 18px 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.88rem;
+}
+
+.violation-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.violation-row strong {
+  font-family: var(--font-mono);
+}
+
+.violation-countdown-text {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: #fca5a5;
+  margin-bottom: 16px;
+  opacity: 0.95;
+}
+
+.violation-exit-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background: #ef4444;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+}
+
+.violation-exit-btn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
+}
+
+/* ==========================================================================
+   Level 4: Maze Navigation Arena Styles (Large 4x4 Grid)
+   ========================================================================== */
+.maze-arena-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.maze-card {
+  width: 100%;
+  background: rgba(14, 18, 24, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm, 4px);
+  padding: 20px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.maze-card-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.maze-card-title {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.maze-legend-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.76rem;
+  font-family: var(--font-mono);
+  color: #94a3b8;
+}
+
+.maze-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.maze-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.maze-legend-player {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+}
+
+.maze-legend-wall {
+  background: #737373;
+  border: 1.5px solid #000000;
+}
+
+.maze-canvas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+}
+
+#maze-canvas {
+  width: 500px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.maze-tools-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 8px;
+}
+
+.maze-coords-pill {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.maze-coords-pill span {
+  color: #86efac;
+  font-weight: 700;
+}
+
+.maze-tool-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.maze-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* Prompt Textbar Section (Directly Below Image) */
+.maze-prompt-section {
+  width: 100%;
+  background: rgba(14, 18, 24, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm, 4px);
+  padding: 18px 20px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.maze-prompt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.maze-prompt-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.maze-prompt-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.maze-textarea-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.maze-textarea {
+  width: 100%;
+  background: #080c11;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  color: #f1f5f9;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  padding: 14px 16px;
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.maze-textarea:focus {
+  border-color: #86efac;
+  box-shadow: 0 0 0 3px rgba(134, 239, 172, 0.18);
+}
+
+.maze-prompt-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--text-subtle);
+}
+
+.maze-counter-badge {
+  color: #86efac;
+  font-weight: 700;
+}
+
+/* =========================================================
+   ADMIN JUDGE ANALYTICS, RANK BADGES & EXPORT SYSTEM
+   ========================================================= */
+
+/* Sortable Table Headers */
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.sortable-th:hover {
+  color: #86efac;
+  background: rgba(134, 239, 172, 0.05);
+}
+
+.sort-indicator {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  opacity: 0.6;
+  vertical-align: middle;
+}
+
+.sortable-th.active-sort {
+  color: #86efac;
+}
+
+.sortable-th.active-sort .sort-indicator {
+  color: #86efac;
+  opacity: 1;
+  font-weight: 800;
+}
+
+/* Leaderboard Rank Badges */
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.rank-badge.rank-1 {
+  background: rgba(234, 179, 8, 0.18);
+  border: 1px solid rgba(234, 179, 8, 0.45);
+  color: #fde047;
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.2);
+}
+
+.rank-badge.rank-2 {
+  background: rgba(203, 213, 225, 0.18);
+  border: 1px solid rgba(203, 213, 225, 0.45);
+  color: #f1f5f9;
+}
+
+.rank-badge.rank-3 {
+  background: rgba(217, 119, 6, 0.18);
+  border: 1px solid rgba(217, 119, 6, 0.45);
+  color: #fdba74;
+}
+
+.rank-badge.rank-other {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+}
+
+/* Download Dropdown */
+.export-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.export-dropdown-content {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: #0b1016;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  min-width: 270px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  padding: 6px;
+  display: none;
+}
+
+.export-dropdown-content.show {
+  display: block;
+  animation: fadeInDown 0.15s ease-out;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.export-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.export-dropdown-item:hover {
+  background: rgba(99, 102, 241, 0.18);
+  color: #ffffff;
+}
+
+.export-dropdown-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: #86efac;
+}
+
+/* Judge Podium Cards */
+.judge-podium-card {
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.judge-podium-card.first {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(234, 179, 8, 0.05));
+  border: 1.5px solid rgba(234, 179, 8, 0.45);
+}
+
+.judge-podium-card.second {
+  background: linear-gradient(135deg, rgba(203, 213, 225, 0.15), rgba(203, 213, 225, 0.05));
+  border: 1.5px solid rgba(203, 213, 225, 0.45);
+}
+
+.judge-podium-card.third {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.15), rgba(217, 119, 6, 0.05));
+  border: 1.5px solid rgba(217, 119, 6, 0.45);
+}
+
+/* Printable Sheet styles for Judges */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #judge-modal, #judge-modal * {
+    visibility: visible;
+  }
+  #judge-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  #judge-modal .modal-card {
+    border: none !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    background: #ffffff !important;
+    max-width: 100% !important;
+  }
+  #judge-modal button, #close-judge-modal-btn {
+    display: none !important;
+  }
+}

@@ -245,12 +245,26 @@ function renderTable() {
         `;
         tdLvl.querySelector(".level-status-badge").addEventListener("click", () => openEvalModal(team, lvl));
       } else {
-        tdLvl.innerHTML = `
-          <div class="level-cell-box">
-            <span class="level-status-badge pending" title="Not submitted yet">- Pending</span>
-            <span style="font-size: 0.72rem; color: #64748b; font-family: var(--font-mono);">0 pts</span>
-          </div>
-        `;
+        const startedAt = rd?.startedAt || team[`level_${lvl}_startedAt`] || team[`lvl${lvl}_startedAt`];
+        if (startedAt) {
+          const elapsed = Date.now() - startedAt;
+          const remainingMins = Math.max(0, Math.floor((40 * 60 * 1000 - elapsed) / 60000));
+          tdLvl.innerHTML = `
+            <div class="level-cell-box">
+              <span class="level-status-badge pending" title="Level started - timer active" style="cursor: pointer; color: #fde047; border-color: rgba(253, 224, 71, 0.4); background: rgba(253, 224, 71, 0.1);">
+                ⏳ ${remainingMins}m left
+              </span>
+              <span style="font-size: 0.72rem; color: #64748b; font-family: var(--font-mono);">In Progress</span>
+            </div>
+          `;
+        } else {
+          tdLvl.innerHTML = `
+            <div class="level-cell-box">
+              <span class="level-status-badge pending" title="Not started yet" style="cursor: pointer;">- Pending</span>
+              <span style="font-size: 0.72rem; color: #64748b; font-family: var(--font-mono);">0 pts</span>
+            </div>
+          `;
+        }
         tdLvl.querySelector(".level-status-badge").addEventListener("click", () => openEvalModal(team, lvl));
       }
       tr.appendChild(tdLvl);
@@ -340,8 +354,15 @@ function updateEvalModalView() {
 
   if (hasSubmission) {
     evalStatusTag.className = "eval-status-tag submitted";
-    evalStatusTag.textContent = "✓ SUBMITTED (ALL 3 PARTS)";
-    evalTimeTag.textContent = rd.time ? `Submitted: ${rd.time}` : "Submitted";
+    evalStatusTag.textContent = rd.autoSubmitted ? "✓ AUTO-SUBMITTED (TIME EXPIRED)" : "✓ SUBMITTED (ALL 3 PARTS)";
+    
+    let timeText = rd.time ? `Submitted: ${rd.time}` : "Submitted";
+    const startedAt = currentEvalTeam?.[`level_${currentEvalLevel}_startedAt`] || rd?.startedAt;
+    if (startedAt) {
+      const startStr = new Date(startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      timeText = `Started: ${startStr} • ${timeText}`;
+    }
+    evalTimeTag.textContent = timeText;
 
     // Format scenarios nicely inside evalPromptContent
     if (rd.scenarios && (rd.scenarios.scenario_1 || rd.scenarios.scenario1)) {
@@ -375,9 +396,28 @@ function updateEvalModalView() {
     evalUnlockLevelBtn.style.opacity = "1";
     evalUnlockLevelBtn.style.cursor = "pointer";
   } else {
-    evalStatusTag.className = "eval-status-tag pending";
-    evalStatusTag.textContent = "PENDING / NOT SUBMITTED";
-    evalTimeTag.textContent = "No submission yet";
+    const startedAt = rd?.startedAt || currentEvalTeam?.[`level_${currentEvalLevel}_startedAt`] || currentEvalTeam?.[`lvl${currentEvalLevel}_startedAt`];
+    if (startedAt) {
+      evalStatusTag.className = "eval-status-tag pending";
+      evalStatusTag.textContent = "⏳ IN PROGRESS (TIMER ACTIVE)";
+      evalStatusTag.style.color = "#fde047";
+      evalStatusTag.style.borderColor = "rgba(253, 224, 71, 0.4)";
+      evalStatusTag.style.background = "rgba(253, 224, 71, 0.12)";
+
+      const startStr = new Date(startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const elapsed = Date.now() - startedAt;
+      const remainingMins = Math.max(0, Math.floor((40 * 60 * 1000 - elapsed) / 60000));
+      const remainingSecs = Math.max(0, Math.floor(((40 * 60 * 1000 - elapsed) % 60000) / 1000));
+      evalTimeTag.textContent = `Started: ${startStr} • ⏱ ${remainingMins}m ${remainingSecs}s remaining (of 40m)`;
+    } else {
+      evalStatusTag.className = "eval-status-tag pending";
+      evalStatusTag.textContent = "PENDING / NOT STARTED";
+      evalStatusTag.style.color = "";
+      evalStatusTag.style.borderColor = "";
+      evalStatusTag.style.background = "";
+      evalTimeTag.textContent = "Round not yet started by team";
+    }
+
     evalPromptContent.textContent = "This team has not submitted responses for this round yet.";
     evalPromptContent.style.color = "#64748b";
     evalScoreInput.value = (rd && rd.score !== undefined) ? rd.score : 0;
@@ -464,11 +504,13 @@ if (evalUnlockLevelBtn) {
     try {
       const docRef = doc(db, "registrations", currentEvalTeam.id);
       
-      // Delete the round map, any legacy fields, and any root score field
+      // Delete the round map, any legacy fields, start time, and any root score field
       await updateDoc(docRef, {
         [`lvl${currentEvalLevel}`]: deleteField(),
         [`level_${currentEvalLevel}_response`]: deleteField(),
         [`level-${currentEvalLevel}-response`]: deleteField(),
+        [`level_${currentEvalLevel}_startedAt`]: deleteField(),
+        [`lvl${currentEvalLevel}_startedAt`]: deleteField(),
         score: deleteField(),
         updatedAt: serverTimestamp()
       });
@@ -476,6 +518,8 @@ if (evalUnlockLevelBtn) {
       delete currentEvalTeam[`lvl${currentEvalLevel}`];
       delete currentEvalTeam[`level_${currentEvalLevel}_response`];
       delete currentEvalTeam[`level-${currentEvalLevel}-response`];
+      delete currentEvalTeam[`level_${currentEvalLevel}_startedAt`];
+      delete currentEvalTeam[`lvl${currentEvalLevel}_startedAt`];
       delete currentEvalTeam.score;
 
       showToast(`Level ${currentEvalLevel} unlocked for ${currentEvalTeam.teamName}!`, "success");

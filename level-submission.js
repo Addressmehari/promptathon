@@ -131,7 +131,22 @@ export async function initLevelPage(levelNumber) {
     }, 4000);
   }
 
-  // 2. Connect to Firestore
+  // 2. Connect to Firestore & Timer Configuration (Strictly Database-Driven)
+  const LEVEL_DURATION_MINUTES = 40;
+  const LEVEL_DURATION_MS = LEVEL_DURATION_MINUTES * 60 * 1000;
+  let levelTimerInterval = null;
+  let levelStartedAt = null;
+  let isTimeExpired = false;
+  let isRecordingStartTime = false;
+
+  const timerBadge = document.getElementById("level-timer-badge");
+  const timerClock = document.getElementById("level-timer-clock");
+
+  // Always clear any stale localStorage keys so client timer never diverges from database
+  try {
+    localStorage.removeItem(`team_${team.teamId}_level_${levelNumber}_startedAt`);
+  } catch (e) {}
+
   let db = null;
   try {
     const fb = await initFirebaseFromEnv();
@@ -140,12 +155,137 @@ export async function initLevelPage(levelNumber) {
     console.warn("Firestore connection warning in level:", err.message);
   }
 
-  // 3. Lock & Unlock state helpers
+  // 3. Countdown Timer Functions (Driven 100% by Database start time)
+  function resetCountdownTimer() {
+    if (levelTimerInterval) {
+      clearInterval(levelTimerInterval);
+      levelTimerInterval = null;
+    }
+    levelStartedAt = null;
+    isTimeExpired = false;
+    if (timerClock) timerClock.textContent = "40:00";
+    if (timerBadge) {
+      timerBadge.className = "level-timer-badge";
+      timerBadge.setAttribute("title", "40-Minute Countdown Timer");
+    }
+  }
+
+  function startCountdown(startedAtMs) {
+    if (!startedAtMs || isNaN(startedAtMs)) return;
+    levelStartedAt = Number(startedAtMs);
+
+    if (levelTimerInterval) clearInterval(levelTimerInterval);
+
+    function tick() {
+      if (isAlreadySubmitted) {
+        if (timerClock) timerClock.textContent = "COMPLETED";
+        if (timerBadge) {
+          timerBadge.className = "level-timer-badge timer-finished";
+          timerBadge.setAttribute("title", "Round completed & locked");
+        }
+        clearInterval(levelTimerInterval);
+        return;
+      }
+
+      const now = Date.now();
+      const elapsed = now - levelStartedAt;
+      const remaining = Math.max(0, LEVEL_DURATION_MS - elapsed);
+
+      const totalSeconds = Math.floor(remaining / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      const formatted = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+      if (timerClock) {
+        timerClock.textContent = formatted;
+      }
+
+      if (timerBadge) {
+        if (remaining <= 0) {
+          timerBadge.className = "level-timer-badge timer-critical timer-expired";
+        } else if (remaining < 5 * 60 * 1000) { // Under 5 mins: urgent red pulse
+          timerBadge.className = "level-timer-badge timer-critical";
+        } else if (remaining < 10 * 60 * 1000) { // Under 10 mins: amber warning
+          timerBadge.className = "level-timer-badge timer-warning";
+        } else {
+          timerBadge.className = "level-timer-badge";
+        }
+      }
+
+      if (remaining <= 0 && !isTimeExpired && !isAlreadySubmitted) {
+        isTimeExpired = true;
+        clearInterval(levelTimerInterval);
+        onTimeExpired();
+      }
+    }
+
+    tick();
+    levelTimerInterval = setInterval(tick, 1000);
+  }
+
+  async function onTimeExpired() {
+    showToast("⏰ 40 minutes has expired! Auto-submitting your work now...", "warning");
+    await executeSubmission(true);
+  }
+
+  // Sync Timer Strictly from Database: DB is the single source of truth
+  async function syncTimerFromDb(data) {
+    const isCompleted = Boolean(
+      data?.[`lvl${levelNumber}`]?.scenarios ||
+      data?.[`lvl${levelNumber}`]?.resp ||
+      data?.[`level_${levelNumber}_response`]
+    );
+    if (isCompleted) {
+      if (levelTimerInterval) clearInterval(levelTimerInterval);
+      if (timerClock) timerClock.textContent = "COMPLETED";
+      if (timerBadge) timerBadge.className = "level-timer-badge timer-finished";
+      return;
+    }
+
+    // Read strictly from Firestore DB level_<levelNumber>_startedAt
+    const dbStartTime = data?.[`level_${levelNumber}_startedAt`];
+
+    // If database has an active startedAt, run countdown strictly from it
+    if (dbStartTime) {
+      startCountdown(Number(dbStartTime));
+      return;
+    }
+
+    // If database does NOT have startedAt (was reset or never started):
+    // Stop any existing ticking clock and reset visually to 40:00
+    resetCountdownTimer();
+
+    // Create fresh start time and write ONLY level_<levelNumber>_startedAt to DB
+    if (db && team.teamId && !isRecordingStartTime) {
+      isRecordingStartTime = true;
+      const freshStart = Date.now();
+      try {
+        const docRef = doc(db, "registrations", team.teamId);
+        await setDoc(docRef, {
+          [`level_${levelNumber}_startedAt`]: freshStart
+        }, { merge: true });
+        console.log(`Initialized fresh level_${levelNumber}_startedAt in DB:`, freshStart);
+        startCountdown(freshStart);
+      } catch (err) {
+        console.warn("Could not save start time to DB:", err.message);
+      } finally {
+        isRecordingStartTime = false;
+      }
+    }
+  }
+
+  // 4. Lock & Unlock state helpers
   let isAlreadySubmitted = false;
   let existingScore = 0;
 
   function lockAsSubmitted(dataPayload, submissionTime) {
     isAlreadySubmitted = true;
+    if (levelTimerInterval) clearInterval(levelTimerInterval);
+    if (timerClock) timerClock.textContent = "COMPLETED";
+    if (timerBadge) {
+      timerBadge.className = "level-timer-badge timer-finished";
+      timerBadge.setAttribute("title", "Round completed & locked");
+    }
 
     // Extract scenario values
     let s1 = "";
@@ -157,7 +297,6 @@ export async function initLevelPage(levelNumber) {
       s2 = dataPayload.scenario_2 || dataPayload.scenario2 || "";
       s3 = dataPayload.scenario_3 || dataPayload.scenario3 || "";
     } else if (typeof dataPayload === "string") {
-      // Legacy or consolidated string format
       const m1 = dataPayload.match(/\[SCENARIO 1\]\s*([\s\S]*?)(?=\[SCENARIO 2\]|$)/i);
       const m2 = dataPayload.match(/\[SCENARIO 2\]\s*([\s\S]*?)(?=\[SCENARIO 3\]|$)/i);
       const m3 = dataPayload.match(/\[SCENARIO 3\]\s*([\s\S]*?)$/i);
@@ -227,6 +366,10 @@ export async function initLevelPage(levelNumber) {
   function unlockState(notify = false) {
     const wasLocked = isAlreadySubmitted;
     isAlreadySubmitted = false;
+    isTimeExpired = false;
+
+    // Reset countdown timer visually to 40:00 when unlocked
+    resetCountdownTimer();
 
     [scenario1Input, scenario2Input, scenario3Input, singleLegacyInput].forEach(inp => {
       if (inp) {
@@ -267,6 +410,7 @@ export async function initLevelPage(levelNumber) {
     if (team[`lvl${levelNumber}`]) delete team[`lvl${levelNumber}`];
     if (team[`level_${levelNumber}_response`]) delete team[`level_${levelNumber}_response`];
     if (team[`level-${levelNumber}-response`]) delete team[`level-${levelNumber}-response`];
+    delete team[`level_${levelNumber}_startedAt`];
     sessionStorage.setItem("promptathon_active_team", JSON.stringify(team));
 
     if (notify && wasLocked) {
@@ -274,10 +418,9 @@ export async function initLevelPage(levelNumber) {
     }
   }
 
-  // 4. Real-time Firestore sync: DB is Single Source of Truth
-  // If response exists in DB -> Locked. If deleted from DB -> Instantly UNLOCKED!
+  // 5. Real-time Firestore sync: DB is Single Source of Truth
   if (db && team.teamId) {
-    onSnapshot(doc(db, "registrations", team.teamId), (docSnap) => {
+    onSnapshot(doc(db, "registrations", team.teamId), async (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
 
@@ -307,11 +450,14 @@ export async function initLevelPage(levelNumber) {
           const payload = lvlData?.scenarios || lvlData?.resp || data[`level_${levelNumber}_response`];
           lockAsSubmitted(payload, lvlData?.time);
         } else {
-          // Field was deleted from database -> Unlock!
-          unlockState(true);
+          // If level submission was cleared / unlocked in database
+          if (isAlreadySubmitted) {
+            unlockState(true);
+          }
+          // Sync timer countdown strictly from database level_<levelNumber>_startedAt
+          await syncTimerFromDb(data);
         }
       } else {
-        // Document was deleted -> Unlock!
         unlockState(true);
       }
     }, (error) => {
@@ -323,27 +469,28 @@ export async function initLevelPage(levelNumber) {
     if (sessionLvl?.scenarios || sessionLvl?.resp || team[`level_${levelNumber}_response`]) {
       const payload = sessionLvl?.scenarios || sessionLvl?.resp || team[`level_${levelNumber}_response`];
       lockAsSubmitted(payload, sessionLvl?.time);
+    } else {
+      syncTimerFromDb(team);
     }
   }
 
   // Initial progress calculation
   updateProgress();
 
-  // 5. Handle Submit Button Click
-  if (submitBtn) {
-    submitBtn.addEventListener("click", async () => {
-      // Guard against duplicate submission
-      if (isAlreadySubmitted) {
+  // 6. Unified Submission Executor (supports manual submit & auto-submit on time expiry)
+  async function executeSubmission(isAutoSubmit = false) {
+    if (isAlreadySubmitted) {
+      if (!isAutoSubmit) {
         showToast("This level has already been submitted and is locked.", "warning");
-        return;
       }
+      return;
+    }
 
-      // Check all 3 scenario inputs
-      const s1Val = scenario1Input?.value?.trim() || "";
-      const s2Val = scenario2Input?.value?.trim() || "";
-      const s3Val = scenario3Input?.value?.trim() || "";
+    let s1Val = scenario1Input?.value?.trim() || "";
+    let s2Val = scenario2Input?.value?.trim() || "";
+    let s3Val = scenario3Input?.value?.trim() || "";
 
-      // Fallback if page still has single input
+    if (!isAutoSubmit) {
       if (!scenario1Input && singleLegacyInput) {
         const val = singleLegacyInput.value.trim();
         if (!val) {
@@ -352,7 +499,6 @@ export async function initLevelPage(levelNumber) {
           return;
         }
       } else {
-        // Strict check: Contestant MUST complete ALL 3 scenarios!
         const missing = [];
         if (!s1Val) missing.push("Scenario 1");
         if (!s2Val) missing.push("Scenario 2");
@@ -366,69 +512,79 @@ export async function initLevelPage(levelNumber) {
           return;
         }
       }
+    } else {
+      // Auto-submit fallback for empty fields
+      if (!s1Val) s1Val = "[Auto-submitted: No response provided before 40m time limit]";
+      if (!s2Val) s2Val = "[Auto-submitted: No response provided before 40m time limit]";
+      if (!s3Val) s3Val = "[Auto-submitted: No response provided before 40m time limit]";
+      if (scenario1Input && !scenario1Input.value.trim()) scenario1Input.value = s1Val;
+      if (scenario2Input && !scenario2Input.value.trim()) scenario2Input.value = s2Val;
+      if (scenario3Input && !scenario3Input.value.trim()) scenario3Input.value = s3Val;
+    }
 
-      const btnTextEl = submitBtn.querySelector(".btn-text");
-      submitBtn.disabled = true;
-      if (btnTextEl) btnTextEl.textContent = "Saving & Locking...";
+    const btnTextEl = submitBtn?.querySelector(".btn-text");
+    if (submitBtn) submitBtn.disabled = true;
+    if (btnTextEl) btnTextEl.textContent = isAutoSubmit ? "Time Expired - Saving..." : "Saving & Locking...";
 
-      const consolidatedResp = `[SCENARIO 1]\n${s1Val}\n\n[SCENARIO 2]\n${s2Val}\n\n[SCENARIO 3]\n${s3Val}`;
+    const consolidatedResp = `[SCENARIO 1]\n${s1Val}\n\n[SCENARIO 2]\n${s2Val}\n\n[SCENARIO 3]\n${s3Val}`;
 
-      const lvlPayload = {
-        scenarios: {
-          scenario_1: s1Val,
-          scenario_2: s2Val,
-          scenario_3: s3Val
-        },
-        resp: consolidatedResp, // Keeps backward compatibility with any dashboard checker
-        score: existingScore,
-        time: new Date().toLocaleString()
-      };
+    const lvlPayload = {
+      scenarios: {
+        scenario_1: s1Val,
+        scenario_2: s2Val,
+        scenario_3: s3Val
+      },
+      resp: consolidatedResp,
+      score: existingScore,
+      time: new Date().toLocaleString(),
+      autoSubmitted: isAutoSubmit
+    };
 
-      try {
-        // Save clean lvl1 / lvl2 / lvl3 / lvl4 map to Firestore
-        if (db && team.teamId) {
-          const docRef = doc(db, "registrations", team.teamId);
-          await setDoc(docRef, {
-            [`lvl${levelNumber}`]: lvlPayload,
-            // Clean up any legacy flat fields
-            [`level_${levelNumber}_response`]: deleteField(),
-            [`level-${levelNumber}-response`]: deleteField(),
-            [`level_${levelNumber}_details`]: deleteField(),
-            [`level_${levelNumber}_submitted_at`]: deleteField(),
-            lastUpdatedLevel: deleteField(),
-            score: deleteField()
-          }, { merge: true });
-          console.log(`Saved clean lvl${levelNumber} scenarios map to Firestore for team:`, team.teamId);
-        }
+    try {
+      if (db && team.teamId) {
+        const docRef = doc(db, "registrations", team.teamId);
+        await setDoc(docRef, {
+          [`lvl${levelNumber}`]: lvlPayload,
+          [`level_${levelNumber}_response`]: deleteField(),
+          [`level-${levelNumber}-response`]: deleteField(),
+          [`level_${levelNumber}_details`]: deleteField(),
+          [`level_${levelNumber}_submitted_at`]: deleteField(),
+          lastUpdatedLevel: deleteField(),
+          score: deleteField()
+        }, { merge: true });
+        console.log(`Saved clean lvl${levelNumber} scenarios map to Firestore for team:`, team.teamId);
+      }
 
-        // Cache locally in browser
-        localStorage.setItem(`team_${team.teamId}_level_${levelNumber}`, JSON.stringify(lvlPayload));
+      localStorage.setItem(`team_${team.teamId}_level_${levelNumber}`, JSON.stringify(lvlPayload));
+      team[`lvl${levelNumber}`] = lvlPayload;
+      delete team.score;
+      delete team[`level_${levelNumber}_response`];
+      delete team[`level-${levelNumber}-response`];
+      sessionStorage.setItem("promptathon_active_team", JSON.stringify(team));
 
-        // Update active team session data
-        team[`lvl${levelNumber}`] = lvlPayload;
-        delete team.score;
-        delete team[`level_${levelNumber}_response`];
-        delete team[`level-${levelNumber}-response`];
-        sessionStorage.setItem("promptathon_active_team", JSON.stringify(team));
+      lockAsSubmitted(lvlPayload.scenarios, lvlPayload.time);
 
-        // Lock button and textareas permanently so contestant cannot submit again
-        lockAsSubmitted(lvlPayload.scenarios, lvlPayload.time);
-
-        // Confetti celebration & feedback
+      if (isAutoSubmit) {
+        showToast(`⏰ 40-minute time limit reached! Responses for Level ${levelNumber} submitted and locked.`, "warning");
+      } else {
         if (typeof confetti === "function") {
           confetti({ particleCount: 80, spread: 75, origin: { y: 0.6 } });
         }
         showToast(`All 3 categories for Level ${levelNumber} submitted! Round is now locked.`, "success");
-
-      } catch (err) {
-        console.error("Submission error:", err);
-        // Fallback save in localStorage & session
-        localStorage.setItem(`team_${team.teamId}_level_${levelNumber}`, JSON.stringify(lvlPayload));
-        team[`lvl${levelNumber}`] = lvlPayload;
-        sessionStorage.setItem("promptathon_active_team", JSON.stringify(team));
-        lockAsSubmitted(lvlPayload.scenarios, lvlPayload.time);
-        showToast(`Saved locally! (Database sync pending)`, "warning");
       }
-    });
+
+    } catch (err) {
+      console.error("Submission error:", err);
+      localStorage.setItem(`team_${team.teamId}_level_${levelNumber}`, JSON.stringify(lvlPayload));
+      team[`lvl${levelNumber}`] = lvlPayload;
+      sessionStorage.setItem("promptathon_active_team", JSON.stringify(team));
+      lockAsSubmitted(lvlPayload.scenarios, lvlPayload.time);
+      showToast(isAutoSubmit ? "Time expired! Saved locally." : "Saved locally! (Database sync pending)", "warning");
+    }
+  }
+
+  // 7. Handle Submit Button Click
+  if (submitBtn) {
+    submitBtn.addEventListener("click", () => executeSubmission(false));
   }
 }

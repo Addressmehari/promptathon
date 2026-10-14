@@ -158,6 +158,15 @@ function isLevelCompleted(lvl) {
   );
 }
 
+function isLevelStarted(lvl) {
+  if (!currentTeam) return false;
+  return Boolean(
+    currentTeam[`lvl${lvl}`]?.startedAt ||
+    currentTeam[`level_${lvl}_startedAt`] ||
+    currentTeam[`lvl${lvl}_startedAt`]
+  );
+}
+
 function isLevelUnlocked(lvl) {
   if (lvl === 1) return true;
   return isLevelCompleted(lvl - 1);
@@ -168,6 +177,7 @@ function updateStopIndicators() {
     const levelNum = parseInt(s.getAttribute("data-level"), 10);
     const completed = isLevelCompleted(levelNum);
     const unlocked = isLevelUnlocked(levelNum);
+    const started = isLevelStarted(levelNum);
     const pill = s.querySelector(".stop-status-pill");
     const isSelected = (selectedLevel === levelNum);
 
@@ -185,6 +195,11 @@ function updateStopIndicators() {
         pill.className = isSelected ? "stop-status-pill active" : "stop-status-pill completed";
         pill.textContent = "✓ Submitted";
       }
+    } else if (started) {
+      if (pill) {
+        pill.className = isSelected ? "stop-status-pill active" : "stop-status-pill upcoming";
+        pill.textContent = isSelected ? "In Progress" : "⏳ Running";
+      }
     } else {
       if (pill) {
         pill.className = isSelected ? "stop-status-pill active" : "stop-status-pill upcoming";
@@ -196,6 +211,7 @@ function updateStopIndicators() {
   // Update Box C button text according to selected round's unlock & submission status
   const selectedCompleted = isLevelCompleted(selectedLevel);
   const selectedUnlocked = isLevelUnlocked(selectedLevel);
+  const selectedStarted = isLevelStarted(selectedLevel);
 
   if (startBtnText && startLevelBtn) {
     if (!selectedUnlocked) {
@@ -208,6 +224,11 @@ function updateStopIndicators() {
       startLevelBtn.style.cursor = "pointer";
       startLevelBtn.style.opacity = "1";
       startBtnText.textContent = `Review Level ${selectedLevel} (Submitted 🔒)`;
+    } else if (selectedStarted) {
+      startLevelBtn.classList.remove("btn-locked");
+      startLevelBtn.style.cursor = "pointer";
+      startLevelBtn.style.opacity = "1";
+      startBtnText.textContent = `Continue Level ${selectedLevel} (In Progress ⏳) \u2192`;
     } else {
       startLevelBtn.classList.remove("btn-locked");
       startLevelBtn.style.cursor = "pointer";

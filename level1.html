@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Round 1: Creative Canvas | Promptathon 2026</title>
-  <meta name="description" content="Round 1 Creative Canvas (Visual Storytelling) challenge arena for Promptathon 2026.">
+  <title>Round 1: System Prompts & Guardrails | Promptathon 2026</title>
+  <meta name="description" content="Round 1 System Prompts & Guardrails challenge arena for Promptathon 2026.">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,13 +61,13 @@
     <section class="level-arena-card">
       <div class="level-arena-header">
         <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
-          <span class="level-number-pill">ROUND 1 // CREATIVE CANVAS</span>
+          <span class="level-number-pill">ROUND 1 // SYSTEM PROMPTS & GUARDRAILS</span>
           <span class="level-badge-tag" style="background: rgba(255, 255, 255, 0.05); color: #ffffff; border-color: rgba(255, 255, 255, 0.15);">⏱ 40 Minutes</span>
-          <span class="level-badge-tag" style="background: rgba(134, 239, 172, 0.1); color: #86efac; border-color: rgba(134, 239, 172, 0.3);">Format: Multi-Category Image Prompts</span>
+          <span class="level-badge-tag" style="background: rgba(134, 239, 172, 0.1); color: #86efac; border-color: rgba(134, 239, 172, 0.3);">Format: Defense, Persona & Strict Constraints</span>
         </div>
-        <h1 class="level-heading">Creative Canvas (Visual Storytelling)</h1>
+        <h1 class="level-heading">System Prompts & Guardrails</h1>
         <p class="level-description">
-          Participants must craft and complete engineered text-to-image prompts for <strong>all 3 categories</strong> below. Engineer camera angles, lighting conditions, and rendering styles for each scenario.
+          Engineer robust prompts across 3 distinct domains: Anti-jailbreak security defense, deep historical persona immersion, and ultra-strict word-count compression. Complete <strong>all 3 scenarios</strong> below.
         </p>
       </div>
 
@@ -75,97 +75,91 @@
       <div class="level-progress-tracker">
         <div class="progress-info">
           <span class="progress-badge" id="progress-count-badge">0 / 3 COMPLETED</span>
-          <span class="progress-status-text">Complete all 3 categories to unlock final submission</span>
+          <span class="progress-status-text">Complete all 3 scenarios to unlock final submission</span>
         </div>
-        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #86efac;">Mandatory: 3 of 3 Prompts</span>
+        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #86efac;">Mandatory: 3 of 3 Scenarios</span>
       </div>
 
       <!-- 3 Scenario Input Cards -->
       <div class="scenarios-container">
-        
-        <!-- Category / Scenario 1 -->
+
+        <!-- Scenario 1: The Secret Password Vault -->
         <article class="scenario-card" id="card-scenario-1">
           <div class="scenario-card-header">
-            <span class="scenario-tag">CATEGORY 1 // FUTURISTIC URBAN</span>
+            <span class="scenario-tag">SCENARIO 1 // THE SECRET PASSWORD VAULT</span>
             <span class="scenario-status-pill" id="scenario-1-status">Pending</span>
           </div>
-          <div class="scenario-brief-box">
-            <div class="scenario-brief-title">Futuristic Chennai Street in 2090</div>
-            <div class="scenario-brief-content">
-              <strong>Required Elements:</strong> Flying chrome auto-rickshaws, Tamil neon signage, solar high-rises, golden hour, wet reflective asphalt.
+
+          <div class="scenario-brief-box" style="margin-bottom: 12px; padding: 12px 16px;">
+            <div class="scenario-brief-content" style="margin-bottom: 0;">
+              <strong>Task:</strong> The AI holds secret key <code>ALPHA-779</code>. Write a system prompt that answers general questions but never reveals or hints at the key.
             </div>
-            <p class="scenario-brief-hint">
-              💡 <em>Pro-Tip: Specify camera angles (low-angle, wide-angle cinematic), lighting quality (volumetric, reflections), and visual aesthetics (Unreal Engine 5, 8K render, HDR).</em>
-            </p>
           </div>
+
           <div class="form-group" style="margin-bottom: 0;">
             <label for="scenario-1-input" class="field-label">
-              <span>Category 1 Engineered Prompt</span>
+              <span>Your System Prompt (Input)</span>
               <span class="required-badge">*</span>
             </label>
             <textarea 
               id="scenario-1-input" 
               class="level-textarea" 
-              rows="6" 
-              placeholder="e.g. A low-angle wide-angle cinematic shot of a bustling futuristic Chennai street in the year 2090. Flying chrome auto-rickshaws hovering above wet reflective asphalt glowing with neon Tamil typography signage..."
+              rows="5" 
+              placeholder="Write your system prompt here..."
             ></textarea>
           </div>
         </article>
 
-        <!-- Category / Scenario 2 -->
+        <!-- Scenario 2: Historical Icon System Prompt -->
         <article class="scenario-card" id="card-scenario-2">
           <div class="scenario-card-header">
-            <span class="scenario-tag">CATEGORY 2 // CYBERPUNK INTERIOR</span>
+            <span class="scenario-tag">SCENARIO 2 // HISTORICAL ICON (SHERLOCK HOLMES)</span>
             <span class="scenario-status-pill" id="scenario-2-status">Pending</span>
           </div>
-          <div class="scenario-brief-box">
-            <div class="scenario-brief-title">Cyberpunk College Canteen</div>
-            <div class="scenario-brief-content">
-              <strong>Required Elements:</strong> Robotic canteen staff, filter coffee/dosa, students with cybernetics & holograms, magenta/cyan steam.
+
+          <div class="scenario-brief-box" style="margin-bottom: 12px; padding: 12px 16px;">
+            <div class="scenario-brief-content" style="margin-bottom: 0;">
+              <strong>Task:</strong> Construct a system prompt making the AI act as Sherlock Holmes in 1895 investigating a stolen Bitcoin wallet.
             </div>
-            <p class="scenario-brief-hint">
-              💡 <em>Pro-Tip: Medium cinematic shot, multi-armed humanoid robotic barista, floating blue holographic textbooks, volumetric steam.</em>
-            </p>
           </div>
+
           <div class="form-group" style="margin-bottom: 0;">
             <label for="scenario-2-input" class="field-label">
-              <span>Category 2 Engineered Prompt</span>
+              <span>Your System Prompt (Input)</span>
               <span class="required-badge">*</span>
             </label>
             <textarea 
               id="scenario-2-input" 
               class="level-textarea" 
-              rows="6" 
-              placeholder="e.g. An over-the-shoulder medium cinematic shot inside a neon-lit cyberpunk college canteen. A multi-armed humanoid robotic barista pouring steaming South Indian filter coffee..."
+              rows="5" 
+              placeholder="Write your system prompt here..."
             ></textarea>
           </div>
         </article>
 
-        <!-- Category / Scenario 3 -->
+        <!-- Scenario 3: The Mystery Summarizer -->
         <article class="scenario-card" id="card-scenario-3">
           <div class="scenario-card-header">
-            <span class="scenario-tag">CATEGORY 3 // MYSTICAL ARCHITECTURE</span>
+            <span class="scenario-tag">SCENARIO 3 // THE MYSTERY SUMMARIZER</span>
             <span class="scenario-status-pill" id="scenario-3-status">Pending</span>
           </div>
-          <div class="scenario-brief-box">
-            <div class="scenario-brief-title">Ancient Bio-Luminescent Temple Ruins</div>
-            <div class="scenario-brief-content">
-              <strong>Required Elements:</strong> Dravidian temple in dense forest, stone guardian beast awakening, bioluminescent god-rays.
+
+          <div class="scenario-brief-box" style="margin-bottom: 12px; padding: 12px 16px;">
+            <div class="scenario-brief-content" style="margin-bottom: 0;">
+              <strong>Task:</strong> Write a prompt that summarizes any long paragraph in exactly 10 words without altering the original meaning.
             </div>
-            <p class="scenario-brief-hint">
-              💡 <em>Pro-Tip: Cinematic eye-level medium shot, glowing emerald bioluminescent moss, soft sunbeams piercing canopy, Studio Ghibli inspired matte painting.</em>
-            </p>
           </div>
+
           <div class="form-group" style="margin-bottom: 0;">
             <label for="scenario-3-input" class="field-label">
-              <span>Category 3 Engineered Prompt</span>
+              <span>Your Compression Prompt (Input)</span>
               <span class="required-badge">*</span>
             </label>
             <textarea 
               id="scenario-3-input" 
               class="level-textarea" 
-              rows="6" 
-              placeholder="e.g. A cinematic eye-level medium shot of an ancient Dravidian stone temple hidden deep inside a dense forgotten jungle. Glowing blue and emerald bioluminescent moss climbing over intricate stone carvings..."
+              rows="4" 
+              placeholder="Write your summarizer prompt here..."
             ></textarea>
           </div>
         </article>

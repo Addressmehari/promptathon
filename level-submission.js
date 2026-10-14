@@ -167,8 +167,32 @@ export async function initLevelPage(levelNumber) {
   const submitBtn = document.getElementById("submit-level-btn");
   const toastContainer = document.getElementById("toast-container");
 
+  const isSinglePromptMode = !scenario2Input && !scenario3Input;
+
   // Helper: Live scenario completion indicators
   function updateProgress() {
+    if (isSinglePromptMode) {
+      const targetInput = scenario1Input || singleLegacyInput;
+      const isFilled = Boolean(targetInput?.value?.trim());
+      if (scenario1Pill) {
+        scenario1Pill.textContent = isFilled ? "✓ Prompt Ready" : "Pending";
+        scenario1Pill.className = `scenario-status-pill ${isFilled ? "filled" : ""}`;
+      }
+      if (progressBadge) {
+        progressBadge.textContent = isFilled ? "1 / 1 COMPLETED" : "0 / 1 COMPLETED";
+        if (isFilled) {
+          progressBadge.style.color = "#86efac";
+          progressBadge.style.borderColor = "rgba(134, 239, 172, 0.4)";
+          progressBadge.style.background = "rgba(134, 239, 172, 0.15)";
+        } else {
+          progressBadge.style.color = "#fde047";
+          progressBadge.style.borderColor = "rgba(253, 224, 71, 0.3)";
+          progressBadge.style.background = "rgba(253, 224, 71, 0.08)";
+        }
+      }
+      return;
+    }
+
     let completedCount = 0;
     if (scenario1Input) {
       const isFilled = Boolean(scenario1Input.value.trim());
@@ -208,7 +232,7 @@ export async function initLevelPage(levelNumber) {
     }
   }
 
-  [scenario1Input, scenario2Input, scenario3Input].forEach(inp => {
+  [scenario1Input, scenario2Input, scenario3Input, singleLegacyInput].forEach(inp => {
     if (inp) {
       inp.addEventListener("input", updateProgress);
     }
@@ -647,6 +671,10 @@ export async function initLevelPage(levelNumber) {
     if (scenario2Input && s2) scenario2Input.value = s2;
     if (scenario3Input && s3) scenario3Input.value = s3;
     if (singleLegacyInput && !s2 && !s3 && s1) singleLegacyInput.value = s1;
+    if ((scenario1Input || singleLegacyInput) && !s2 && !s3 && !s1 && dataPayload?.resp) {
+      if (scenario1Input) scenario1Input.value = dataPayload.resp;
+      if (singleLegacyInput) singleLegacyInput.value = dataPayload.resp;
+    }
 
     [scenario1Input, scenario2Input, scenario3Input, singleLegacyInput].forEach(inp => {
       if (inp) {
@@ -675,7 +703,9 @@ export async function initLevelPage(levelNumber) {
       submitBtn.style.pointerEvents = "none";
       const btnText = submitBtn.querySelector(".btn-text");
       if (btnText) {
-        btnText.innerHTML = `🔒 Level ${levelNumber} Submitted & Locked (All 3 Categories)`;
+        btnText.innerHTML = isSinglePromptMode
+          ? `🔒 Level ${levelNumber} Submitted & Locked`
+          : `🔒 Level ${levelNumber} Submitted & Locked (All 3 Categories)`;
       }
     }
 
@@ -855,16 +885,15 @@ export async function initLevelPage(levelNumber) {
 
     isSubmittingLocally = true;
 
-    let s1Val = scenario1Input?.value?.trim() || "";
+    let s1Val = (scenario1Input?.value || singleLegacyInput?.value || "").trim();
     let s2Val = scenario2Input?.value?.trim() || "";
     let s3Val = scenario3Input?.value?.trim() || "";
 
     if (!isAutoSubmit) {
-      if (!scenario1Input && singleLegacyInput) {
-        const val = singleLegacyInput.value.trim();
-        if (!val) {
-          showToast("Please enter your prompt before submitting.", "error");
-          singleLegacyInput.focus();
+      if (isSinglePromptMode) {
+        if (!s1Val) {
+          showToast("Please enter your prompt to guide the player before submitting.", "error");
+          (scenario1Input || singleLegacyInput)?.focus();
           isSubmittingLocally = false;
           return;
         }
@@ -886,25 +915,32 @@ export async function initLevelPage(levelNumber) {
     } else {
       // Auto-submit fallback for empty fields
       if (!s1Val) s1Val = "[Auto-submitted: No response provided before 40m time limit]";
-      if (!s2Val) s2Val = "[Auto-submitted: No response provided before 40m time limit]";
-      if (!s3Val) s3Val = "[Auto-submitted: No response provided before 40m time limit]";
       if (scenario1Input && !scenario1Input.value.trim()) scenario1Input.value = s1Val;
-      if (scenario2Input && !scenario2Input.value.trim()) scenario2Input.value = s2Val;
-      if (scenario3Input && !scenario3Input.value.trim()) scenario3Input.value = s3Val;
+      if (singleLegacyInput && !singleLegacyInput.value.trim()) singleLegacyInput.value = s1Val;
+      if (!isSinglePromptMode) {
+        if (!s2Val) s2Val = "[Auto-submitted: No response provided before 40m time limit]";
+        if (!s3Val) s3Val = "[Auto-submitted: No response provided before 40m time limit]";
+        if (scenario2Input && !scenario2Input.value.trim()) scenario2Input.value = s2Val;
+        if (scenario3Input && !scenario3Input.value.trim()) scenario3Input.value = s3Val;
+      }
     }
 
     const btnTextEl = submitBtn?.querySelector(".btn-text");
     if (submitBtn) submitBtn.disabled = true;
     if (btnTextEl) btnTextEl.textContent = isAutoSubmit ? "Time Expired - Saving..." : "Saving & Locking...";
 
-    const consolidatedResp = `[SCENARIO 1]\n${s1Val}\n\n[SCENARIO 2]\n${s2Val}\n\n[SCENARIO 3]\n${s3Val}`;
+    const consolidatedResp = isSinglePromptMode 
+      ? s1Val 
+      : `[SCENARIO 1]\n${s1Val}\n\n[SCENARIO 2]\n${s2Val}\n\n[SCENARIO 3]\n${s3Val}`;
 
     const lvlPayload = {
-      scenarios: {
-        scenario_1: s1Val,
-        scenario_2: s2Val,
-        scenario_3: s3Val
-      },
+      scenarios: isSinglePromptMode 
+        ? { scenario_1: s1Val } 
+        : {
+            scenario_1: s1Val,
+            scenario_2: s2Val,
+            scenario_3: s3Val
+          },
       resp: consolidatedResp,
       score: existingScore,
       time: new Date().toLocaleString(),
@@ -942,7 +978,10 @@ export async function initLevelPage(levelNumber) {
         if (typeof confetti === "function") {
           confetti({ particleCount: 80, spread: 75, origin: { y: 0.6 } });
         }
-        showToast(`All 3 categories for Level ${levelNumber} submitted! Level locked. Returning to mission map...`, "success");
+        showToast(isSinglePromptMode 
+          ? `Prompt for Level ${levelNumber} submitted! Level locked. Returning to mission map...`
+          : `All 3 categories for Level ${levelNumber} submitted! Level locked. Returning to mission map...`, 
+          "success");
         setTimeout(() => {
           window.location.href = "index.html";
         }, 1500);

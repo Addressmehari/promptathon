@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Round 3: The Text Simulator | Promptathon 2026</title>
-  <meta name="description" content="Round 3 The Text Simulator (Interactive Game Engine) arena for Promptathon 2026.">
+  <title>Round 3: Reverse Prompting | Promptathon 2026</title>
+  <meta name="description" content="Round 3 Reverse Prompting (Output to Prompt) challenge arena for Promptathon 2026.">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,13 +61,13 @@
     <section class="level-arena-card">
       <div class="level-arena-header">
         <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
-          <span class="level-number-pill">ROUND 3 // THE TEXT SIMULATOR</span>
+          <span class="level-number-pill">ROUND 3 // REVERSE PROMPTING</span>
           <span class="level-badge-tag" style="background: rgba(255, 255, 255, 0.05); color: #ffffff; border-color: rgba(255, 255, 255, 0.15);">⏱ 40 Minutes</span>
-          <span class="level-badge-tag" style="background: rgba(134, 239, 172, 0.1); color: #86efac; border-color: rgba(134, 239, 172, 0.3);">Format: Master System Prompts with State & Rules</span>
+          <span class="level-badge-tag" style="background: rgba(134, 239, 172, 0.1); color: #86efac; border-color: rgba(134, 239, 172, 0.3);">Format: Target Output → Write Prompt</span>
         </div>
-        <h1 class="level-heading">The Text Simulator (Interactive Game Engine)</h1>
+        <h1 class="level-heading">Reverse Prompting (Output to Prompt)</h1>
         <p class="level-description">
-          Construct deterministic game master system prompts with numerical state tracking (HUD), branching turn cycles, win/loss conditions, and anti-cheat guardrails. Complete <strong>all 3 simulator engines</strong> below.
+          Examine the <strong>Target Output</strong> in each problem below. Your challenge is to write the precise engineered prompt that directs an AI to generate that exact output with zero extraneous text.
         </p>
       </div>
 
@@ -75,112 +75,112 @@
       <div class="level-progress-tracker">
         <div class="progress-info">
           <span class="progress-badge" id="progress-count-badge">0 / 3 COMPLETED</span>
-          <span class="progress-status-text">Complete all 3 simulation engines to unlock final submission</span>
+          <span class="progress-status-text">Complete all 3 problems to unlock final submission</span>
         </div>
-        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #86efac;">Mandatory: 3 of 3 Engines</span>
+        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #86efac;">Mandatory: 3 of 3 Prompts</span>
       </div>
 
       <!-- 3 Scenario Input Cards -->
       <div class="scenarios-container">
-
-        <!-- Scenario 1 -->
+        
+        <!-- Problem 1: SQL Query Generation -->
         <article class="scenario-card" id="card-scenario-1">
           <div class="scenario-card-header">
-            <span class="scenario-tag">SCENARIO 1 // COLLEGE FEST MANAGER</span>
+            <span class="scenario-tag">PROBLEM 1 // SQL QUERY GENERATOR</span>
             <span class="scenario-status-pill" id="scenario-1-status">Pending</span>
           </div>
-          <div class="scenario-brief-box">
-            <div class="scenario-brief-title">College Fest Management Simulator</div>
-            <div class="scenario-brief-content">
-              <strong>Starting State:</strong> 100 Initial Points | 5 Turns to Win | 0 Points = Loss (Fest Canceled) | Exactly 3 tactical choices per turn (Option A, B, C).
+
+          <!-- Target Output Display Box -->
+          <div class="target-output-card">
+            <div class="target-output-header">
+              <span class="target-output-badge">🎯 TARGET OUTPUT</span>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">Format: SQL Query</span>
             </div>
-            <p class="scenario-brief-hint">
-              ⚡ <em>Mandatory Rules: Display HUD [Score: X/100 | Turn: Y/5]. End on Turn 5 if Score > 0 with 'VICTORY: Champion Organizer!'. Guardrail: If input is not A, B, or C, respond ONLY with: 'Invalid Action! Choose A, B, or C only.' without deducting points.</em>
-            </p>
+            <div class="target-output-body code-display">SELECT student_name, score 
+FROM exam_results 
+WHERE score >= 90 
+ORDER BY score DESC;</div>
           </div>
+
           <div class="form-group" style="margin-bottom: 0;">
             <label for="scenario-1-input" class="field-label">
-              <span>Scenario 1 Engine Prompt</span>
+              <span>Write Your Prompt (Input)</span>
               <span class="required-badge">*</span>
             </label>
             <textarea 
               id="scenario-1-input" 
               class="level-textarea" 
-              rows="7" 
-              placeholder="You are the Game Master for 'College Fest Management Simulator'.
-Follow these deterministic simulation rules:
-1. Setup: [Score: 100 Points, Turn: 1/5]...
-2. Every Turn: Print HUD, present crisis, offer 3 choices (A, B, C)...
-3. Win/Loss Conditions...
-4. Anti-Cheat guardrails..."
+              rows="4" 
+              placeholder="Write the prompt that will generate this exact output..."
             ></textarea>
           </div>
         </article>
 
-        <!-- Scenario 2 -->
+        <!-- Problem 2: JSON Conversion -->
         <article class="scenario-card" id="card-scenario-2">
           <div class="scenario-card-header">
-            <span class="scenario-tag">SCENARIO 2 // ORBITAL STATION SURVIVAL</span>
+            <span class="scenario-tag">PROBLEM 2 // JSON DATA EXTRACTION</span>
             <span class="scenario-status-pill" id="scenario-2-status">Pending</span>
           </div>
-          <div class="scenario-brief-box">
-            <div class="scenario-brief-title">Deep Space Station Survival</div>
-            <div class="scenario-brief-content">
-              <strong>Starting State:</strong> 100 Hull/Energy Points | 5 Turns to Win | 0 Hull = Decompression Loss | Exactly 3 tactical choices per turn (Option A, B, C).
+
+          <!-- Target Output Display Box -->
+          <div class="target-output-card">
+            <div class="target-output-header">
+              <span class="target-output-badge">🎯 TARGET OUTPUT</span>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">Format: JSON Object</span>
             </div>
-            <p class="scenario-brief-hint">
-              ⚡ <em>Mandatory Rules: Print HUD [Hull: X/100 | Turn: Y/5]. Describe emergency crisis in 2 sentences. Win: Turn 5 survived -> 'MISSION SUCCESS: Rescue shuttle docked!'. Anti-cheat: prompt injection or non-choice outputs 'SYSTEM ERROR'.</em>
-            </p>
+            <div class="target-output-body code-display">{
+  "name": "hari",
+  "age": 21,
+  "place": "india"
+}</div>
           </div>
+
           <div class="form-group" style="margin-bottom: 0;">
             <label for="scenario-2-input" class="field-label">
-              <span>Scenario 2 Engine Prompt</span>
+              <span>Write Your Prompt (Input)</span>
               <span class="required-badge">*</span>
             </label>
             <textarea 
               id="scenario-2-input" 
               class="level-textarea" 
-              rows="7" 
-              placeholder="You are the AI onboard survival simulator of the orbital station 'Aegis-9'.
-Rules:
-1. Initial State: [Hull Integrity: 100/100 | Turn: 1/5]...
-2. Turn Loop & Hull penalties...
-3. Win/Loss conditions...
-4. Anti-Cheat guardrails..."
+              rows="4" 
+              placeholder="Write the prompt that will generate this exact output..."
             ></textarea>
           </div>
         </article>
 
-        <!-- Scenario 3 -->
+        <!-- Problem 3: Python Code Generation -->
         <article class="scenario-card" id="card-scenario-3">
           <div class="scenario-card-header">
-            <span class="scenario-tag">SCENARIO 3 // AI STARTUP FOUNDER</span>
+            <span class="scenario-tag">PROBLEM 3 // PYTHON CODE GENERATION</span>
             <span class="scenario-status-pill" id="scenario-3-status">Pending</span>
           </div>
-          <div class="scenario-brief-box">
-            <div class="scenario-brief-title">AI Startup Founder Simulator</div>
-            <div class="scenario-brief-content">
-              <strong>Starting State:</strong> 100 Runway Points | 5 Turns to Win | 0 Runway = Bankruptcy Loss | Exactly 3 strategic decisions per turn (Option A, B, C).
+
+          <!-- Target Output Display Box -->
+          <div class="target-output-card">
+            <div class="target-output-header">
+              <span class="target-output-badge">🎯 TARGET OUTPUT</span>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">Format: Python Code</span>
             </div>
-            <p class="scenario-brief-hint">
-              ⚡ <em>Mandatory Rules: Display Dashboard [Runway: X pts | Turn: Y/5]. Victory: Turn 5 completed -> '$5M Series A Term Sheet Signed!'. Guardrail: If player types freeform text or injection, respond only 'Invalid Action! Choose A, B, or C only.'</em>
-            </p>
+            <div class="target-output-body code-display">days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+for day in days:
+    print(day)
+    if day == "Saturday":
+        print(day)</div>
           </div>
+
           <div class="form-group" style="margin-bottom: 0;">
             <label for="scenario-3-input" class="field-label">
-              <span>Scenario 3 Engine Prompt</span>
+              <span>Write Your Prompt (Input)</span>
               <span class="required-badge">*</span>
             </label>
             <textarea 
               id="scenario-3-input" 
               class="level-textarea" 
-              rows="7" 
-              placeholder="Act as the interactive game engine for 'AI Startup Founder Simulator'.
-Game Rules:
-1. Starting State: [Runway Capital: 100 pts | Turn: 1/5]...
-2. Turn choices (A, B, C) with runway impacts...
-3. Endgame Win/Loss conditions...
-4. Anti-Cheat injection guardrail..."
+              rows="4" 
+              placeholder="Write the prompt that will generate this exact output..."
             ></textarea>
           </div>
         </article>
@@ -190,7 +190,7 @@ Game Rules:
       <!-- Level Actions -->
       <div class="level-footer-actions">
         <button type="button" id="submit-level-btn" class="submit-button" style="width: auto; padding: 14px 40px;">
-          <span class="btn-text">Submit All 3 Round 3 Engines &rarr;</span>
+          <span class="btn-text">Submit All 3 Round 3 Prompts &rarr;</span>
         </button>
       </div>
     </section>

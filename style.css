@@ -2676,6 +2676,62 @@ input[type=number] {
   margin: 0;
 }
 
+/* Target Output Display Box for Reverse Prompting */
+.target-output-card {
+  background: rgba(16, 24, 34, 0.95);
+  border: 1px solid rgba(134, 239, 172, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  margin: 14px 0 18px 0;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.target-output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.target-output-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #86efac;
+  text-transform: uppercase;
+}
+
+.target-output-body {
+  background: rgba(6, 10, 14, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xs);
+  padding: 14px 18px;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  color: #e2e8f0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  user-select: all;
+}
+
+.target-output-body.emoji-display {
+  font-size: 2.2rem;
+  letter-spacing: 0.4em;
+  text-align: center;
+  padding: 16px 20px;
+}
+
+.target-output-body.code-display {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  color: #38bdf8;
+  font-size: 0.88rem;
+}
+
 /* ========================================== */
 /* Level Arena Live Countdown Timer          */
 /* ========================================== */
@@ -3156,5 +3212,229 @@ input[type=number] {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
 }
+
+/* ==========================================================================
+   Level 4: Maze Navigation Arena Styles (Large 4x4 Grid)
+   ========================================================================== */
+.maze-arena-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.maze-card {
+  width: 100%;
+  background: rgba(14, 18, 24, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm, 4px);
+  padding: 20px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.maze-card-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.maze-card-title {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.maze-legend-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.76rem;
+  font-family: var(--font-mono);
+  color: #94a3b8;
+}
+
+.maze-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.maze-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.maze-legend-player {
+  background: #ffffff;
+  border: 1.5px solid #000000;
+}
+
+.maze-legend-wall {
+  background: #737373;
+  border: 1.5px solid #000000;
+}
+
+.maze-canvas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 4px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+}
+
+#maze-canvas {
+  width: 500px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.maze-tools-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 8px;
+}
+
+.maze-coords-pill {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.maze-coords-pill span {
+  color: #86efac;
+  font-weight: 700;
+}
+
+.maze-tool-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.maze-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* Prompt Textbar Section (Directly Below Image) */
+.maze-prompt-section {
+  width: 100%;
+  background: rgba(14, 18, 24, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm, 4px);
+  padding: 18px 20px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.maze-prompt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.maze-prompt-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.maze-prompt-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.maze-textarea-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.maze-textarea {
+  width: 100%;
+  background: #080c11;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  color: #f1f5f9;
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  padding: 14px 16px;
+  resize: vertical;
+  min-height: 120px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+
+.maze-textarea:focus {
+  border-color: #86efac;
+  box-shadow: 0 0 0 3px rgba(134, 239, 172, 0.18);
+}
+
+.maze-prompt-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--text-subtle);
+}
+
+.maze-counter-badge {
+  color: #86efac;
+  font-weight: 700;
+}
+
+
 
 

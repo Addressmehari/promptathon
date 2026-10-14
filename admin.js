@@ -402,22 +402,31 @@ function updateEvalModalView() {
       const s2 = rd.scenarios.scenario_2 || rd.scenarios.scenario2 || "";
       const s3 = rd.scenarios.scenario_3 || rd.scenarios.scenario3 || "";
 
-      evalPromptContent.innerHTML = `
-        <div style="display: flex; flex-direction: column; gap: 14px;">
-          <div style="background: rgba(14, 20, 26, 0.95); border: 1px solid rgba(134, 239, 172, 0.25); border-radius: 4px; padding: 12px 14px;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #86efac; font-family: var(--font-mono); margin-bottom: 6px;">[CATEGORY / SCENARIO 1]</div>
-            <div style="font-size: 0.88rem; color: #ffffff; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(s1)}</div>
+      if (!s2 && !s3) {
+        evalPromptContent.innerHTML = `
+          <div style="background: rgba(14, 20, 26, 0.95); border: 1px solid rgba(253, 224, 71, 0.3); border-radius: 4px; padding: 14px 16px;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #fde047; font-family: var(--font-mono); margin-bottom: 8px;">[ROUND ${currentEvalLevel} // NAVIGATION PROMPT]</div>
+            <div style="font-size: 0.92rem; color: #ffffff; white-space: pre-wrap; line-height: 1.6;">${escapeHtml(s1)}</div>
           </div>
-          <div style="background: rgba(14, 20, 26, 0.95); border: 1px solid rgba(134, 239, 172, 0.25); border-radius: 4px; padding: 12px 14px;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #86efac; font-family: var(--font-mono); margin-bottom: 6px;">[CATEGORY / SCENARIO 2]</div>
-            <div style="font-size: 0.88rem; color: #ffffff; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(s2)}</div>
+        `;
+      } else {
+        evalPromptContent.innerHTML = `
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="background: rgba(14, 20, 26, 0.95); border: 1px solid rgba(134, 239, 172, 0.25); border-radius: 4px; padding: 12px 14px;">
+              <div style="font-size: 0.75rem; font-weight: 700; color: #86efac; font-family: var(--font-mono); margin-bottom: 6px;">[CATEGORY / SCENARIO 1]</div>
+              <div style="font-size: 0.88rem; color: #ffffff; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(s1)}</div>
+            </div>
+            <div style="background: rgba(14, 20, 26, 0.95); border: 1px solid rgba(134, 239, 172, 0.25); border-radius: 4px; padding: 12px 14px;">
+              <div style="font-size: 0.75rem; font-weight: 700; color: #86efac; font-family: var(--font-mono); margin-bottom: 6px;">[CATEGORY / SCENARIO 2]</div>
+              <div style="font-size: 0.88rem; color: #ffffff; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(s2)}</div>
+            </div>
+            <div style="background: rgba(14, 20, 26, 0.95); border: 1px solid rgba(134, 239, 172, 0.25); border-radius: 4px; padding: 12px 14px;">
+              <div style="font-size: 0.75rem; font-weight: 700; color: #86efac; font-family: var(--font-mono); margin-bottom: 6px;">[CATEGORY / SCENARIO 3]</div>
+              <div style="font-size: 0.88rem; color: #ffffff; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(s3)}</div>
+            </div>
           </div>
-          <div style="background: rgba(14, 20, 26, 0.95); border: 1px solid rgba(134, 239, 172, 0.25); border-radius: 4px; padding: 12px 14px;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #86efac; font-family: var(--font-mono); margin-bottom: 6px;">[CATEGORY / SCENARIO 3]</div>
-            <div style="font-size: 0.88rem; color: #ffffff; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(s3)}</div>
-          </div>
-        </div>
-      `;
+        `;
+      }
     } else {
       evalPromptContent.textContent = rd.resp || "Submitted prompt";
     }

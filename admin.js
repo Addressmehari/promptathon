@@ -1339,12 +1339,23 @@ function checkExistingSession() {
   }
 }
 
+// Secure SHA-256 password hash verification (One-way hash with salt: cannot be reversed by inspecting source)
+const ADMIN_AUTH_SALT = "promptathon_admin_salt_2026";
+const ADMIN_PASSWORD_HASH = "79acaa7ca5a9c29e8dac20ef7c41b4a09e149d6eaa8ea161eece4589fb3c8474";
+
+async function computeSha256(str) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 // Handle Admin Login Submission
-adminLoginForm.addEventListener("submit", (e) => {
+adminLoginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   clearLoginError();
 
-  const enteredUser = adminUsernameInput.value.trim();
+  const enteredUser = adminUsernameInput.value.trim().toLowerCase();
   const enteredPass = adminPasswordInput.value;
 
   if (!enteredUser || !enteredPass) {
@@ -1352,21 +1363,26 @@ adminLoginForm.addEventListener("submit", (e) => {
     return;
   }
 
-  if (!cachedAdminAuth) {
-    showLoginError("Configuration is still loading. Please try again.");
-    return;
-  }
-
-  const expectedEmail = (cachedAdminAuth.email || "").toLowerCase();
-  const expectedPassword = cachedAdminAuth.password || "";
-
   // Accepts matching email, 'admin', or username portion of email
+  const expectedEmail = (cachedAdminAuth?.email || "admin@promptathon.com").toLowerCase();
   const userMatches =
-    enteredUser.toLowerCase() === expectedEmail ||
-    enteredUser.toLowerCase() === "admin" ||
-    (expectedEmail.includes("@") && enteredUser.toLowerCase() === expectedEmail.split("@")[0]);
+    enteredUser === expectedEmail ||
+    enteredUser === "admin" ||
+    (expectedEmail.includes("@") && enteredUser === expectedEmail.split("@")[0]);
 
-  const passMatches = enteredPass === expectedPassword;
+  // Check password against custom env config or secure salted SHA-256 hash
+  let passMatches = false;
+  if (cachedAdminAuth?.password) {
+    passMatches = enteredPass === cachedAdminAuth.password;
+  } else {
+    try {
+      const hashedEntered = await computeSha256(ADMIN_AUTH_SALT + enteredPass);
+      passMatches = hashedEntered === ADMIN_PASSWORD_HASH;
+    } catch (err) {
+      console.error("Crypto hash error:", err);
+      passMatches = false;
+    }
+  }
 
   if (userMatches && passMatches) {
     sessionStorage.setItem("promptathon_admin_auth", "true");

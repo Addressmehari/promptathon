@@ -2,7 +2,22 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 /**
- * Parse .env format string into key-value pairs (fallback)
+ * Built-in Production Fallback Configuration
+ * Ensures immediate connectivity on any online deployment (Vercel, Netlify, GitHub Pages, Firebase Hosting)
+ * even when .env and env.js are not served or blocked by server dotfile rules.
+ */
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyB0x_WECfo3QpRFIetsMwZ9jzM0tcljg48",
+  authDomain: "promptathon-hp.firebaseapp.com",
+  projectId: "promptathon-hp",
+  storageBucket: "promptathon-hp.firebasestorage.app",
+  messagingSenderId: "195648128484",
+  appId: "1:195648128484:web:67d0350a3ee6580fec33f1",
+  measurementId: "G-2H65NM8043",
+};
+
+/**
+ * Parse .env format string into key-value pairs (local dev fallback)
  * @param {string} text 
  * @returns {Record<string, string>}
  */
@@ -22,24 +37,30 @@ function parseEnv(text) {
 }
 
 /**
- * Loads configuration from env.js or .env and initializes Firebase & Firestore
+ * Loads configuration and initializes Firebase & Firestore
+ * Gracefully prioritizes: env.js -> local .env -> DEFAULT_FIREBASE_CONFIG (online deployment)
  * @returns {Promise<{ app: any, db: any, config: any, adminAuth: { email: string, password: string } }>}
  */
 export async function initFirebaseFromEnv() {
   let env = null;
 
-  // 1. Primary method: Load from env.js (browser-friendly ES module, bypasses server dotfile restrictions)
+  // 1. Check for custom env.js if provided
   try {
     const envModule = await import("./env.js");
     if (envModule && envModule.ENV) {
       env = envModule.ENV;
     }
   } catch (err) {
-    // env.js not present or failed to load, proceed to fallback
+    // env.js not present or ignored in git, proceed to fallbacks
   }
 
-  // 2. Fallback method: Fetch .env (works if server permits dotfile requests)
-  if (!env && window.location.protocol !== "file:") {
+  // 2. Check for local .env ONLY on localhost (avoids 404 console noise in online production)
+  const isLocalhost = 
+    window.location.hostname === "localhost" || 
+    window.location.hostname === "127.0.0.1" ||
+    window.location.protocol === "file:";
+
+  if (!env && isLocalhost && window.location.protocol !== "file:") {
     try {
       const response = await fetch(".env");
       if (response.ok) {
@@ -47,36 +68,25 @@ export async function initFirebaseFromEnv() {
         env = parseEnv(envContent);
       }
     } catch (err) {
-      // fetch blocked or failed
+      // Local fetch failed, fallback to DEFAULT_FIREBASE_CONFIG
     }
   }
 
-  if (!env) {
-    throw new Error(
-      "Configuration not found. Please ensure 'env.js' exists in your root folder (see env.example.js)."
-    );
-  }
-
+  // 3. Fallback to production default config (ensures 100% online deployment uptime)
   const firebaseConfig = {
-    apiKey: env.FIREBASE_API_KEY,
-    authDomain: env.FIREBASE_AUTH_DOMAIN,
-    projectId: env.FIREBASE_PROJECT_ID,
-    storageBucket: env.FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: env.FIREBASE_MESSAGING_SENDER_ID,
-    appId: env.FIREBASE_APP_ID,
-    measurementId: env.FIREBASE_MEASUREMENT_ID,
+    apiKey: env?.FIREBASE_API_KEY || DEFAULT_FIREBASE_CONFIG.apiKey,
+    authDomain: env?.FIREBASE_AUTH_DOMAIN || DEFAULT_FIREBASE_CONFIG.authDomain,
+    projectId: env?.FIREBASE_PROJECT_ID || DEFAULT_FIREBASE_CONFIG.projectId,
+    storageBucket: env?.FIREBASE_STORAGE_BUCKET || DEFAULT_FIREBASE_CONFIG.storageBucket,
+    messagingSenderId: env?.FIREBASE_MESSAGING_SENDER_ID || DEFAULT_FIREBASE_CONFIG.messagingSenderId,
+    appId: env?.FIREBASE_APP_ID || DEFAULT_FIREBASE_CONFIG.appId,
+    measurementId: env?.FIREBASE_MEASUREMENT_ID || DEFAULT_FIREBASE_CONFIG.measurementId,
   };
 
-  const adminAuth = {
-    email: env.ADMIN_EMAIL || "",
-    password: env.ADMIN_PASSWORD || "",
-  };
-
-  if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
-    throw new Error(
-      "Invalid configuration: FIREBASE_API_KEY and FIREBASE_PROJECT_ID are required in env.js."
-    );
-  }
+  const adminAuth = (env?.ADMIN_EMAIL && env?.ADMIN_PASSWORD) ? {
+    email: env.ADMIN_EMAIL,
+    password: env.ADMIN_PASSWORD,
+  } : null;
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);

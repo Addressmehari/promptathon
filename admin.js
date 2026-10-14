@@ -233,7 +233,23 @@ function renderTable() {
       tdLvl.className = `col-lvl col-lvl-${lvl}`;
       const rd = getRoundData(team, lvl);
 
-      if (rd && (rd.scenarios || rd.resp)) {
+      const isViolated = Boolean(
+        rd?.violated === "true" ||
+        rd?.violated === true ||
+        (team[`level_${lvl}_strikes`] >= 3)
+      );
+
+      if (isViolated) {
+        tdLvl.innerHTML = `
+          <div class="level-cell-box">
+            <span class="level-status-badge violated" title="Terminated: 3 Safe-Browsing Violations" style="cursor: pointer; color: #ef4444; border-color: rgba(239, 68, 68, 0.45); background: rgba(239, 68, 68, 0.15);">
+              🚨 Violated (3 Strikes)
+            </span>
+            <span style="font-size: 0.72rem; color: #f87171; font-family: var(--font-mono); font-weight: 700;">Locked</span>
+          </div>
+        `;
+        tdLvl.querySelector(".level-status-badge").addEventListener("click", () => openEvalModal(team, lvl));
+      } else if (rd && (rd.scenarios || rd.resp)) {
         const scoreVal = rd.score !== undefined && rd.score !== null ? rd.score : 0;
         tdLvl.innerHTML = `
           <div class="level-cell-box">
@@ -352,8 +368,24 @@ function updateEvalModalView() {
 
   const hasSubmission = Boolean(rd && (rd.scenarios || rd.resp));
 
-  if (hasSubmission) {
+  const isViolated = Boolean(
+    rd?.violated === "true" ||
+    rd?.violated === true ||
+    (currentEvalTeam?.[`level_${currentEvalLevel}_strikes`] >= 3)
+  );
+
+  if (isViolated) {
+    evalStatusTag.className = "eval-status-tag pending";
+    evalStatusTag.style.color = "#ef4444";
+    evalStatusTag.style.borderColor = "rgba(239, 68, 68, 0.5)";
+    evalStatusTag.style.background = "rgba(239, 68, 68, 0.15)";
+    evalStatusTag.textContent = "🚨 VIOLATED (3 STRIKES RECORDED)";
+    evalTimeTag.textContent = rd.time ? `Terminated on ${rd.time}` : "Terminated due to Safe-Browsing rule violations";
+  } else if (hasSubmission) {
     evalStatusTag.className = "eval-status-tag submitted";
+    evalStatusTag.style.color = "";
+    evalStatusTag.style.borderColor = "";
+    evalStatusTag.style.background = "";
     evalStatusTag.textContent = rd.autoSubmitted ? "✓ AUTO-SUBMITTED (TIME EXPIRED)" : "✓ SUBMITTED (ALL 3 PARTS)";
     
     let timeText = rd.time ? `Submitted: ${rd.time}` : "Submitted";
@@ -504,13 +536,14 @@ if (evalUnlockLevelBtn) {
     try {
       const docRef = doc(db, "registrations", currentEvalTeam.id);
       
-      // Delete the round map, any legacy fields, start time, and any root score field
+      // Delete the round map, any legacy fields, start time, strikes, and root score field
       await updateDoc(docRef, {
         [`lvl${currentEvalLevel}`]: deleteField(),
         [`level_${currentEvalLevel}_response`]: deleteField(),
         [`level-${currentEvalLevel}-response`]: deleteField(),
         [`level_${currentEvalLevel}_startedAt`]: deleteField(),
         [`lvl${currentEvalLevel}_startedAt`]: deleteField(),
+        [`level_${currentEvalLevel}_strikes`]: deleteField(),
         score: deleteField(),
         updatedAt: serverTimestamp()
       });
@@ -520,6 +553,7 @@ if (evalUnlockLevelBtn) {
       delete currentEvalTeam[`level-${currentEvalLevel}-response`];
       delete currentEvalTeam[`level_${currentEvalLevel}_startedAt`];
       delete currentEvalTeam[`lvl${currentEvalLevel}_startedAt`];
+      delete currentEvalTeam[`level_${currentEvalLevel}_strikes`];
       delete currentEvalTeam.score;
 
       showToast(`Level ${currentEvalLevel} unlocked for ${currentEvalTeam.teamName}!`, "success");

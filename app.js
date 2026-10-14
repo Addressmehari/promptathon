@@ -158,12 +158,20 @@ function isLevelCompleted(lvl) {
   );
 }
 
+function isLevelViolated(lvl) {
+  if (!currentTeam) return false;
+  return Boolean(
+    currentTeam[`lvl${lvl}`]?.violated === "true" ||
+    currentTeam[`lvl${lvl}`]?.violated === true ||
+    (currentTeam[`level_${lvl}_strikes`] >= 3)
+  );
+}
+
 function isLevelStarted(lvl) {
   if (!currentTeam) return false;
   return Boolean(
-    currentTeam[`lvl${lvl}`]?.startedAt ||
     currentTeam[`level_${lvl}_startedAt`] ||
-    currentTeam[`lvl${lvl}_startedAt`]
+    currentTeam[`lvl${lvl}`]?.startedAt
   );
 }
 
@@ -178,12 +186,19 @@ function updateStopIndicators() {
     const completed = isLevelCompleted(levelNum);
     const unlocked = isLevelUnlocked(levelNum);
     const started = isLevelStarted(levelNum);
+    const violated = isLevelViolated(levelNum);
     const pill = s.querySelector(".stop-status-pill");
     const isSelected = (selectedLevel === levelNum);
 
-    s.classList.remove("stop-locked", "stop-completed");
+    s.classList.remove("stop-locked", "stop-completed", "stop-violated");
 
-    if (!unlocked) {
+    if (violated) {
+      s.classList.add("stop-violated");
+      if (pill) {
+        pill.className = "stop-status-pill violated";
+        pill.textContent = "🚨 Violated";
+      }
+    } else if (!unlocked) {
       s.classList.add("stop-locked");
       if (pill) {
         pill.className = "stop-status-pill locked";
@@ -208,29 +223,35 @@ function updateStopIndicators() {
     }
   });
 
-  // Update Box C button text according to selected round's unlock & submission status
+  // Update Box C button text according to selected round's unlock, submission, and violation status
   const selectedCompleted = isLevelCompleted(selectedLevel);
   const selectedUnlocked = isLevelUnlocked(selectedLevel);
   const selectedStarted = isLevelStarted(selectedLevel);
+  const selectedViolated = isLevelViolated(selectedLevel);
 
   if (startBtnText && startLevelBtn) {
-    if (!selectedUnlocked) {
+    startLevelBtn.classList.remove("btn-locked", "btn-violated");
+
+    if (selectedViolated) {
+      startLevelBtn.classList.add("btn-locked", "btn-violated");
+      startLevelBtn.style.cursor = "not-allowed";
+      startLevelBtn.style.opacity = "0.8";
+      startBtnText.textContent = `Level ${selectedLevel} Locked (3 Violations Triggered 🚨)`;
+    } else if (selectedCompleted) {
+      startLevelBtn.classList.add("btn-locked", "btn-submitted-locked");
+      startLevelBtn.style.cursor = "not-allowed";
+      startLevelBtn.style.opacity = "0.85";
+      startBtnText.textContent = `Level ${selectedLevel} Submitted & Locked 🔒`;
+    } else if (!selectedUnlocked) {
       startLevelBtn.classList.add("btn-locked");
       startLevelBtn.style.cursor = "not-allowed";
       startLevelBtn.style.opacity = "0.6";
       startBtnText.textContent = `Level ${selectedLevel} Locked (Complete Level ${selectedLevel - 1} First)`;
-    } else if (selectedCompleted) {
-      startLevelBtn.classList.remove("btn-locked");
-      startLevelBtn.style.cursor = "pointer";
-      startLevelBtn.style.opacity = "1";
-      startBtnText.textContent = `Review Level ${selectedLevel} (Submitted 🔒)`;
     } else if (selectedStarted) {
-      startLevelBtn.classList.remove("btn-locked");
       startLevelBtn.style.cursor = "pointer";
       startLevelBtn.style.opacity = "1";
       startBtnText.textContent = `Continue Level ${selectedLevel} (In Progress ⏳) \u2192`;
     } else {
-      startLevelBtn.classList.remove("btn-locked");
       startLevelBtn.style.cursor = "pointer";
       startLevelBtn.style.opacity = "1";
       startBtnText.textContent = `Start Level ${selectedLevel} \u2192`;
@@ -280,6 +301,14 @@ if (startLevelBtn) {
   startLevelBtn.addEventListener("click", () => {
     if (!currentTeam) {
       showToast("Please sign in with your team credentials first.", "error");
+      return;
+    }
+    if (isLevelViolated(selectedLevel)) {
+      showToast(`Level ${selectedLevel} is permanently locked due to Safe-Browsing rule violations (3 strikes).`, "error");
+      return;
+    }
+    if (isLevelCompleted(selectedLevel)) {
+      showToast(`Level ${selectedLevel} has already been submitted and is locked. You cannot enter even to view.`, "warning");
       return;
     }
     if (!isLevelUnlocked(selectedLevel)) {

@@ -29,6 +29,84 @@ export async function initLevelPage(levelNumber) {
     return;
   }
 
+  let isViolatedTerminated = false;
+  let levelTimerInterval = null;
+
+  // Custom Disqualification & Violation Modal Dialogue (No native browser alert popup)
+  function showViolationDialogue(reason = "3 Safe-Browsing rule violations recorded.") {
+    isViolatedTerminated = true;
+    if (levelTimerInterval) clearInterval(levelTimerInterval);
+
+    // If contestant is in fullscreen, exit cleanly
+    if (document.fullscreenElement) {
+      try {
+        document.exitFullscreen().catch(() => {});
+      } catch (e) {}
+    }
+
+    // Dismiss any interim proctor/violation overlays or banners
+    const proctorOverlay = document.getElementById("proctor-overlay");
+    if (proctorOverlay) proctorOverlay.remove();
+    const violationPopup = document.getElementById("violation-popup");
+    if (violationPopup) violationPopup.remove();
+
+    let existingDialogue = document.getElementById("violation-dialogue-overlay");
+    if (existingDialogue) existingDialogue.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "violation-dialogue-overlay";
+    overlay.className = "proctor-overlay";
+    overlay.innerHTML = `
+      <div class="proctor-modal violation-modal">
+        <div class="proctor-badge violation-badge">🚨 PROCTOR VIOLATION DETECTED</div>
+        <h2 class="proctor-title violation-title">Level ${levelNumber} Disqualified</h2>
+        <p class="proctor-desc violation-desc">
+          ${reason}
+        </p>
+        <div class="violation-card-box">
+          <div class="violation-row">
+            <span>Strikes:</span>
+            <strong style="color: #ef4444;">3 / 3 (MAX REACHED)</strong>
+          </div>
+          <div class="violation-row">
+            <span>Arena Access:</span>
+            <strong style="color: #fca5a5;">LEVEL PERMANENTLY LOCKED</strong>
+          </div>
+        </div>
+        <div class="violation-countdown-text" id="violation-countdown-text">
+          Exiting to Mission Map in 3 seconds...
+        </div>
+        <button type="button" id="violation-exit-btn" class="violation-exit-btn">
+          Exit Level & Go Home Now &rarr;
+        </button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    let secondsLeft = 3;
+    const countdownEl = overlay.querySelector("#violation-countdown-text");
+    const exitBtn = overlay.querySelector("#violation-exit-btn");
+
+    function goHome() {
+      window.location.href = "index.html";
+    }
+
+    if (exitBtn) {
+      exitBtn.addEventListener("click", goHome);
+    }
+
+    const timer = setInterval(() => {
+      secondsLeft--;
+      if (countdownEl) {
+        countdownEl.textContent = `Exiting to Mission Map in ${secondsLeft} second${secondsLeft === 1 ? "" : "s"}...`;
+      }
+      if (secondsLeft <= 0) {
+        clearInterval(timer);
+        goHome();
+      }
+    }, 1000);
+  }
+
   // Progression Gate: Level 2, 3, 4 require completion of previous round
   if (levelNumber > 1) {
     const priorLevel = levelNumber - 1;
@@ -43,6 +121,30 @@ export async function initLevelPage(levelNumber) {
       window.location.href = "index.html";
       return;
     }
+  }
+
+  // Safe-Browsing Disqualification Check: if 3 strikes or violated = true, lock permanently
+  const isViolated = Boolean(
+    team[`lvl${levelNumber}`]?.violated === "true" ||
+    team[`lvl${levelNumber}`]?.violated === true ||
+    (Number(team[`level_${levelNumber}_strikes`] || 0) >= 3)
+  );
+  if (isViolated) {
+    showViolationDialogue("This level is permanently locked due to 3 Safe-Browsing violations.");
+    return;
+  }
+
+  // Completed Level Lock Gate: once submitted, contestants cannot enter even to view
+  const isAlreadyCompleted = Boolean(
+    team[`lvl${levelNumber}`]?.scenarios ||
+    team[`lvl${levelNumber}`]?.resp ||
+    team[`level_${levelNumber}_response`] ||
+    team[`level-${levelNumber}-response`]
+  );
+  if (isAlreadyCompleted) {
+    alert(`🔒 Level ${levelNumber} has already been submitted and is locked. You cannot enter this level.`);
+    window.location.href = "index.html";
+    return;
   }
 
   // Populate header team badge & name
@@ -134,7 +236,7 @@ export async function initLevelPage(levelNumber) {
   // 2. Connect to Firestore & Timer Configuration (Strictly Database-Driven)
   const LEVEL_DURATION_MINUTES = 40;
   const LEVEL_DURATION_MS = LEVEL_DURATION_MINUTES * 60 * 1000;
-  let levelTimerInterval = null;
+  levelTimerInterval = null;
   let levelStartedAt = null;
   let isTimeExpired = false;
   let isRecordingStartTime = false;
@@ -274,8 +376,240 @@ export async function initLevelPage(levelNumber) {
     }
   }
 
+  // ==========================================
+  // 4. Safe-Browsing & Proctoring Controls
+  // ==========================================
+  const strikesBadge = document.getElementById("level-strikes-badge");
+  const strikesDisplay = document.getElementById("strikes-count-display");
+  let currentStrikes = Number(team[`level_${levelNumber}_strikes`] || 0);
+  let lastStrikeTime = 0;
+  const MAX_STRIKES = 3;
+  isViolatedTerminated = false;
+  let isProctorActive = false;
+
+  function updateStrikesUI(strikes) {
+    if (strikesDisplay) {
+      strikesDisplay.textContent = `${Math.min(strikes, MAX_STRIKES)}/${MAX_STRIKES}`;
+    }
+    if (strikesBadge) {
+      strikesBadge.classList.remove("strike-1", "strike-2", "strike-3", "strike-violated");
+      if (strikes === 1) {
+        strikesBadge.classList.add("strike-1");
+      } else if (strikes === 2) {
+        strikesBadge.classList.add("strike-2");
+      } else if (strikes >= 3) {
+        strikesBadge.classList.add("strike-3", "strike-violated");
+      }
+    }
+  }
+
+  // Initial display of strikes
+  updateStrikesUI(currentStrikes);
+
+  function showProctorOverlay() {
+    if (isAlreadySubmitted || isViolatedTerminated) return;
+    let overlay = document.getElementById("proctor-overlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "proctor-overlay";
+      overlay.className = "proctor-overlay";
+      overlay.innerHTML = `
+        <div class="proctor-modal">
+          <div class="proctor-badge">🛡️ PROCTORED ARENA</div>
+          <h2 class="proctor-title">Full Screen Required</h2>
+          <p class="proctor-desc">This competition arena strictly monitors session integrity. The following rules are active:</p>
+          <ul class="proctor-rules-list">
+            <li><span>🖥️</span> <div><strong>Full Screen Mode:</strong> You must remain in full screen. Exiting triggers 1 strike.</div></li>
+            <li><span>🚫</span> <div><strong>No Tab Switching or Minimizing:</strong> Leaving this window triggers 1 strike.</div></li>
+            <li><span>🖱️</span> <div><strong>No Right-Click or DevTools:</strong> Context menus and inspector shortcuts are blocked.</div></li>
+            <li><span>⚠️</span> <div><strong>3 Strikes Rule:</strong> 3 strikes will permanently lock you out of this level.</div></li>
+          </ul>
+          <button type="button" id="proctor-enter-btn" class="proctor-enter-btn">
+            Enter Full Screen & Begin Round &rarr;
+          </button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      overlay.querySelector("#proctor-enter-btn").addEventListener("click", async () => {
+        try {
+          if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (err) {
+          console.warn("Fullscreen request note:", err.message);
+        }
+        overlay.classList.add("hidden");
+        isProctorActive = true;
+        showToast("🛡️ Safe-Browsing active in full-screen mode.", "success");
+      });
+    } else {
+      overlay.classList.remove("hidden");
+    }
+  }
+
+  function showViolationPopup(reason, strikes) {
+    let popup = document.getElementById("violation-popup");
+    if (!popup) {
+      popup = document.createElement("div");
+      popup.id = "violation-popup";
+      popup.className = "violation-popup-modal";
+      document.body.appendChild(popup);
+    }
+    popup.innerHTML = `
+      <div class="violation-icon">⚠️</div>
+      <div class="violation-content">
+        <div class="violation-title">VIOLATION DETECTED // STRIKE ${strikes} OF 3</div>
+        <div class="violation-message"><strong>Reason:</strong> ${reason}. You must remain in full-screen on this tab!</div>
+        <div class="violation-strike-dots">
+          <span class="violation-dot ${strikes >= 1 ? "hit" : ""}">1</span>
+          <span class="violation-dot ${strikes >= 2 ? "hit" : ""}">2</span>
+          <span class="violation-dot ${strikes >= 3 ? "hit" : ""}">3</span>
+        </div>
+      </div>
+      <button type="button" id="dismiss-violation-btn" style="padding: 8px 14px; background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.5); color: #fca5a5; border-radius: 4px; font-weight: 700; cursor: pointer; flex-shrink: 0;">
+        Resume
+      </button>
+    `;
+    popup.classList.remove("hidden");
+
+    const resumeBtn = popup.querySelector("#dismiss-violation-btn");
+    resumeBtn.onclick = async () => {
+      popup.classList.add("hidden");
+      if (!document.fullscreenElement && !isAlreadySubmitted && !isViolatedTerminated) {
+        try {
+          await document.documentElement.requestFullscreen();
+        } catch (e) {}
+      }
+    };
+
+    setTimeout(() => {
+      if (popup) popup.classList.add("hidden");
+    }, 6000);
+  }
+
+  async function triggerStrike(reason) {
+    if (isAlreadySubmitted || isViolatedTerminated) return;
+
+    // Debounce rapid duplicate events (e.g., blur + visibilitychange firing together)
+    const now = Date.now();
+    if (now - lastStrikeTime < 2500) return;
+    lastStrikeTime = now;
+
+    currentStrikes++;
+    updateStrikesUI(currentStrikes);
+    console.warn(`[Safe-Browsing Strike ${currentStrikes}/3]: ${reason}`);
+
+    if (db && team.teamId) {
+      try {
+        const docRef = doc(db, "registrations", team.teamId);
+        await setDoc(docRef, {
+          [`level_${levelNumber}_strikes`]: currentStrikes
+        }, { merge: true });
+      } catch (err) {
+        console.warn("Could not save strike to DB:", err.message);
+      }
+    }
+
+    if (currentStrikes < MAX_STRIKES) {
+      showViolationPopup(reason, currentStrikes);
+      showToast(`⚠️ Strike ${currentStrikes}/3: ${reason}`, "error");
+    } else {
+      await terminateLevelDueToViolations(reason);
+    }
+  }
+
+  async function terminateLevelDueToViolations(reason) {
+    isViolatedTerminated = true;
+    if (levelTimerInterval) clearInterval(levelTimerInterval);
+
+    let s1Val = scenario1Input?.value?.trim() || "[Terminated: 3 Safe-Browsing Violations]";
+    let s2Val = scenario2Input?.value?.trim() || "[Terminated: 3 Safe-Browsing Violations]";
+    let s3Val = scenario3Input?.value?.trim() || "[Terminated: 3 Safe-Browsing Violations]";
+
+    const lvlPayload = {
+      scenarios: {
+        scenario_1: s1Val,
+        scenario_2: s2Val,
+        scenario_3: s3Val
+      },
+      resp: `[TERMINATED: 3 SAFE-BROWSING VIOLATIONS - Last reason: ${reason}]`,
+      score: existingScore || 0,
+      time: new Date().toLocaleTimeString(),
+      violated: "true",
+      autoSubmitted: true
+    };
+
+    try {
+      if (db && team.teamId) {
+        const docRef = doc(db, "registrations", team.teamId);
+        await setDoc(docRef, {
+          [`lvl${levelNumber}`]: lvlPayload,
+          [`level_${levelNumber}_strikes`]: 3
+        }, { merge: true });
+      }
+
+      team[`lvl${levelNumber}`] = lvlPayload;
+      team[`level_${levelNumber}_strikes`] = 3;
+      sessionStorage.setItem("promptathon_active_team", JSON.stringify(team));
+    } catch (err) {
+      console.error("Disqualification error:", err);
+    }
+
+    showViolationDialogue(`3 Safe-Browsing violations recorded (${reason}). This level has been permanently locked.`);
+  }
+
+  function initSafeBrowsingListeners() {
+    // 1. Context menu (right-click) blocker
+    document.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+      if (!isAlreadySubmitted && !isViolatedTerminated) {
+        triggerStrike("Right-Click context menu prohibited");
+      }
+    });
+
+    // 2. Tab switch or window minimization
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden && !isAlreadySubmitted && !isViolatedTerminated) {
+        triggerStrike("Tab switch or browser minimized");
+      }
+    });
+
+    // 3. Window blur (leaving window / alt-tab)
+    window.addEventListener("blur", () => {
+      if (!isAlreadySubmitted && !isViolatedTerminated) {
+        triggerStrike("Switched window or application");
+      }
+    });
+
+    // 4. Exiting full screen
+    document.addEventListener("fullscreenchange", () => {
+      if (!document.fullscreenElement && !isAlreadySubmitted && !isViolatedTerminated) {
+        triggerStrike("Exited full-screen mode");
+        if (currentStrikes < MAX_STRIKES) {
+          showProctorOverlay();
+        }
+      }
+    });
+
+    // 5. Developer Tools Shortcuts (F12, Ctrl+Shift+I, etc.)
+    document.addEventListener("keydown", (e) => {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && ["I", "i", "J", "j", "C", "c"].includes(e.key)) ||
+        (e.ctrlKey && ["U", "u"].includes(e.key))
+      ) {
+        e.preventDefault();
+        if (!isAlreadySubmitted && !isViolatedTerminated) {
+          triggerStrike("Developer tools / source inspection shortcut");
+        }
+      }
+    });
+  }
+
   // 4. Lock & Unlock state helpers
   let isAlreadySubmitted = false;
+  let isSubmittingLocally = false;
   let existingScore = 0;
 
   function lockAsSubmitted(dataPayload, submissionTime) {
@@ -364,9 +698,12 @@ export async function initLevelPage(levelNumber) {
   }
 
   function unlockState(notify = false) {
-    const wasLocked = isAlreadySubmitted;
+    const wasLocked = isAlreadySubmitted || isViolatedTerminated;
     isAlreadySubmitted = false;
     isTimeExpired = false;
+    isViolatedTerminated = false;
+    currentStrikes = 0;
+    updateStrikesUI(0);
 
     // Reset countdown timer visually to 40:00 when unlocked
     resetCountdownTimer();
@@ -411,6 +748,7 @@ export async function initLevelPage(levelNumber) {
     if (team[`level_${levelNumber}_response`]) delete team[`level_${levelNumber}_response`];
     if (team[`level-${levelNumber}-response`]) delete team[`level-${levelNumber}-response`];
     delete team[`level_${levelNumber}_startedAt`];
+    delete team[`level_${levelNumber}_strikes`];
     sessionStorage.setItem("promptathon_active_team", JSON.stringify(team));
 
     if (notify && wasLocked) {
@@ -445,13 +783,41 @@ export async function initLevelPage(levelNumber) {
           existingScore = lvlData.score;
         }
 
-        const hasPayload = lvlData?.scenarios || lvlData?.resp || data[`level_${levelNumber}_response`] || data[`level-${levelNumber}-response`];
+        // Live Safe-Browsing violation & strike sync from database
+        const dbStrikes = Number(data[`level_${levelNumber}_strikes`] || 0);
+        if (dbStrikes !== currentStrikes) {
+          currentStrikes = dbStrikes;
+          updateStrikesUI(currentStrikes);
+        }
+
+        const isDisqualified = Boolean(
+          lvlData?.violated === "true" ||
+          lvlData?.violated === true ||
+          dbStrikes >= 3
+        );
+
+        if (isDisqualified) {
+          showViolationDialogue("This level is permanently locked due to Safe-Browsing violations (3 strikes).");
+          return;
+        }
+
+        const hasPayload = Boolean(
+          lvlData?.scenarios ||
+          lvlData?.resp ||
+          data[`level_${levelNumber}_response`] ||
+          data[`level-${levelNumber}-response`]
+        );
+
         if (hasPayload) {
-          const payload = lvlData?.scenarios || lvlData?.resp || data[`level_${levelNumber}_response`];
-          lockAsSubmitted(payload, lvlData?.time);
+          // If level has already been submitted in DB, contestants cannot access or view it!
+          if (!isSubmittingLocally) {
+            alert(`🔒 Level ${levelNumber} has already been submitted and is locked. You cannot enter this level.`);
+            window.location.href = "index.html";
+            return;
+          }
         } else {
           // If level submission was cleared / unlocked in database
-          if (isAlreadySubmitted) {
+          if (isAlreadySubmitted || isViolatedTerminated) {
             unlockState(true);
           }
           // Sync timer countdown strictly from database level_<levelNumber>_startedAt
@@ -464,11 +830,12 @@ export async function initLevelPage(levelNumber) {
       console.warn("Firestore listener warning:", error.message);
     });
   } else {
-    // Fallback check from session if offline
+    // Fallback check from session if offline: once submitted, cannot enter even to view
     const sessionLvl = team[`lvl${levelNumber}`];
-    if (sessionLvl?.scenarios || sessionLvl?.resp || team[`level_${levelNumber}_response`]) {
-      const payload = sessionLvl?.scenarios || sessionLvl?.resp || team[`level_${levelNumber}_response`];
-      lockAsSubmitted(payload, sessionLvl?.time);
+    if (sessionLvl?.scenarios || sessionLvl?.resp || team[`level_${levelNumber}_response`] || team[`level-${levelNumber}-response`]) {
+      alert(`🔒 Level ${levelNumber} has already been submitted and is locked. You cannot enter this level.`);
+      window.location.href = "index.html";
+      return;
     } else {
       syncTimerFromDb(team);
     }
@@ -479,12 +846,14 @@ export async function initLevelPage(levelNumber) {
 
   // 6. Unified Submission Executor (supports manual submit & auto-submit on time expiry)
   async function executeSubmission(isAutoSubmit = false) {
-    if (isAlreadySubmitted) {
+    if (isAlreadySubmitted || isSubmittingLocally) {
       if (!isAutoSubmit) {
         showToast("This level has already been submitted and is locked.", "warning");
       }
       return;
     }
+
+    isSubmittingLocally = true;
 
     let s1Val = scenario1Input?.value?.trim() || "";
     let s2Val = scenario2Input?.value?.trim() || "";
@@ -496,6 +865,7 @@ export async function initLevelPage(levelNumber) {
         if (!val) {
           showToast("Please enter your prompt before submitting.", "error");
           singleLegacyInput.focus();
+          isSubmittingLocally = false;
           return;
         }
       } else {
@@ -509,6 +879,7 @@ export async function initLevelPage(levelNumber) {
           if (!s1Val) scenario1Input?.focus();
           else if (!s2Val) scenario2Input?.focus();
           else if (!s3Val) scenario3Input?.focus();
+          isSubmittingLocally = false;
           return;
         }
       }
@@ -565,12 +936,16 @@ export async function initLevelPage(levelNumber) {
       lockAsSubmitted(lvlPayload.scenarios, lvlPayload.time);
 
       if (isAutoSubmit) {
-        showToast(`⏰ 40-minute time limit reached! Responses for Level ${levelNumber} submitted and locked.`, "warning");
+        alert(`⏰ 40-minute time limit reached! Responses for Level ${levelNumber} submitted and locked. Returning to mission map.`);
+        window.location.href = "index.html";
       } else {
         if (typeof confetti === "function") {
           confetti({ particleCount: 80, spread: 75, origin: { y: 0.6 } });
         }
-        showToast(`All 3 categories for Level ${levelNumber} submitted! Round is now locked.`, "success");
+        showToast(`All 3 categories for Level ${levelNumber} submitted! Level locked. Returning to mission map...`, "success");
+        setTimeout(() => {
+          window.location.href = "index.html";
+        }, 1500);
       }
 
     } catch (err) {
@@ -579,12 +954,23 @@ export async function initLevelPage(levelNumber) {
       team[`lvl${levelNumber}`] = lvlPayload;
       sessionStorage.setItem("promptathon_active_team", JSON.stringify(team));
       lockAsSubmitted(lvlPayload.scenarios, lvlPayload.time);
-      showToast(isAutoSubmit ? "Time expired! Saved locally." : "Saved locally! (Database sync pending)", "warning");
+      showToast(isAutoSubmit ? "Time expired! Saved locally. Returning to mission map..." : "Saved! Level locked. Returning to mission map...", "warning");
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 1500);
     }
   }
 
   // 7. Handle Submit Button Click
   if (submitBtn) {
     submitBtn.addEventListener("click", () => executeSubmission(false));
+  }
+
+  // 8. Initialize Safe-Browsing Listeners & Fullscreen Proctor Prompt
+  initSafeBrowsingListeners();
+  if (!isAlreadySubmitted && !isViolatedTerminated) {
+    if (!document.fullscreenElement) {
+      showProctorOverlay();
+    }
   }
 }

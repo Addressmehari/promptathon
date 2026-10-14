@@ -422,16 +422,6 @@ async function findTeamInDb(inputIdentifier) {
 
 let teamDocUnsubscribe = null;
 
-function calculateTeamScore(data) {
-  if (!data) return "0.00";
-  let total = 0;
-  for (let lvl = 1; lvl <= 4; lvl++) {
-    const s = data[`lvl${lvl}`]?.score;
-    if (typeof s === "number") total += s;
-  }
-  return Number(total.toFixed(2)).toFixed(2);
-}
-
 // Switch to Workspace
 function unlockWorkspace(teamData) {
   currentTeam = { ...teamData };
@@ -445,12 +435,6 @@ function unlockWorkspace(teamData) {
   passOriginalId.textContent = currentTeam.originalId;
   passLeaderName.textContent = currentTeam.leaderName || "N/A";
   passParticipants.textContent = currentTeam.participants || "Team Members";
-
-  // Score display (computed strictly from lvl1..lvl4 scores)
-  const teamScoreNum = document.getElementById("team-score-num");
-  if (teamScoreNum) {
-    teamScoreNum.textContent = calculateTeamScore(currentTeam);
-  }
 
   // Update visual state of level stops to show which ones are already completed
   updateStopIndicators();
@@ -482,9 +466,6 @@ function unlockWorkspace(teamData) {
           }
         }
         sessionStorage.setItem("promptathon_active_team", JSON.stringify(currentTeam));
-        if (teamScoreNum) {
-          teamScoreNum.textContent = calculateTeamScore(currentTeam);
-        }
         updateStopIndicators();
       }
     }, (err) => {

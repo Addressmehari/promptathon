@@ -10,7 +10,7 @@ import {
 import { initFirebaseFromEnv } from "./firebase-config.js";
 
 /**
- * Initializes Level Page session, previous response loading, and Firestore submission
+ * Initializes Level Page session, previous response loading, and multi-scenario Firestore submission
  * @param {number} levelNumber (1, 2, 3, or 4)
  */
 export async function initLevelPage(levelNumber) {
@@ -33,6 +33,7 @@ export async function initLevelPage(levelNumber) {
   if (levelNumber > 1) {
     const priorLevel = levelNumber - 1;
     const priorCompleted = Boolean(
+      team[`lvl${priorLevel}`]?.scenarios ||
       team[`lvl${priorLevel}`]?.resp ||
       team[`level_${priorLevel}_response`] ||
       team[`level-${priorLevel}-response`]
@@ -50,9 +51,66 @@ export async function initLevelPage(levelNumber) {
   if (badgeEl) badgeEl.textContent = team.teamId || "ACTIVE TEAM";
   if (nameEl) nameEl.textContent = team.teamName || "Team Contestant";
 
-  const promptInput = document.getElementById("level-prompt-input");
+  // Elements for 3 scenarios
+  const scenario1Input = document.getElementById("scenario-1-input");
+  const scenario2Input = document.getElementById("scenario-2-input");
+  const scenario3Input = document.getElementById("scenario-3-input");
+  const singleLegacyInput = document.getElementById("level-prompt-input");
+
+  const scenario1Pill = document.getElementById("scenario-1-status");
+  const scenario2Pill = document.getElementById("scenario-2-status");
+  const scenario3Pill = document.getElementById("scenario-3-status");
+  const progressBadge = document.getElementById("progress-count-badge");
+
   const submitBtn = document.getElementById("submit-level-btn");
   const toastContainer = document.getElementById("toast-container");
+
+  // Helper: Live scenario completion indicators
+  function updateProgress() {
+    let completedCount = 0;
+    if (scenario1Input) {
+      const isFilled = Boolean(scenario1Input.value.trim());
+      if (isFilled) completedCount++;
+      if (scenario1Pill) {
+        scenario1Pill.textContent = isFilled ? "✓ Completed" : "Pending";
+        scenario1Pill.className = `scenario-status-pill ${isFilled ? "filled" : ""}`;
+      }
+    }
+    if (scenario2Input) {
+      const isFilled = Boolean(scenario2Input.value.trim());
+      if (isFilled) completedCount++;
+      if (scenario2Pill) {
+        scenario2Pill.textContent = isFilled ? "✓ Completed" : "Pending";
+        scenario2Pill.className = `scenario-status-pill ${isFilled ? "filled" : ""}`;
+      }
+    }
+    if (scenario3Input) {
+      const isFilled = Boolean(scenario3Input.value.trim());
+      if (isFilled) completedCount++;
+      if (scenario3Pill) {
+        scenario3Pill.textContent = isFilled ? "✓ Completed" : "Pending";
+        scenario3Pill.className = `scenario-status-pill ${isFilled ? "filled" : ""}`;
+      }
+    }
+    if (progressBadge) {
+      progressBadge.textContent = `${completedCount} / 3 COMPLETED`;
+      if (completedCount === 3) {
+        progressBadge.style.color = "#86efac";
+        progressBadge.style.borderColor = "rgba(134, 239, 172, 0.4)";
+        progressBadge.style.background = "rgba(134, 239, 172, 0.15)";
+      } else {
+        progressBadge.style.color = "#fde047";
+        progressBadge.style.borderColor = "rgba(253, 224, 71, 0.3)";
+        progressBadge.style.background = "rgba(253, 224, 71, 0.08)";
+      }
+    }
+  }
+
+  [scenario1Input, scenario2Input, scenario3Input].forEach(inp => {
+    if (inp) {
+      inp.addEventListener("input", updateProgress);
+    }
+  });
 
   // Toast notification helper
   function showToast(message, type = "success") {
@@ -86,15 +144,52 @@ export async function initLevelPage(levelNumber) {
   let isAlreadySubmitted = false;
   let existingScore = 0;
 
-  function lockAsSubmitted(responseText, submissionTime) {
+  function lockAsSubmitted(dataPayload, submissionTime) {
     isAlreadySubmitted = true;
-    if (promptInput) {
-      if (responseText) promptInput.value = responseText;
-      promptInput.readOnly = true;
-      promptInput.style.cursor = "not-allowed";
-      promptInput.style.opacity = "0.85";
-      promptInput.style.borderColor = "rgba(134, 239, 172, 0.4)";
+
+    // Extract scenario values
+    let s1 = "";
+    let s2 = "";
+    let s3 = "";
+
+    if (dataPayload && typeof dataPayload === "object" && (dataPayload.scenario_1 || dataPayload.scenario1)) {
+      s1 = dataPayload.scenario_1 || dataPayload.scenario1 || "";
+      s2 = dataPayload.scenario_2 || dataPayload.scenario2 || "";
+      s3 = dataPayload.scenario_3 || dataPayload.scenario3 || "";
+    } else if (typeof dataPayload === "string") {
+      // Legacy or consolidated string format
+      const m1 = dataPayload.match(/\[SCENARIO 1\]\s*([\s\S]*?)(?=\[SCENARIO 2\]|$)/i);
+      const m2 = dataPayload.match(/\[SCENARIO 2\]\s*([\s\S]*?)(?=\[SCENARIO 3\]|$)/i);
+      const m3 = dataPayload.match(/\[SCENARIO 3\]\s*([\s\S]*?)$/i);
+      if (m1 || m2 || m3) {
+        s1 = m1 ? m1[1].trim() : "";
+        s2 = m2 ? m2[1].trim() : "";
+        s3 = m3 ? m3[1].trim() : "";
+      } else {
+        s1 = dataPayload;
+      }
     }
+
+    if (scenario1Input && s1) scenario1Input.value = s1;
+    if (scenario2Input && s2) scenario2Input.value = s2;
+    if (scenario3Input && s3) scenario3Input.value = s3;
+    if (singleLegacyInput && !s2 && !s3 && s1) singleLegacyInput.value = s1;
+
+    [scenario1Input, scenario2Input, scenario3Input, singleLegacyInput].forEach(inp => {
+      if (inp) {
+        inp.readOnly = true;
+        inp.style.cursor = "not-allowed";
+        inp.style.opacity = "0.85";
+        inp.style.borderColor = "rgba(134, 239, 172, 0.4)";
+      }
+    });
+
+    document.querySelectorAll(".scenario-card").forEach(card => card.classList.add("card-locked"));
+
+    updateProgress();
+    if (scenario1Pill) scenario1Pill.textContent = "🔒 Submitted";
+    if (scenario2Pill) scenario2Pill.textContent = "🔒 Submitted";
+    if (scenario3Pill) scenario3Pill.textContent = "🔒 Submitted";
 
     if (submitBtn) {
       submitBtn.disabled = true;
@@ -107,24 +202,25 @@ export async function initLevelPage(levelNumber) {
       submitBtn.style.pointerEvents = "none";
       const btnText = submitBtn.querySelector(".btn-text");
       if (btnText) {
-        btnText.innerHTML = `🔒 Level ${levelNumber} Submitted & Locked`;
+        btnText.innerHTML = `🔒 Level ${levelNumber} Submitted & Locked (All 3 Categories)`;
       }
     }
 
     let lockNotice = document.getElementById("level-locked-notice");
-    if (!lockNotice && promptInput) {
+    if (!lockNotice && (scenario1Input || singleLegacyInput)) {
       lockNotice = document.createElement("div");
       lockNotice.id = "level-locked-notice";
       lockNotice.className = "level-locked-badge";
-      lockNotice.style.cssText = "display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 14px; background: rgba(134, 239, 172, 0.08); border: 1px solid rgba(134, 239, 172, 0.3); border-radius: 4px; font-size: 0.82rem; color: #86efac; font-family: var(--font-mono, monospace);";
+      lockNotice.style.cssText = "display: flex; align-items: center; gap: 8px; margin-top: 14px; padding: 12px 16px; background: rgba(134, 239, 172, 0.08); border: 1px solid rgba(134, 239, 172, 0.3); border-radius: 6px; font-size: 0.85rem; color: #86efac; font-family: var(--font-mono, monospace);";
       lockNotice.innerHTML = `
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
         </svg>
-        <span><strong>LOCKED:</strong> Response submitted${submissionTime ? ` on ${submissionTime}` : ""}. Further submissions for this round are locked.</span>
+        <span><strong>LOCKED:</strong> All 3 scenario responses submitted${submissionTime ? ` on ${submissionTime}` : ""}. Further edits for this round are locked.</span>
       `;
-      promptInput.parentNode.insertBefore(lockNotice, promptInput.nextSibling);
+      const anchor = document.querySelector(".level-footer-actions") || document.querySelector(".scenarios-container");
+      if (anchor) anchor.parentNode.insertBefore(lockNotice, anchor);
     }
   }
 
@@ -132,13 +228,19 @@ export async function initLevelPage(levelNumber) {
     const wasLocked = isAlreadySubmitted;
     isAlreadySubmitted = false;
 
-    if (promptInput) {
-      promptInput.readOnly = false;
-      promptInput.style.cursor = "text";
-      promptInput.style.opacity = "1";
-      promptInput.style.borderColor = "";
-      if (wasLocked) promptInput.value = "";
-    }
+    [scenario1Input, scenario2Input, scenario3Input, singleLegacyInput].forEach(inp => {
+      if (inp) {
+        inp.readOnly = false;
+        inp.style.cursor = "text";
+        inp.style.opacity = "1";
+        inp.style.borderColor = "";
+        if (wasLocked) inp.value = "";
+      }
+    });
+
+    document.querySelectorAll(".scenario-card").forEach(card => card.classList.remove("card-locked"));
+
+    updateProgress();
 
     if (submitBtn) {
       submitBtn.disabled = false;
@@ -151,7 +253,7 @@ export async function initLevelPage(levelNumber) {
       submitBtn.style.pointerEvents = "auto";
       const btnText = submitBtn.querySelector(".btn-text");
       if (btnText) {
-        btnText.innerHTML = `Submit Level ${levelNumber} Response &rarr;`;
+        btnText.innerHTML = `Submit All 3 Scenarios &rarr;`;
       }
     }
 
@@ -168,7 +270,7 @@ export async function initLevelPage(levelNumber) {
     sessionStorage.setItem("promptathon_active_team", JSON.stringify(team));
 
     if (notify && wasLocked) {
-      showToast(`Level ${levelNumber} was unlocked in database! You can now submit again.`, "info");
+      showToast(`Level ${levelNumber} was unlocked in database! You can now edit and resubmit.`, "info");
     }
   }
 
@@ -183,6 +285,7 @@ export async function initLevelPage(levelNumber) {
         if (levelNumber > 1) {
           const priorLevel = levelNumber - 1;
           const priorCompleted = Boolean(
+            data[`lvl${priorLevel}`]?.scenarios ||
             data[`lvl${priorLevel}`]?.resp ||
             data[`level_${priorLevel}_response`] ||
             data[`level-${priorLevel}-response`]
@@ -194,14 +297,15 @@ export async function initLevelPage(levelNumber) {
           }
         }
 
-        if (data[`lvl${levelNumber}`]?.score !== undefined) {
-          existingScore = data[`lvl${levelNumber}`].score;
+        const lvlData = data[`lvl${levelNumber}`];
+        if (lvlData?.score !== undefined) {
+          existingScore = lvlData.score;
         }
-        const remoteResponse = data[`lvl${levelNumber}`]?.resp ||
-                               data[`level_${levelNumber}_response`] || 
-                               data[`level-${levelNumber}-response`];
-        if (remoteResponse) {
-          lockAsSubmitted(remoteResponse, data[`lvl${levelNumber}`]?.time);
+
+        const hasPayload = lvlData?.scenarios || lvlData?.resp || data[`level_${levelNumber}_response`] || data[`level-${levelNumber}-response`];
+        if (hasPayload) {
+          const payload = lvlData?.scenarios || lvlData?.resp || data[`level_${levelNumber}_response`];
+          lockAsSubmitted(payload, lvlData?.time);
         } else {
           // Field was deleted from database -> Unlock!
           unlockState(true);
@@ -215,13 +319,17 @@ export async function initLevelPage(levelNumber) {
     });
   } else {
     // Fallback check from session if offline
-    const sessionResponse = team[`lvl${levelNumber}`]?.resp || team[`level_${levelNumber}_response`];
-    if (sessionResponse) {
-      lockAsSubmitted(sessionResponse, team[`lvl${levelNumber}`]?.time);
+    const sessionLvl = team[`lvl${levelNumber}`];
+    if (sessionLvl?.scenarios || sessionLvl?.resp || team[`level_${levelNumber}_response`]) {
+      const payload = sessionLvl?.scenarios || sessionLvl?.resp || team[`level_${levelNumber}_response`];
+      lockAsSubmitted(payload, sessionLvl?.time);
     }
   }
 
-  // 4. Handle Submit Button Click
+  // Initial progress calculation
+  updateProgress();
+
+  // 5. Handle Submit Button Click
   if (submitBtn) {
     submitBtn.addEventListener("click", async () => {
       // Guard against duplicate submission
@@ -230,19 +338,48 @@ export async function initLevelPage(levelNumber) {
         return;
       }
 
-      const promptVal = promptInput?.value?.trim();
-      if (!promptVal) {
-        showToast("Please enter your prompt before submitting.", "error");
-        promptInput?.focus();
-        return;
+      // Check all 3 scenario inputs
+      const s1Val = scenario1Input?.value?.trim() || "";
+      const s2Val = scenario2Input?.value?.trim() || "";
+      const s3Val = scenario3Input?.value?.trim() || "";
+
+      // Fallback if page still has single input
+      if (!scenario1Input && singleLegacyInput) {
+        const val = singleLegacyInput.value.trim();
+        if (!val) {
+          showToast("Please enter your prompt before submitting.", "error");
+          singleLegacyInput.focus();
+          return;
+        }
+      } else {
+        // Strict check: Contestant MUST complete ALL 3 scenarios!
+        const missing = [];
+        if (!s1Val) missing.push("Scenario 1");
+        if (!s2Val) missing.push("Scenario 2");
+        if (!s3Val) missing.push("Scenario 3");
+
+        if (missing.length > 0) {
+          showToast(`Please complete all 3 categories before submitting. Missing: ${missing.join(", ")}`, "error");
+          if (!s1Val) scenario1Input?.focus();
+          else if (!s2Val) scenario2Input?.focus();
+          else if (!s3Val) scenario3Input?.focus();
+          return;
+        }
       }
 
       const btnTextEl = submitBtn.querySelector(".btn-text");
       submitBtn.disabled = true;
       if (btnTextEl) btnTextEl.textContent = "Saving & Locking...";
 
+      const consolidatedResp = `[SCENARIO 1]\n${s1Val}\n\n[SCENARIO 2]\n${s2Val}\n\n[SCENARIO 3]\n${s3Val}`;
+
       const lvlPayload = {
-        resp: promptVal,
+        scenarios: {
+          scenario_1: s1Val,
+          scenario_2: s2Val,
+          scenario_3: s3Val
+        },
+        resp: consolidatedResp, // Keeps backward compatibility with any dashboard checker
         score: existingScore,
         time: new Date().toLocaleString()
       };
@@ -258,9 +395,10 @@ export async function initLevelPage(levelNumber) {
             [`level-${levelNumber}-response`]: deleteField(),
             [`level_${levelNumber}_details`]: deleteField(),
             [`level_${levelNumber}_submitted_at`]: deleteField(),
-            lastUpdatedLevel: deleteField()
+            lastUpdatedLevel: deleteField(),
+            score: deleteField()
           }, { merge: true });
-          console.log(`Saved clean lvl${levelNumber} map to Firestore for team:`, team.teamId);
+          console.log(`Saved clean lvl${levelNumber} scenarios map to Firestore for team:`, team.teamId);
         }
 
         // Cache locally in browser
@@ -268,18 +406,19 @@ export async function initLevelPage(levelNumber) {
 
         // Update active team session data
         team[`lvl${levelNumber}`] = lvlPayload;
+        delete team.score;
         delete team[`level_${levelNumber}_response`];
         delete team[`level-${levelNumber}-response`];
         sessionStorage.setItem("promptathon_active_team", JSON.stringify(team));
 
-        // Lock button and textarea permanently so contestant cannot submit again
-        lockAsSubmitted(promptVal, lvlPayload.time);
+        // Lock button and textareas permanently so contestant cannot submit again
+        lockAsSubmitted(lvlPayload.scenarios, lvlPayload.time);
 
         // Confetti celebration & feedback
         if (typeof confetti === "function") {
-          confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+          confetti({ particleCount: 80, spread: 75, origin: { y: 0.6 } });
         }
-        showToast(`Level ${levelNumber} response submitted! Round is now locked.`, "success");
+        showToast(`All 3 categories for Level ${levelNumber} submitted! Round is now locked.`, "success");
 
       } catch (err) {
         console.error("Submission error:", err);
@@ -287,7 +426,7 @@ export async function initLevelPage(levelNumber) {
         localStorage.setItem(`team_${team.teamId}_level_${levelNumber}`, JSON.stringify(lvlPayload));
         team[`lvl${levelNumber}`] = lvlPayload;
         sessionStorage.setItem("promptathon_active_team", JSON.stringify(team));
-        lockAsSubmitted(promptVal, lvlPayload.time);
+        lockAsSubmitted(lvlPayload.scenarios, lvlPayload.time);
         showToast(`Saved locally! (Database sync pending)`, "warning");
       }
     });

@@ -153,26 +153,26 @@
           </div>
         </div>
         <div class="stat-value" id="stat-total-teams">0</div>
-        <span class="stat-subtext">Live synchronized from Firestore</span>
+        <span class="stat-subtext">Active Contestants</span>
       </div>
 
       <div class="stat-card">
         <div class="stat-header">
-          <span class="stat-label">LATEST REGISTRATION</span>
+          <span class="stat-label">ROUND SUBMISSIONS</span>
           <div class="stat-icon-box accent">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 6 12 12 16 14"></polyline>
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
             </svg>
           </div>
         </div>
-        <div class="stat-value text-truncate" id="stat-latest-team">None yet</div>
-        <span class="stat-subtext" id="stat-latest-time">Waiting for first submission</span>
+        <div class="stat-value text-truncate" id="stat-total-submissions">0 / 0</div>
+        <span class="stat-subtext" id="stat-latest-time">Submitted across Rounds 1-4</span>
       </div>
 
       <div class="stat-card">
         <div class="stat-header">
-          <span class="stat-label">DATABASE SYNC</span>
+          <span class="stat-label">DATABASE SYNC & EVAL</span>
           <div class="stat-icon-box success">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -208,18 +208,19 @@
           <select id="sort-select" title="Sort teams">
             <option value="num-asc">Team Number (Lowest first)</option>
             <option value="num-desc">Team Number (Highest first)</option>
-            <option value="time-desc">Recently Registered</option>
+            <option value="score-desc">Highest Score First</option>
+            <option value="time-desc">Recently Updated</option>
             <option value="name-asc">Team Name (A - Z)</option>
           </select>
         </div>
 
-        <button id="export-csv-btn" class="action-btn" title="Download spreadsheet of registered teams">
+        <button id="export-csv-btn" class="action-btn" title="Download spreadsheet of team submissions & scores">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="7 10 12 15 17 10"></polyline>
             <line x1="12" y1="15" x2="12" y2="3"></line>
           </svg>
-          <span>Export CSV</span>
+          <span>Export Submissions CSV</span>
         </button>
 
         <button id="refresh-btn" class="action-btn icon-only" title="Force Refresh">
@@ -234,8 +235,8 @@
     <!-- Main Table Container -->
     <section class="table-container-card">
       <div class="table-header-info">
-        <h2 class="section-heading">Registered Teams List</h2>
-        <span class="showing-count" id="showing-count">Loading teams...</span>
+        <h2 class="section-heading">Team Submissions & Live Evaluation Console</h2>
+        <span class="showing-count" id="showing-count">Loading submissions...</span>
       </div>
 
       <!-- State: Error Notice -->
@@ -248,23 +249,25 @@
         <span id="admin-error-text">Failed to fetch registrations.</span>
       </div>
 
-      <!-- Table Structure -->
+      <!-- Table Structure: Submissions & Scores Alone -->
       <div class="table-responsive">
         <table class="teams-table" id="teams-table">
           <thead>
             <tr>
-              <th class="col-num">Team #</th>
-              <th class="col-name">Team Name & Leader</th>
-              <th class="col-id">Team ID</th>
-              <th class="col-pin" style="width: 100px;">Access PIN</th>
-              <th class="col-time">Registration Time</th>
-              <th class="col-actions">Actions</th>
+              <th class="col-num" style="width: 75px;">Team #</th>
+              <th class="col-name" style="min-width: 180px;">Team Name & ID</th>
+              <th class="col-lvl" style="min-width: 130px;">Round 1</th>
+              <th class="col-lvl" style="min-width: 130px;">Round 2</th>
+              <th class="col-lvl" style="min-width: 130px;">Round 3</th>
+              <th class="col-lvl" style="min-width: 130px;">Round 4</th>
+              <th class="col-score" style="width: 100px;">Total Score</th>
+              <th class="col-actions" style="width: 140px;">Admin Control</th>
             </tr>
           </thead>
           <tbody id="teams-tbody">
             <!-- Loading placeholder rows -->
             <tr class="placeholder-row">
-              <td colspan="5">
+              <td colspan="8">
                 <div class="table-loader">
                   <div class="btn-loader"></div>
                   <span>Connecting to Firestore database...</span>
@@ -288,6 +291,73 @@
         <a href="index.html" class="secondary-button empty-action">Go to Registration Page</a>
       </div>
     </section>
+  </div>
+
+  <!-- Submission Review, Scoring & Unlock Control Modal -->
+  <div id="eval-modal" class="modal-backdrop hidden">
+    <div class="modal-card eval-modal-card" style="max-width: 720px; width: 94%;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <span class="badge-mini" id="eval-team-badge">PRMT-004-DOOM</span>
+          <h3 id="eval-team-title" style="margin-top: 4px; font-size: 1.3rem; color: #ffffff;">TEAM DOOM</h3>
+          <span id="eval-team-sub" style="font-size: 0.8rem; color: #94a3b8;">Leader: Kalidoss</span>
+        </div>
+        <button id="close-eval-modal-btn" class="modal-close-btn" title="Close modal" style="background:none; border:none; color:#94a3b8; font-size: 1.8rem; cursor:pointer; line-height: 1;">&times;</button>
+      </div>
+
+      <!-- Level Selector Tabs -->
+      <div class="eval-tabs" style="display: flex; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); margin: 16px 0 14px 0; padding-bottom: 4px;">
+        <button type="button" class="eval-tab-btn active" data-lvl="1">Round 1</button>
+        <button type="button" class="eval-tab-btn" data-lvl="2">Round 2</button>
+        <button type="button" class="eval-tab-btn" data-lvl="3">Round 3</button>
+        <button type="button" class="eval-tab-btn" data-lvl="4">Round 4</button>
+      </div>
+
+      <!-- Level Content Area -->
+      <div class="eval-body">
+        <div class="eval-meta-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <span class="eval-status-tag" id="eval-status-tag">SUBMITTED</span>
+          <span class="eval-time" id="eval-time-tag" style="font-size: 0.75rem; color: #94a3b8; font-family: var(--font-mono);">Time: -</span>
+        </div>
+
+        <div class="eval-prompt-wrapper" style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px;">Contestant Prompt Submission:</label>
+          <div class="eval-prompt-box" id="eval-prompt-content" style="background: rgba(10, 14, 18, 0.9); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 14px; font-family: var(--font-mono); font-size: 0.88rem; color: #f1f5f9; line-height: 1.6; max-height: 220px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;">
+            No submission yet for this round.
+          </div>
+        </div>
+
+        <!-- Evaluation Controls: Score & Unlock -->
+        <div class="eval-controls-card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 4px; padding: 16px;">
+          <!-- Score Input -->
+          <div class="score-input-group">
+            <label for="eval-score-input" style="display: block; font-size: 0.75rem; font-weight: 700; color: #86efac; margin-bottom: 6px; text-transform: uppercase;">
+              Assign Score (0 - 100):
+            </label>
+            <div style="display: flex; gap: 8px;">
+              <input type="number" id="eval-score-input" min="0" max="100" placeholder="Score" style="width: 90px; padding: 8px 12px; background: rgba(10, 14, 18, 0.8); border: 1px solid rgba(134, 239, 172, 0.3); border-radius: 4px; color: #86efac; font-family: var(--font-mono); font-weight: 700; font-size: 1rem; outline: none;">
+              <button type="button" id="eval-save-score-btn" class="action-btn" style="padding: 8px 16px; background: #86efac; color: #0f172a; font-weight: 700; border: none; cursor: pointer;">
+                Save Score
+              </button>
+            </div>
+          </div>
+
+          <!-- Unlock / Reset Control -->
+          <div class="unlock-group">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #fca5a5; margin-bottom: 6px; text-transform: uppercase;">
+              Admin Reset Control:
+            </label>
+            <button type="button" id="eval-unlock-level-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 4px; color: #fca5a5; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Unlock / Reset Level</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Delete Confirmation Modal -->

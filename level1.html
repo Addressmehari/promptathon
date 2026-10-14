@@ -47,66 +47,119 @@
         <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
           <span class="level-number-pill">ROUND 1 // CREATIVE CANVAS</span>
           <span class="level-badge-tag" style="background: rgba(255, 255, 255, 0.05); color: #ffffff; border-color: rgba(255, 255, 255, 0.15);">⏱ 15 Minutes</span>
-          <span class="level-badge-tag" style="background: rgba(134, 239, 172, 0.1); color: #86efac; border-color: rgba(134, 239, 172, 0.3);">Format: Image Generation Prompt (Midjourney / DALL-E)</span>
+          <span class="level-badge-tag" style="background: rgba(134, 239, 172, 0.1); color: #86efac; border-color: rgba(134, 239, 172, 0.3);">Format: Multi-Category Image Prompts</span>
         </div>
         <h1 class="level-heading">Creative Canvas (Visual Storytelling)</h1>
         <p class="level-description">
-          Craft an evocative, ultra-detailed text-to-image prompt. Select your assigned theme below, integrate the required visual elements, and engineer camera angles, lighting conditions, and rendering styles.
+          Participants must craft and complete engineered text-to-image prompts for <strong>all 3 categories</strong> below. Engineer camera angles, lighting conditions, and rendering styles for each scenario.
         </p>
       </div>
 
-      <!-- Theme Selector Pills -->
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-subtle); letter-spacing: 0.06em;">CHOOSE YOUR ASSIGNED THEME:</span>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;" id="theme-selector-grid">
-          <button type="button" class="theme-btn active" data-theme="1">
-            <span class="theme-btn-num">Theme 1</span>
-            <span class="theme-btn-title">Futuristic Chennai 2090</span>
-          </button>
-          <button type="button" class="theme-btn" data-theme="2">
-            <span class="theme-btn-num">Theme 2</span>
-            <span class="theme-btn-title">Cyberpunk College Canteen</span>
-          </button>
-          <button type="button" class="theme-btn" data-theme="3">
-            <span class="theme-btn-num">Theme 3</span>
-            <span class="theme-btn-title">Ancient Temple Ruins</span>
-          </button>
-          <button type="button" class="theme-btn" data-theme="4">
-            <span class="theme-btn-num">Theme 4</span>
-            <span class="theme-btn-title">Orbital Research Station</span>
-          </button>
+      <!-- Live Multi-Category Progress Tracker -->
+      <div class="level-progress-tracker">
+        <div class="progress-info">
+          <span class="progress-badge" id="progress-count-badge">0 / 3 COMPLETED</span>
+          <span class="progress-status-text">Complete all 3 categories to unlock final submission</span>
         </div>
+        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #86efac;">Mandatory: 3 of 3 Prompts</span>
       </div>
 
-      <!-- Active Theme Briefing Box -->
-      <div class="level-task-box" id="theme-brief-box">
-        <div class="level-task-title" id="theme-brief-title">THEME 1: FUTURISTIC CHENNAI STREET IN 2090</div>
-        <p class="level-task-content" id="theme-brief-desc" style="margin-bottom: 10px;">
-          <strong>Required Elements:</strong> Flying auto-rickshaws, Tamil neon signage, solar high-rises, golden hour, wet asphalt.
-        </p>
-        <p style="font-size: 0.8rem; color: var(--text-subtle); margin: 0;">
-          💡 <em>Pro-Tip: Specify camera angles (low-angle, wide-angle), lighting quality (volumetric, reflections), and visual aesthetics (Unreal Engine 5, 8K render, photorealistic depth of field).</em>
-        </p>
-      </div>
+      <!-- 3 Scenario Input Cards -->
+      <div class="scenarios-container">
+        
+        <!-- Category / Scenario 1 -->
+        <article class="scenario-card" id="card-scenario-1">
+          <div class="scenario-card-header">
+            <span class="scenario-tag">CATEGORY 1 // FUTURISTIC URBAN</span>
+            <span class="scenario-status-pill" id="scenario-1-status">Pending</span>
+          </div>
+          <div class="scenario-brief-box">
+            <div class="scenario-brief-title">Futuristic Chennai Street in 2090</div>
+            <div class="scenario-brief-content">
+              <strong>Required Elements:</strong> Flying chrome auto-rickshaws, Tamil neon signage, solar high-rises, golden hour, wet reflective asphalt.
+            </div>
+            <p class="scenario-brief-hint">
+              💡 <em>Pro-Tip: Specify camera angles (low-angle, wide-angle cinematic), lighting quality (volumetric, reflections), and visual aesthetics (Unreal Engine 5, 8K render, HDR).</em>
+            </p>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="scenario-1-input" class="field-label">
+              <span>Category 1 Engineered Prompt</span>
+              <span class="required-badge">*</span>
+            </label>
+            <textarea 
+              id="scenario-1-input" 
+              class="level-textarea" 
+              rows="6" 
+              placeholder="e.g. A low-angle wide-angle cinematic shot of a bustling futuristic Chennai street in the year 2090. Flying chrome auto-rickshaws hovering above wet reflective asphalt glowing with neon Tamil typography signage..."
+            ></textarea>
+          </div>
+        </article>
 
-      <!-- Prompt Input Area -->
-      <div class="form-group">
-        <label for="level-prompt-input" class="field-label">
-          <span>Engineered Image Generation Prompt</span>
-          <span class="required-badge">*</span>
-        </label>
-        <textarea 
-          id="level-prompt-input" 
-          class="level-textarea" 
-          rows="8" 
-          placeholder="Craft your image prompt here... (e.g. A low-angle wide-angle cinematic shot of a bustling futuristic Chennai street in the year 2090. Flying chrome auto-rickshaws hovering above wet reflective asphalt...)"
-        ></textarea>
+        <!-- Category / Scenario 2 -->
+        <article class="scenario-card" id="card-scenario-2">
+          <div class="scenario-card-header">
+            <span class="scenario-tag">CATEGORY 2 // CYBERPUNK INTERIOR</span>
+            <span class="scenario-status-pill" id="scenario-2-status">Pending</span>
+          </div>
+          <div class="scenario-brief-box">
+            <div class="scenario-brief-title">Cyberpunk College Canteen</div>
+            <div class="scenario-brief-content">
+              <strong>Required Elements:</strong> Robotic canteen staff, filter coffee/dosa, students with cybernetics & holograms, magenta/cyan steam.
+            </div>
+            <p class="scenario-brief-hint">
+              💡 <em>Pro-Tip: Medium cinematic shot, multi-armed humanoid robotic barista, floating blue holographic textbooks, volumetric steam.</em>
+            </p>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="scenario-2-input" class="field-label">
+              <span>Category 2 Engineered Prompt</span>
+              <span class="required-badge">*</span>
+            </label>
+            <textarea 
+              id="scenario-2-input" 
+              class="level-textarea" 
+              rows="6" 
+              placeholder="e.g. An over-the-shoulder medium cinematic shot inside a neon-lit cyberpunk college canteen. A multi-armed humanoid robotic barista pouring steaming South Indian filter coffee..."
+            ></textarea>
+          </div>
+        </article>
+
+        <!-- Category / Scenario 3 -->
+        <article class="scenario-card" id="card-scenario-3">
+          <div class="scenario-card-header">
+            <span class="scenario-tag">CATEGORY 3 // MYSTICAL ARCHITECTURE</span>
+            <span class="scenario-status-pill" id="scenario-3-status">Pending</span>
+          </div>
+          <div class="scenario-brief-box">
+            <div class="scenario-brief-title">Ancient Bio-Luminescent Temple Ruins</div>
+            <div class="scenario-brief-content">
+              <strong>Required Elements:</strong> Dravidian temple in dense forest, stone guardian beast awakening, bioluminescent god-rays.
+            </div>
+            <p class="scenario-brief-hint">
+              💡 <em>Pro-Tip: Cinematic eye-level medium shot, glowing emerald bioluminescent moss, soft sunbeams piercing canopy, Studio Ghibli inspired matte painting.</em>
+            </p>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="scenario-3-input" class="field-label">
+              <span>Category 3 Engineered Prompt</span>
+              <span class="required-badge">*</span>
+            </label>
+            <textarea 
+              id="scenario-3-input" 
+              class="level-textarea" 
+              rows="6" 
+              placeholder="e.g. A cinematic eye-level medium shot of an ancient Dravidian stone temple hidden deep inside a dense forgotten jungle. Glowing blue and emerald bioluminescent moss climbing over intricate stone carvings..."
+            ></textarea>
+          </div>
+        </article>
+
       </div>
 
       <!-- Level Actions -->
       <div class="level-footer-actions">
         <button type="button" id="submit-level-btn" class="submit-button" style="width: auto; padding: 14px 40px;">
-          <span class="btn-text">Submit Round 1 Prompt &rarr;</span>
+          <span class="btn-text">Submit All 3 Round 1 Prompts &rarr;</span>
         </button>
       </div>
     </section>
@@ -114,45 +167,6 @@
 
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
-
-  <!-- Script for Theme Toggle & Session Guard -->
-  <script>
-    // Theme data from ROUND 1.docx
-    const THEMES = {
-      1: {
-        title: "THEME 1: FUTURISTIC CHENNAI STREET IN 2090",
-        elements: "Flying auto-rickshaws, Tamil neon signage, solar high-rises, golden hour, wet asphalt."
-      },
-      2: {
-        title: "THEME 2: CYBERPUNK COLLEGE CANTEEN",
-        elements: "Robotic canteen staff, filter coffee/dosa, students with cybernetics & holograms, magenta/cyan steam."
-      },
-      3: {
-        title: "THEME 3: ANCIENT BIO-LUMINESCENT TEMPLE RUINS",
-        elements: "Dravidian temple in dense forest, stone guardian beast awakening, bioluminescent god-rays."
-      },
-      4: {
-        title: "THEME 4: DEEP SPACE ORBITAL RESEARCH STATION",
-        elements: "Astronaut in gold-visor suit, panoramic observation dome, planetary rings, harsh high-contrast lighting."
-      }
-    };
-
-    const themeButtons = document.querySelectorAll(".theme-btn");
-    const themeTitleEl = document.getElementById("theme-brief-title");
-    const themeDescEl = document.getElementById("theme-brief-desc");
-
-    themeButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        themeButtons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        const tid = btn.getAttribute("data-theme");
-        if (THEMES[tid]) {
-          themeTitleEl.textContent = THEMES[tid].title;
-          themeDescEl.innerHTML = `<strong>Required Elements:</strong> ${THEMES[tid].elements}`;
-        }
-      });
-    });
-  </script>
 
   <!-- Level 1 Submission & Session Controller -->
   <script type="module">

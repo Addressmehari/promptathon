@@ -46,45 +46,122 @@
       <div class="level-arena-header">
         <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
           <span class="level-number-pill" style="color: #fde047; border-color: rgba(253, 224, 71, 0.35); background: rgba(253, 224, 71, 0.08);">ROUND 4 // GRAND FINALE SHOWCASE</span>
-          <span class="level-badge-tag" style="background: rgba(255, 255, 255, 0.05); color: #ffffff; border-color: rgba(255, 255, 255, 0.15);">⏱ 20 Minutes</span>
-          <span class="level-badge-tag" style="background: rgba(253, 224, 71, 0.15); color: #fde047; border-color: rgba(253, 224, 71, 0.35);">Format: End-to-End Autonomous Agentic Pipeline</span>
+          <span class="level-badge-tag" style="background: rgba(253, 224, 71, 0.15); color: #fde047; border-color: rgba(253, 224, 71, 0.35);">Format: 3-Part Autonomous AI Product Pipeline</span>
         </div>
         <h1 class="level-heading">Grand Finale Championship Showcase</h1>
         <p class="level-description">
-          Synthesize all prompt engineering mastery: Visual Storytelling (Round 1), Constrained Optimization (Round 2), and Deterministic State Control (Round 3) into an autonomous, jury-defensible AI product.
+          Synthesize all prompt engineering mastery: Visual Storytelling (Round 1), Constrained Optimization (Round 2), and Deterministic State Control (Round 3) into an autonomous, jury-defensible AI product. Complete <strong>all 3 pipeline modules</strong> below.
         </p>
       </div>
 
-      <!-- Problem Statement Box -->
-      <div class="level-task-box">
-        <div class="level-task-title" style="color: #fde047;">FINALE DIRECTIVE // MULTI-MODAL MASTER ORCHESTRATOR</div>
-        <p class="level-task-content" style="margin-bottom: 8px;">
-          Build a complete Master System Prompt for an autonomous multi-modal AI copilot. Your prompt must accept multi-format inputs, handle strict latency & negative constraints, execute tool routing, and deliver deterministic JSON output.
-        </p>
-        <p style="font-size: 0.8rem; color: var(--text-subtle); margin: 0;">
-          🏆 <em>Jury Evaluation Criteria: Prompt robustness against adversarial edge cases, schema validity, originality of problem formulation, and real-time execution quality.</em>
-        </p>
+      <!-- Live Multi-Category Progress Tracker -->
+      <div class="level-progress-tracker" style="border-color: rgba(253, 224, 71, 0.35);">
+        <div class="progress-info">
+          <span class="progress-badge" id="progress-count-badge" style="color: #fde047; border-color: rgba(253, 224, 71, 0.3); background: rgba(253, 224, 71, 0.08);">0 / 3 COMPLETED</span>
+          <span class="progress-status-text">Complete all 3 pipeline modules to unlock final grand submission</span>
+        </div>
+        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #fde047;">Mandatory: 3 of 3 Modules</span>
       </div>
 
-      <!-- Prompt Input Area -->
-      <div class="form-group">
-        <label for="level-prompt-input" class="field-label">
-          <span>Master Orchestration System Prompt</span>
-          <span class="required-badge">*</span>
-        </label>
-        <textarea 
-          id="level-prompt-input" 
-          class="level-textarea" 
-          rows="10" 
-          placeholder="[MASTER_AI_CONTROLLER_PROMPT]
-Define role architecture, tool dispatch constraints, multi-step chain of verification, and final presentation output..."
-        ></textarea>
+      <!-- 3 Scenario Input Cards -->
+      <div class="scenarios-container">
+
+        <!-- Part / Scenario 1 -->
+        <article class="scenario-card" id="card-scenario-1">
+          <div class="scenario-card-header">
+            <span class="scenario-tag" style="color: #fde047; border-color: rgba(253, 224, 71, 0.3); background: rgba(253, 224, 71, 0.08);">PART 1 // INTENT ROUTER & TOOL DISPATCH ENGINE</span>
+            <span class="scenario-status-pill" id="scenario-1-status">Pending</span>
+          </div>
+          <div class="scenario-brief-box">
+            <div class="scenario-brief-title">Autonomous Multi-Modal Controller Prompt</div>
+            <div class="scenario-brief-content">
+              Build the master ingestion system prompt for an autonomous copilot. Must accept multi-modal inputs, classify query intent into deterministic execution pathways, and execute function/tool dispatch.
+            </div>
+            <p class="scenario-brief-hint">
+              💡 <em>Criteria: Intent classification precision, explicit fallback routing on low confidence, strict schema dispatch.</em>
+            </p>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="scenario-1-input" class="field-label">
+              <span>Part 1 Controller System Prompt</span>
+              <span class="required-badge">*</span>
+            </label>
+            <textarea 
+              id="scenario-1-input" 
+              class="level-textarea" 
+              rows="7" 
+              placeholder="[AGENTIC_INTENT_DISPATCH_PROMPT]
+Define role architecture, tool dispatch constraints, multi-step routing, and fallback logic..."
+            ></textarea>
+          </div>
+        </article>
+
+        <!-- Part / Scenario 2 -->
+        <article class="scenario-card" id="card-scenario-2">
+          <div class="scenario-card-header">
+            <span class="scenario-tag" style="color: #fde047; border-color: rgba(253, 224, 71, 0.3); background: rgba(253, 224, 71, 0.08);">PART 2 // DETERMINISTIC STATE & ADVERSARIAL GUARDRAILS</span>
+            <span class="scenario-status-pill" id="scenario-2-status">Pending</span>
+          </div>
+          <div class="scenario-brief-box">
+            <div class="scenario-brief-title">State Machine & Anti-Jailbreak Guardrails</div>
+            <div class="scenario-brief-content">
+              Construct the stateful session prompt ensuring zero hallucination, numerical state preservation, token budgeting, and airtight defense against prompt injections or jailbreaks.
+            </div>
+            <p class="scenario-brief-hint">
+              ⚡ <em>Criteria: Resilience against adversarial edge-cases, deterministic state mutation rules, strict negative filters.</em>
+            </p>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="scenario-2-input" class="field-label">
+              <span>Part 2 Guardrail & State Prompt</span>
+              <span class="required-badge">*</span>
+            </label>
+            <textarea 
+              id="scenario-2-input" 
+              class="level-textarea" 
+              rows="7" 
+              placeholder="[STATE_GUARDRAIL_SYSTEM_PROMPT]
+Define immutable state structure, anti-jailbreak negative constraints, and injection detection protocols..."
+            ></textarea>
+          </div>
+        </article>
+
+        <!-- Part / Scenario 3 -->
+        <article class="scenario-card" id="card-scenario-3">
+          <div class="scenario-card-header">
+            <span class="scenario-tag" style="color: #fde047; border-color: rgba(253, 224, 71, 0.3); background: rgba(253, 224, 71, 0.08);">PART 3 // OUTPUT SCHEMA & REAL-TIME VERIFIER</span>
+            <span class="scenario-status-pill" id="scenario-3-status">Pending</span>
+          </div>
+          <div class="scenario-brief-box">
+            <div class="scenario-brief-title">Production Output Schema & Verification Chain</div>
+            <div class="scenario-brief-content">
+              Engineer the final output formatter prompt. Enforces raw JSON schema adherence, self-correction/reflection verification before emitting, and latency optimization.
+            </div>
+            <p class="scenario-brief-hint">
+              🏆 <em>Criteria: Exact schema integrity, self-critique/verification chain, zero extraneous markdown tokens.</em>
+            </p>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="scenario-3-input" class="field-label">
+              <span>Part 3 Verification & Delivery Prompt</span>
+              <span class="required-badge">*</span>
+            </label>
+            <textarea 
+              id="scenario-3-input" 
+              class="level-textarea" 
+              rows="7" 
+              placeholder="[PRODUCTION_VERIFICATION_SCHEMA_PROMPT]
+Define exact JSON response schema, self-reflection checklist before final output, and latency guardrails..."
+            ></textarea>
+          </div>
+        </article>
+
       </div>
 
       <!-- Level Actions -->
       <div class="level-footer-actions">
         <button type="button" id="submit-level-btn" class="submit-button" style="width: auto; padding: 14px 44px; background: #fde047; color: #1a1600; font-weight: 800;">
-          <span class="btn-text">Submit Grand Finale Project &rarr;</span>
+          <span class="btn-text">Submit Grand Finale Project (All 3 Parts) &rarr;</span>
         </button>
       </div>
     </section>

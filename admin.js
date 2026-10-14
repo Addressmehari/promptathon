@@ -3,7 +3,11 @@ import {
   collection, 
   onSnapshot, 
   doc, 
-  deleteDoc 
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  deleteField,
+  serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { initFirebaseFromEnv } from "./firebase-config.js";
 
@@ -13,6 +17,8 @@ let allTeams = [];
 let pendingDeleteId = null;
 let cachedAdminAuth = null;
 let isAuthenticated = false;
+let currentEvalTeam = null;
+let currentEvalLevel = 1;
 
 // DOM Elements - Authentication
 const adminLoginScreen = document.getElementById("admin-login-screen");
@@ -26,7 +32,7 @@ const adminLogoutBtn = document.getElementById("admin-logout-btn");
 
 // DOM Elements - Dashboard
 const statTotalTeams = document.getElementById("stat-total-teams");
-const statLatestTeam = document.getElementById("stat-latest-team");
+const statTotalSubmissions = document.getElementById("stat-total-submissions");
 const statLatestTime = document.getElementById("stat-latest-time");
 const statSyncStatus = document.getElementById("stat-sync-status");
 
@@ -42,6 +48,20 @@ const emptyState = document.getElementById("empty-state");
 const emptyStateDesc = document.getElementById("empty-state-desc");
 const adminErrorBox = document.getElementById("admin-error-box");
 const adminErrorText = document.getElementById("admin-error-text");
+
+// DOM Elements - Evaluation Modal
+const evalModal = document.getElementById("eval-modal");
+const closeEvalModalBtn = document.getElementById("close-eval-modal-btn");
+const evalTeamBadge = document.getElementById("eval-team-badge");
+const evalTeamTitle = document.getElementById("eval-team-title");
+const evalTeamSub = document.getElementById("eval-team-sub");
+const evalTabBtns = document.querySelectorAll(".eval-tab-btn");
+const evalStatusTag = document.getElementById("eval-status-tag");
+const evalTimeTag = document.getElementById("eval-time-tag");
+const evalPromptContent = document.getElementById("eval-prompt-content");
+const evalScoreInput = document.getElementById("eval-score-input");
+const evalSaveScoreBtn = document.getElementById("eval-save-score-btn");
+const evalUnlockLevelBtn = document.getElementById("eval-unlock-level-btn");
 
 const deleteModal = document.getElementById("delete-modal");
 const deleteTargetName = document.getElementById("delete-target-name");
@@ -86,28 +106,48 @@ function formatTimestamp(item) {
   return "N/A";
 }
 
+// Helpers for Submissions & Scores
+function getRoundData(team, lvl) {
+  if (team[`lvl${lvl}`]) return team[`lvl${lvl}`];
+  if (team[`level_${lvl}_response`]) {
+    return {
+      resp: team[`level_${lvl}_response`],
+      score: 0,
+      time: team[`level_${lvl}_submitted_at`] || ""
+    };
+  }
+  return null;
+}
+
+function calculateTotalScore(team) {
+  let total = 0;
+  for (let lvl = 1; lvl <= 4; lvl++) {
+    const rd = getRoundData(team, lvl);
+    if (rd && typeof rd.score === "number") {
+      total += rd.score;
+    }
+  }
+  return total;
+}
+
 // Update Metric Cards
 function updateStats(teams) {
   statTotalTeams.textContent = teams.length;
 
-  if (teams.length > 0) {
-    // Sort copy by createdAt / arrival to find latest
-    const sortedByArrival = [...teams].sort((a, b) => {
-      const timeA = a.createdAt?.seconds || 0;
-      const timeB = b.createdAt?.seconds || 0;
-      return timeB - timeA;
-    });
+  let totalSubs = 0;
+  teams.forEach(t => {
+    for (let lvl = 1; lvl <= 4; lvl++) {
+      const rd = getRoundData(t, lvl);
+      if (rd && (rd.scenarios || rd.resp)) totalSubs++;
+    }
+  });
 
-    const latest = sortedByArrival[0];
-    statLatestTeam.textContent = `Team #${latest.teamNumber}: ${latest.teamName}`;
-    statLatestTime.textContent = formatTimestamp(latest);
-  } else {
-    statLatestTeam.textContent = "None yet";
-    statLatestTime.textContent = "Waiting for first submission";
+  if (statTotalSubmissions) {
+    statTotalSubmissions.textContent = `${totalSubs} / ${teams.length * 4}`;
   }
 }
 
-// Render Teams Table
+// Render Teams Table: Submissions & Scores Alone
 function renderTable() {
   const query = searchInput.value.trim().toLowerCase();
   const sortMode = sortSelect.value;
@@ -116,7 +156,8 @@ function renderTable() {
   let filtered = allTeams.filter(team => {
     const numMatch = String(team.teamNumber || "").toLowerCase().includes(query);
     const nameMatch = (team.teamName || "").toLowerCase().includes(query);
-    return numMatch || nameMatch;
+    const idMatch = (team.teamId || team.id || "").toLowerCase().includes(query);
+    return numMatch || nameMatch || idMatch;
   });
 
   // Sort
@@ -126,6 +167,8 @@ function renderTable() {
         return (Number(a.teamNumber) || 0) - (Number(b.teamNumber) || 0);
       case "num-desc":
         return (Number(b.teamNumber) || 0) - (Number(a.teamNumber) || 0);
+      case "score-desc":
+        return calculateTotalScore(b) - calculateTotalScore(a);
       case "name-asc":
         return (a.teamName || "").localeCompare(b.teamName || "");
       case "time-desc":
@@ -144,7 +187,7 @@ function renderTable() {
   if (query) {
     showingCount.textContent = `Showing ${filtered.length} of ${allTeams.length} teams`;
   } else {
-    showingCount.textContent = `${allTeams.length} registered team${allTeams.length === 1 ? "" : "s"}`;
+    showingCount.textContent = `${allTeams.length} registered contestant team${allTeams.length === 1 ? "" : "s"}`;
   }
 
   // Handle Empty States
@@ -153,7 +196,7 @@ function renderTable() {
     if (query) {
       emptyStateDesc.textContent = `No teams matched the search "${query}".`;
     } else {
-      emptyStateDesc.textContent = "Teams registered via the registration portal will appear here in real-time.";
+      emptyStateDesc.textContent = "Contestant teams and their round submissions will appear here in real-time.";
     }
     return;
   }
@@ -166,60 +209,293 @@ function renderTable() {
   filtered.forEach(team => {
     const tr = document.createElement("tr");
 
-    // Team Number Column
+    // 1. Team Number Column
     const tdNum = document.createElement("td");
     tdNum.className = "col-num";
     tdNum.innerHTML = `<span class="team-badge">#${escapeHtml(String(team.teamNumber))}</span>`;
 
-    // Team Name & Leader Column
+    // 2. Team Name & ID Column
     const tdName = document.createElement("td");
     tdName.className = "col-name";
-    const leaderHtml = team.leaderName ? `<div style="font-size: 0.75rem; color: #86efac; margin-top: 3px;">Leader: ${escapeHtml(team.leaderName)}</div>` : '';
-    tdName.innerHTML = `<span class="team-name-cell">${escapeHtml(team.teamName)}</span>${leaderHtml}`;
-
-    // Team ID Column
-    const tdId = document.createElement("td");
-    tdId.className = "col-id";
-    tdId.innerHTML = `<code class="doc-code" style="font-weight: 700; color: #86efac;">${escapeHtml(team.teamId || team.id)}</code>`;
-
-    // Access PIN Column
-    const tdPin = document.createElement("td");
-    tdPin.className = "col-pin";
-    tdPin.innerHTML = team.password ? `<span style="display:inline-block; padding: 2px 8px; background: rgba(134, 239, 172, 0.1); border: 1px solid rgba(134, 239, 172, 0.25); border-radius: 3px; font-family: var(--font-mono); font-weight: 700; color: #86efac;">${escapeHtml(team.password)}</span>` : '<span style="color:#64748b;">-</span>';
-
-    // Registration Time Column
-    const tdTime = document.createElement("td");
-    tdTime.className = "col-time";
-    tdTime.textContent = formatTimestamp(team);
-
-    // Actions Column
-    const tdActions = document.createElement("td");
-    tdActions.className = "col-actions";
-    
-    const delBtn = document.createElement("button");
-    delBtn.className = "table-btn-delete";
-    delBtn.title = "Delete Registration";
-    delBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="del-icon">
-        <polyline points="3 6 5 6 21 6"></polyline>
-        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-      </svg>
-      <span>Delete</span>
+    tdName.innerHTML = `
+      <div class="team-name-cell">${escapeHtml(team.teamName)}</div>
+      <div style="font-size: 0.75rem; color: #86efac; font-family: var(--font-mono); margin-top: 2px;">
+        ${escapeHtml(team.teamId || team.id)}
+      </div>
     `;
-    delBtn.addEventListener("click", () => openDeleteModal(team));
-    tdActions.appendChild(delBtn);
 
     tr.appendChild(tdNum);
     tr.appendChild(tdName);
-    tr.appendChild(tdId);
-    tr.appendChild(tdPin);
-    tr.appendChild(tdTime);
+
+    // 3, 4, 5, 6. Round 1 to 4 Submissions & Scores
+    for (let lvl = 1; lvl <= 4; lvl++) {
+      const tdLvl = document.createElement("td");
+      tdLvl.className = `col-lvl col-lvl-${lvl}`;
+      const rd = getRoundData(team, lvl);
+
+      if (rd && (rd.scenarios || rd.resp)) {
+        const scoreVal = rd.score !== undefined && rd.score !== null ? rd.score : 0;
+        tdLvl.innerHTML = `
+          <div class="level-cell-box">
+            <span class="level-status-badge submitted" title="Click to view prompt & score" style="cursor: pointer;">
+              ✓ Submitted
+            </span>
+            <span class="level-score-pill">${escapeHtml(String(scoreVal))} pts</span>
+          </div>
+        `;
+        tdLvl.querySelector(".level-status-badge").addEventListener("click", () => openEvalModal(team, lvl));
+      } else {
+        tdLvl.innerHTML = `
+          <div class="level-cell-box">
+            <span class="level-status-badge pending" title="Not submitted yet">- Pending</span>
+            <span style="font-size: 0.72rem; color: #64748b; font-family: var(--font-mono);">0 pts</span>
+          </div>
+        `;
+        tdLvl.querySelector(".level-status-badge").addEventListener("click", () => openEvalModal(team, lvl));
+      }
+      tr.appendChild(tdLvl);
+    }
+
+    // 7. Total Score Column
+    const tdScore = document.createElement("td");
+    tdScore.className = "col-score";
+    tdScore.innerHTML = `
+      <span style="font-family: var(--font-mono); font-weight: 800; font-size: 1.05rem; color: #86efac;">
+        ${calculateTotalScore(team)}
+      </span>
+      <span style="font-size: 0.75rem; color: #94a3b8;">pts</span>
+    `;
+    tr.appendChild(tdScore);
+
+    // 8. Admin Control Action Column
+    const tdActions = document.createElement("td");
+    tdActions.className = "col-actions";
+    tdActions.innerHTML = `
+      <button type="button" class="table-btn-eval" title="Review Submissions & Score Team">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 20h9"></path>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+        </svg>
+        <span>Review & Score</span>
+      </button>
+    `;
+    tdActions.querySelector(".table-btn-eval").addEventListener("click", () => openEvalModal(team, 1));
     tr.appendChild(tdActions);
 
     fragment.appendChild(tr);
   });
 
   teamsTbody.appendChild(fragment);
+}
+
+// ==========================================
+// Evaluation & Scoring Modal Logic
+// ==========================================
+function openEvalModal(team, level = 1) {
+  currentEvalTeam = team;
+  currentEvalLevel = level;
+
+  evalTeamBadge.textContent = team.teamId || team.id || "TEAM";
+  evalTeamTitle.textContent = team.teamName || "Team Contestant";
+  evalTeamSub.textContent = `Leader: ${team.leaderName || "N/A"} • Team #${team.teamNumber || "-"}`;
+
+  updateEvalModalView();
+  evalModal.classList.remove("hidden");
+}
+
+function closeEvalModal() {
+  evalModal.classList.add("hidden");
+  currentEvalTeam = null;
+}
+
+if (closeEvalModalBtn) {
+  closeEvalModalBtn.addEventListener("click", closeEvalModal);
+}
+if (evalModal) {
+  evalModal.addEventListener("click", (e) => {
+    if (e.target === evalModal) closeEvalModal();
+  });
+}
+
+function updateEvalModalView() {
+  if (!currentEvalTeam) return;
+
+  // Active tab button visual state
+  evalTabBtns.forEach(btn => {
+    const lvl = parseInt(btn.getAttribute("data-lvl"), 10);
+    if (lvl === currentEvalLevel) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+
+  const rd = getRoundData(currentEvalTeam, currentEvalLevel);
+
+  // Admin can always assign/edit scores
+  evalScoreInput.disabled = false;
+  evalSaveScoreBtn.disabled = false;
+
+  const hasSubmission = Boolean(rd && (rd.scenarios || rd.resp));
+
+  if (hasSubmission) {
+    evalStatusTag.className = "eval-status-tag submitted";
+    evalStatusTag.textContent = "✓ SUBMITTED (ALL 3 PARTS)";
+    evalTimeTag.textContent = rd.time ? `Submitted: ${rd.time}` : "Submitted";
+
+    // Format scenarios nicely inside evalPromptContent
+    if (rd.scenarios && (rd.scenarios.scenario_1 || rd.scenarios.scenario1)) {
+      const s1 = rd.scenarios.scenario_1 || rd.scenarios.scenario1 || "";
+      const s2 = rd.scenarios.scenario_2 || rd.scenarios.scenario2 || "";
+      const s3 = rd.scenarios.scenario_3 || rd.scenarios.scenario3 || "";
+
+      evalPromptContent.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: rgba(14, 20, 26, 0.95); border: 1px solid rgba(134, 239, 172, 0.25); border-radius: 4px; padding: 12px 14px;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #86efac; font-family: var(--font-mono); margin-bottom: 6px;">[CATEGORY / SCENARIO 1]</div>
+            <div style="font-size: 0.88rem; color: #ffffff; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(s1)}</div>
+          </div>
+          <div style="background: rgba(14, 20, 26, 0.95); border: 1px solid rgba(134, 239, 172, 0.25); border-radius: 4px; padding: 12px 14px;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #86efac; font-family: var(--font-mono); margin-bottom: 6px;">[CATEGORY / SCENARIO 2]</div>
+            <div style="font-size: 0.88rem; color: #ffffff; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(s2)}</div>
+          </div>
+          <div style="background: rgba(14, 20, 26, 0.95); border: 1px solid rgba(134, 239, 172, 0.25); border-radius: 4px; padding: 12px 14px;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #86efac; font-family: var(--font-mono); margin-bottom: 6px;">[CATEGORY / SCENARIO 3]</div>
+            <div style="font-size: 0.88rem; color: #ffffff; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(s3)}</div>
+          </div>
+        </div>
+      `;
+    } else {
+      evalPromptContent.textContent = rd.resp || "Submitted prompt";
+    }
+
+    evalPromptContent.style.color = "#f1f5f9";
+    evalScoreInput.value = rd.score !== undefined && rd.score !== null ? rd.score : 0;
+    evalUnlockLevelBtn.disabled = false;
+    evalUnlockLevelBtn.style.opacity = "1";
+    evalUnlockLevelBtn.style.cursor = "pointer";
+  } else {
+    evalStatusTag.className = "eval-status-tag pending";
+    evalStatusTag.textContent = "PENDING / NOT SUBMITTED";
+    evalTimeTag.textContent = "No submission yet";
+    evalPromptContent.textContent = "This team has not submitted responses for this round yet.";
+    evalPromptContent.style.color = "#64748b";
+    evalScoreInput.value = (rd && rd.score !== undefined) ? rd.score : 0;
+    evalUnlockLevelBtn.disabled = true;
+    evalUnlockLevelBtn.style.opacity = "0.5";
+    evalUnlockLevelBtn.style.cursor = "not-allowed";
+  }
+}
+
+// Tab Switch Listener
+evalTabBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    currentEvalLevel = parseInt(btn.getAttribute("data-lvl"), 10);
+    updateEvalModalView();
+  });
+});
+
+// Save Score to Firestore - Updates inside lvl1/lvl2/lvl3/lvl4 map directly
+if (evalSaveScoreBtn) {
+  evalSaveScoreBtn.addEventListener("click", async () => {
+    if (!currentEvalTeam || !db) return;
+
+    const val = parseInt(evalScoreInput.value, 10);
+    if (isNaN(val) || val < 0 || val > 100) {
+      showToast("Please enter a valid score between 0 and 100.", "error");
+      return;
+    }
+
+    evalSaveScoreBtn.disabled = true;
+    evalSaveScoreBtn.textContent = "Saving...";
+
+    try {
+      const docRef = doc(db, "registrations", currentEvalTeam.id);
+      const existingLvl = getRoundData(currentEvalTeam, currentEvalLevel) || {};
+      
+      // Save clean map: { resp, scenarios, score, time } inside lvlX
+      const updatedLvl = {
+        resp: existingLvl.resp || "",
+        score: val,
+        time: existingLvl.time || new Date().toLocaleString()
+      };
+      if (existingLvl.scenarios) {
+        updatedLvl.scenarios = existingLvl.scenarios;
+      }
+
+      // Save clean map strictly inside lvlX, deleting any root score field
+      await setDoc(docRef, {
+        [`lvl${currentEvalLevel}`]: updatedLvl,
+        score: deleteField(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      // Update local team object
+      currentEvalTeam[`lvl${currentEvalLevel}`] = updatedLvl;
+      delete currentEvalTeam.score;
+
+      showToast(`Score (${val} pts) saved inside lvl${currentEvalLevel} for ${currentEvalTeam.teamName}!`, "success");
+      updateEvalModalView();
+      renderTable();
+
+    } catch (err) {
+      console.error("Score save error:", err);
+      showToast("Failed to save score to database: " + err.message, "error");
+    } finally {
+      evalSaveScoreBtn.disabled = false;
+      evalSaveScoreBtn.textContent = "Save Score";
+    }
+  });
+}
+
+// Unlock / Reset Level for Team in Firestore
+if (evalUnlockLevelBtn) {
+  evalUnlockLevelBtn.addEventListener("click", async () => {
+    if (!currentEvalTeam || !db) return;
+
+    const confirmUnlock = confirm(
+      `Unlock Level ${currentEvalLevel} for ${currentEvalTeam.teamName}?\n\nThis will remove their prompt submission from the database and allow them to resubmit.`
+    );
+    if (!confirmUnlock) return;
+
+    evalUnlockLevelBtn.disabled = true;
+    evalUnlockLevelBtn.innerHTML = `<span>Unlocking...</span>`;
+
+    try {
+      const docRef = doc(db, "registrations", currentEvalTeam.id);
+      
+      // Delete the round map, any legacy fields, and any root score field
+      await updateDoc(docRef, {
+        [`lvl${currentEvalLevel}`]: deleteField(),
+        [`level_${currentEvalLevel}_response`]: deleteField(),
+        [`level-${currentEvalLevel}-response`]: deleteField(),
+        score: deleteField(),
+        updatedAt: serverTimestamp()
+      });
+
+      delete currentEvalTeam[`lvl${currentEvalLevel}`];
+      delete currentEvalTeam[`level_${currentEvalLevel}_response`];
+      delete currentEvalTeam[`level-${currentEvalLevel}-response`];
+      delete currentEvalTeam.score;
+
+      showToast(`Level ${currentEvalLevel} unlocked for ${currentEvalTeam.teamName}!`, "success");
+      updateEvalModalView();
+      renderTable();
+
+    } catch (err) {
+      console.error("Level unlock error:", err);
+      showToast("Failed to unlock level: " + err.message, "error");
+    } finally {
+      evalUnlockLevelBtn.disabled = false;
+      evalUnlockLevelBtn.innerHTML = `
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Unlock / Reset Level</span>
+      `;
+    }
+  });
 }
 
 // Basic HTML escaping
@@ -283,23 +559,29 @@ exportCsvBtn.addEventListener("click", () => {
   }
 
   const csvRows = [
-    ["Team Number", "Creative Team ID", "Original ID", "Team Name", "Team Leader", "Participants", "Access PIN", "Registration Time", "Level 1 Response", "Level 2 Response", "Level 3 Response", "Level 4 Response"]
+    ["Team Number", "Team ID", "Team Name", "Leader", "R1 Score", "R1 Prompt", "R2 Score", "R2 Prompt", "R3 Score", "R3 Prompt", "R4 Score", "R4 Prompt", "Total Score"]
   ];
 
   allTeams.forEach(t => {
+    const r1 = getRoundData(t, 1);
+    const r2 = getRoundData(t, 2);
+    const r3 = getRoundData(t, 3);
+    const r4 = getRoundData(t, 4);
+
     csvRows.push([
       `"${t.teamNumber || ""}"`,
       `"${t.teamId || t.id}"`,
-      `"${t.originalId || ""}"`,
       `"${(t.teamName || "").replace(/"/g, '""')}"`,
       `"${(t.leaderName || "").replace(/"/g, '""')}"`,
-      `"${(t.participants || "").replace(/"/g, '""')}"`,
-      `"${t.password || ""}"`,
-      `"${formatTimestamp(t)}"`,
-      `"${(t.lvl1?.resp || t.level_1_response || t["level-1-response"] || "").replace(/"/g, '""')}"`,
-      `"${(t.lvl2?.resp || t.level_2_response || t["level-2-response"] || "").replace(/"/g, '""')}"`,
-      `"${(t.lvl3?.resp || t.level_3_response || t["level-3-response"] || "").replace(/"/g, '""')}"`,
-      `"${(t.lvl4?.resp || t.level_4_response || t["level-4-response"] || "").replace(/"/g, '""')}"`
+      `"${r1 && r1.score !== undefined ? r1.score : 0}"`,
+      `"${(r1?.resp || "").replace(/"/g, '""')}"`,
+      `"${r2 && r2.score !== undefined ? r2.score : 0}"`,
+      `"${(r2?.resp || "").replace(/"/g, '""')}"`,
+      `"${r3 && r3.score !== undefined ? r3.score : 0}"`,
+      `"${(r3?.resp || "").replace(/"/g, '""')}"`,
+      `"${r4 && r4.score !== undefined ? r4.score : 0}"`,
+      `"${(r4?.resp || "").replace(/"/g, '""')}"`,
+      `"${calculateTotalScore(t)}"`
     ]);
   });
 
@@ -352,9 +634,11 @@ function setupRealtimeListener() {
     (snapshot) => {
       allTeams = [];
       snapshot.forEach(docSnap => {
+        const teamData = docSnap.data();
+        delete teamData.score; // strictly rely on lvl1..lvl4 scores
         allTeams.push({
           id: docSnap.id,
-          ...docSnap.data()
+          ...teamData
         });
       });
 

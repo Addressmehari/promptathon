@@ -151,6 +151,7 @@ const healthbarStatusBadge = document.querySelector(".healthbar-status-badge");
 function isLevelCompleted(lvl) {
   if (!currentTeam) return false;
   return Boolean(
+    currentTeam[`lvl${lvl}`]?.scenarios ||
     currentTeam[`lvl${lvl}`]?.resp ||
     currentTeam[`level_${lvl}_response`] || 
     currentTeam[`level-${lvl}-response`]
@@ -285,8 +286,7 @@ async function findTeamInDb(inputIdentifier) {
         teamName: data.teamName || "",
         leaderName: data.leaderName || "",
         participants: data.participants || "",
-        password: String(data.password || ""),
-        score: data.score || 85
+        password: String(data.password || "")
       };
     }
   } catch (e) {
@@ -307,8 +307,7 @@ async function findTeamInDb(inputIdentifier) {
         teamName: data.teamName || "",
         leaderName: data.leaderName || "",
         participants: data.participants || "",
-        password: String(data.password || ""),
-        score: data.score || 85
+        password: String(data.password || "")
       };
     }
   } catch (e) {
@@ -331,8 +330,7 @@ async function findTeamInDb(inputIdentifier) {
           teamName: data.teamName || "",
           leaderName: data.leaderName || "",
           participants: data.participants || "",
-          password: String(data.password || ""),
-          score: data.score || 85
+          password: String(data.password || "")
         };
       }
 
@@ -344,8 +342,7 @@ async function findTeamInDb(inputIdentifier) {
           teamName: data.teamName || "",
           leaderName: data.leaderName || "",
           participants: data.participants || "",
-          password: String(data.password || ""),
-          score: data.score || 85
+          password: String(data.password || "")
         };
       }
 
@@ -361,8 +358,7 @@ async function findTeamInDb(inputIdentifier) {
             teamName: data.teamName || "",
             leaderName: data.leaderName || "",
             participants: data.participants || "",
-            password: String(data.password || ""),
-            score: data.score || 85
+            password: String(data.password || "")
           };
         }
       }
@@ -376,23 +372,34 @@ async function findTeamInDb(inputIdentifier) {
 
 let teamDocUnsubscribe = null;
 
+function calculateTeamScore(data) {
+  if (!data) return 0;
+  let total = 0;
+  for (let lvl = 1; lvl <= 4; lvl++) {
+    const s = data[`lvl${lvl}`]?.score;
+    if (typeof s === "number") total += s;
+  }
+  return total;
+}
+
 // Switch to Workspace
 function unlockWorkspace(teamData) {
-  currentTeam = teamData;
-  sessionStorage.setItem("promptathon_active_team", JSON.stringify(teamData));
+  currentTeam = { ...teamData };
+  delete currentTeam.score;
+  sessionStorage.setItem("promptathon_active_team", JSON.stringify(currentTeam));
 
   // Populate pass and identity elements
-  workspaceTeamBadge.textContent = teamData.teamId;
-  workspaceTeamName.textContent = teamData.teamName;
-  passTeamId.textContent = teamData.teamId;
-  passOriginalId.textContent = teamData.originalId;
-  passLeaderName.textContent = teamData.leaderName || "N/A";
-  passParticipants.textContent = teamData.participants || "Team Members";
+  workspaceTeamBadge.textContent = currentTeam.teamId;
+  workspaceTeamName.textContent = currentTeam.teamName;
+  passTeamId.textContent = currentTeam.teamId;
+  passOriginalId.textContent = currentTeam.originalId;
+  passLeaderName.textContent = currentTeam.leaderName || "N/A";
+  passParticipants.textContent = currentTeam.participants || "Team Members";
 
-  // Score display (mockup / remote)
+  // Score display (computed strictly from lvl1..lvl4 scores)
   const teamScoreNum = document.getElementById("team-score-num");
-  if (teamScoreNum && teamData.score) {
-    teamScoreNum.textContent = teamData.score;
+  if (teamScoreNum) {
+    teamScoreNum.textContent = calculateTeamScore(currentTeam);
   }
 
   // Update visual state of level stops to show which ones are already completed
@@ -412,9 +419,11 @@ function unlockWorkspace(teamData) {
           ...currentTeam,
           ...liveData
         };
+        delete currentTeam.score;
+
         // Clean out any level that was removed from Firestore
         for (let lvl = 1; lvl <= 4; lvl++) {
-          const exists = liveData[`lvl${lvl}`]?.resp || liveData[`level_${lvl}_response`];
+          const exists = liveData[`lvl${lvl}`]?.scenarios || liveData[`lvl${lvl}`]?.resp || liveData[`level_${lvl}_response`];
           if (!exists) {
             localStorage.removeItem(`team_${teamData.teamId}_level_${lvl}`);
             if (currentTeam[`lvl${lvl}`]) delete currentTeam[`lvl${lvl}`];
@@ -423,6 +432,9 @@ function unlockWorkspace(teamData) {
           }
         }
         sessionStorage.setItem("promptathon_active_team", JSON.stringify(currentTeam));
+        if (teamScoreNum) {
+          teamScoreNum.textContent = calculateTeamScore(currentTeam);
+        }
         updateStopIndicators();
       }
     }, (err) => {

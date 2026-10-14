@@ -47,63 +47,119 @@
         <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap;">
           <span class="level-number-pill">ROUND 2 // THE DEBUGGER</span>
           <span class="level-badge-tag" style="background: rgba(255, 255, 255, 0.05); color: #ffffff; border-color: rgba(255, 255, 255, 0.15);">⏱ 15 Minutes</span>
-          <span class="level-badge-tag" style="background: rgba(134, 239, 172, 0.1); color: #86efac; border-color: rgba(134, 239, 172, 0.3);">Format: Engineered System / User Prompt</span>
+          <span class="level-badge-tag" style="background: rgba(134, 239, 172, 0.1); color: #86efac; border-color: rgba(134, 239, 172, 0.3);">Format: Engineered System / User Prompts</span>
         </div>
         <h1 class="level-heading">The Debugger (Prompt Optimization & Fixes)</h1>
         <p class="level-description">
-          Transform vague, broken prompts into production-grade prompts with strict negative constraints, deterministic formatting schemas, and token limits.
+          Transform vague, broken prompts into production-grade prompts with strict negative constraints, deterministic formatting schemas, and token limits. Complete <strong>all 3 scenarios</strong> below.
         </p>
       </div>
 
-      <!-- Scenario Selector -->
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-subtle); letter-spacing: 0.06em;">CHOOSE YOUR ASSIGNED SCENARIO:</span>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">
-          <button type="button" class="theme-btn active" data-scenario="1">
-            <span class="theme-btn-num">Scenario 1</span>
-            <span class="theme-btn-title">Corporate Leave Request</span>
-          </button>
-          <button type="button" class="theme-btn" data-scenario="2">
-            <span class="theme-btn-num">Scenario 2</span>
-            <span class="theme-btn-title">Tech Product Spec (JSON)</span>
-          </button>
-          <button type="button" class="theme-btn" data-scenario="3">
-            <span class="theme-btn-num">Scenario 3</span>
-            <span class="theme-btn-title">Startup Investor Pitch</span>
-          </button>
+      <!-- Live Multi-Category Progress Tracker -->
+      <div class="level-progress-tracker">
+        <div class="progress-info">
+          <span class="progress-badge" id="progress-count-badge">0 / 3 COMPLETED</span>
+          <span class="progress-status-text">Complete all 3 scenarios to unlock final submission</span>
         </div>
+        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: #86efac;">Mandatory: 3 of 3 Scenarios</span>
       </div>
 
-      <!-- Active Scenario Briefing Box -->
-      <div class="level-task-box" id="scenario-brief-box">
-        <div class="level-task-title" id="scenario-title">SCENARIO 1: CORPORATE EMERGENCY LEAVE REQUEST</div>
-        <div style="margin-bottom: 12px; padding: 10px 14px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; border-radius: 2px;">
-          <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #fca5a5; font-weight: 700; display: block;">BAD PROMPT (TO FIX):</span>
-          <span id="scenario-bad-prompt" style="font-size: 0.95rem; color: #ffffff; font-family: var(--font-mono);">"Write a leave letter."</span>
-        </div>
-        <p class="level-task-content" id="scenario-constraints" style="margin-bottom: 0;">
-          <strong>Required Constraints:</strong> Corporate tone, strictly under 50 words, mandatory sections ([Subject], [Reason], [Handover], [Signature]), forbidden words: 'sick', 'sorry'.
-        </p>
-      </div>
+      <!-- 3 Scenario Input Cards -->
+      <div class="scenarios-container">
 
-      <!-- Prompt Input Area -->
-      <div class="form-group">
-        <label for="level-prompt-input" class="field-label">
-          <span>Engineered Replacement Prompt</span>
-          <span class="required-badge">*</span>
-        </label>
-        <textarea 
-          id="level-prompt-input" 
-          class="level-textarea" 
-          rows="9" 
-          placeholder="Write your optimized, engineered prompt here including role, structure, and negative constraints..."
-        ></textarea>
+        <!-- Scenario 1 -->
+        <article class="scenario-card" id="card-scenario-1">
+          <div class="scenario-card-header">
+            <span class="scenario-tag">SCENARIO 1 // CORPORATE EMERGENCY LEAVE</span>
+            <span class="scenario-status-pill" id="scenario-1-status">Pending</span>
+          </div>
+          <div class="scenario-brief-box">
+            <div style="margin-bottom: 8px; padding: 8px 12px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; border-radius: 2px;">
+              <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #fca5a5; font-weight: 700; display: block;">BROKEN PROMPT (TO FIX):</span>
+              <span style="font-size: 0.92rem; color: #ffffff; font-family: var(--font-mono);">"Write a leave letter."</span>
+            </div>
+            <div class="scenario-brief-content">
+              <strong>Required Constraints:</strong> Corporate professional tone, strictly under 50 words, mandatory sections ([Subject], [Reason], [Handover], [Signature]), forbidden words: <code>'sick'</code>, <code>'sorry'</code>.
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="scenario-1-input" class="field-label">
+              <span>Scenario 1 Optimized Prompt</span>
+              <span class="required-badge">*</span>
+            </label>
+            <textarea 
+              id="scenario-1-input" 
+              class="level-textarea" 
+              rows="6" 
+              placeholder="Write your optimized, engineered prompt here including role, structure, and negative constraints..."
+            ></textarea>
+          </div>
+        </article>
+
+        <!-- Scenario 2 -->
+        <article class="scenario-card" id="card-scenario-2">
+          <div class="scenario-card-header">
+            <span class="scenario-tag">SCENARIO 2 // PRODUCT FEATURE SPEC (JSON ONLY)</span>
+            <span class="scenario-status-pill" id="scenario-2-status">Pending</span>
+          </div>
+          <div class="scenario-brief-box">
+            <div style="margin-bottom: 8px; padding: 8px 12px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; border-radius: 2px;">
+              <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #fca5a5; font-weight: 700; display: block;">BROKEN PROMPT (TO FIX):</span>
+              <span style="font-size: 0.92rem; color: #ffffff; font-family: var(--font-mono);">"Tell me about a new AI feature for a mobile app."</span>
+            </div>
+            <div class="scenario-brief-content">
+              <strong>Required Constraints:</strong> Valid parseable raw JSON only (no markdown fences, no conversational text), exact schema keys (<code>feature_name</code>, <code>target_users</code>, <code>tech_stack</code>, <code>latency_target_ms</code>), latency_target_ms strictly &lt; 100.
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="scenario-2-input" class="field-label">
+              <span>Scenario 2 Optimized Prompt</span>
+              <span class="required-badge">*</span>
+            </label>
+            <textarea 
+              id="scenario-2-input" 
+              class="level-textarea" 
+              rows="6" 
+              placeholder="Write your engineered prompt demanding pure JSON schema output with strict keys..."
+            ></textarea>
+          </div>
+        </article>
+
+        <!-- Scenario 3 -->
+        <article class="scenario-card" id="card-scenario-3">
+          <div class="scenario-card-header">
+            <span class="scenario-tag">SCENARIO 3 // STARTUP INVESTOR PITCH</span>
+            <span class="scenario-status-pill" id="scenario-3-status">Pending</span>
+          </div>
+          <div class="scenario-brief-box">
+            <div style="margin-bottom: 8px; padding: 8px 12px; background: rgba(239, 68, 68, 0.08); border-left: 3px solid #ef4444; border-radius: 2px;">
+              <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #fca5a5; font-weight: 700; display: block;">BROKEN PROMPT (TO FIX):</span>
+              <span style="font-size: 0.92rem; color: #ffffff; font-family: var(--font-mono);">"Summarize our green energy startup idea for investors."</span>
+            </div>
+            <div class="scenario-brief-content">
+              <strong>Required Constraints:</strong> Exactly 3 bullet points (• Problem, • Proprietary Solution, • Fund Ask), strictly under 60 words total, forbidden buzzwords: <code>'disruptive'</code>, <code>'revolutionize'</code>, <code>'game-changer'</code>.
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="scenario-3-input" class="field-label">
+              <span>Scenario 3 Optimized Prompt</span>
+              <span class="required-badge">*</span>
+            </label>
+            <textarea 
+              id="scenario-3-input" 
+              class="level-textarea" 
+              rows="6" 
+              placeholder="Write your prompt enforcing the 3 bullet points structure, strict word count, and negative buzzword filters..."
+            ></textarea>
+          </div>
+        </article>
+
       </div>
 
       <!-- Level Actions -->
       <div class="level-footer-actions">
         <button type="button" id="submit-level-btn" class="submit-button" style="width: auto; padding: 14px 40px;">
-          <span class="btn-text">Submit Round 2 Solution &rarr;</span>
+          <span class="btn-text">Submit All 3 Round 2 Solutions &rarr;</span>
         </button>
       </div>
     </section>
@@ -111,46 +167,6 @@
 
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
-
-  <!-- Script for Scenario Toggle & Session Guard -->
-  <script>
-    // Scenario data from ROUND 1.docx
-    const SCENARIOS = {
-      1: {
-        title: "SCENARIO 1: CORPORATE EMERGENCY LEAVE REQUEST",
-        bad: '"Write a leave letter."',
-        constraints: "Corporate tone, strictly under 50 words, mandatory sections ([Subject], [Reason], [Handover], [Signature]), forbidden words: 'sick', 'sorry'."
-      },
-      2: {
-        title: "SCENARIO 2: TECHNICAL PRODUCT FEATURE SPEC (JSON ONLY)",
-        bad: '"Tell me about a new AI feature for a mobile app."',
-        constraints: "Valid parseable raw JSON only (no markdown code fences, no intro/outro), exact schema keys (feature_name, target_users, tech_stack, latency_target_ms), latency_target_ms strictly < 100."
-      },
-      3: {
-        title: "SCENARIO 3: STARTUP INVESTOR PITCH SUMMARY",
-        bad: '"Summarize our green energy startup idea for investors."',
-        constraints: "Exactly 3 bullet points (• Problem, • Proprietary Solution, • Fund Ask), strictly under 60 words total, forbidden words: 'disruptive', 'revolutionize', 'game-changer'."
-      }
-    };
-
-    const scenarioButtons = document.querySelectorAll(".theme-btn");
-    const scenarioTitle = document.getElementById("scenario-title");
-    const scenarioBad = document.getElementById("scenario-bad-prompt");
-    const scenarioConstraints = document.getElementById("scenario-constraints");
-
-    scenarioButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        scenarioButtons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        const sid = btn.getAttribute("data-scenario");
-        if (SCENARIOS[sid]) {
-          scenarioTitle.textContent = SCENARIOS[sid].title;
-          scenarioBad.textContent = SCENARIOS[sid].bad;
-          scenarioConstraints.innerHTML = `<strong>Required Constraints:</strong> ${SCENARIOS[sid].constraints}`;
-        }
-      });
-    });
-  </script>
 
   <!-- Level 2 Submission & Session Controller -->
   <script type="module">

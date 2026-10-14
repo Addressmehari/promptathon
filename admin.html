@@ -138,7 +138,7 @@
       </div>
     </header>
 
-    <!-- Metrics Overview -->
+    <!-- Metrics Overview (Judge Analytics) -->
     <section class="stats-grid">
       <div class="stat-card">
         <div class="stat-header">
@@ -170,6 +170,36 @@
         <span class="stat-subtext" id="stat-latest-time">Submitted across Rounds 1-4</span>
       </div>
 
+      <!-- Judge Analytics: Tournament Leader & Top Score -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">TOURNAMENT LEADER (1ST)</span>
+          <div class="stat-icon-box" style="background: rgba(234, 179, 8, 0.15); color: #fde047;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </div>
+        </div>
+        <div class="stat-value text-truncate" id="stat-top-team" style="color: #fde047; font-size: 1.35rem;">-</div>
+        <span class="stat-subtext" id="stat-top-score" style="color: #fde047; font-family: var(--font-mono); font-weight: 700;">Top Score: 0.00 pts</span>
+      </div>
+
+      <!-- Judge Analytics: Competition Average Score -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-label">AVERAGE TOTAL SCORE</span>
+          <div class="stat-icon-box" style="background: rgba(134, 239, 172, 0.15); color: #86efac;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+          </div>
+        </div>
+        <div class="stat-value" id="stat-avg-score" style="color: #86efac; font-family: var(--font-mono);">0.00 pts</div>
+        <span class="stat-subtext" id="stat-scored-teams-count">Across evaluated teams</span>
+      </div>
+
       <div class="stat-card">
         <div class="stat-header">
           <span class="stat-label">DATABASE SYNC & EVAL</span>
@@ -187,7 +217,7 @@
       </div>
     </section>
 
-    <!-- Controls Toolbar (Search, Filter, Export) -->
+    <!-- Controls Toolbar (Search, Score-based Sort, Download Dropdown, Judge Finalize) -->
     <section class="admin-toolbar">
       <div class="search-box">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -204,23 +234,79 @@
       </div>
 
       <div class="toolbar-actions">
+        <!-- Score-Based Sorting Select -->
         <div class="select-wrapper">
-          <select id="sort-select" title="Sort teams">
+          <select id="sort-select" title="Score-based and category sorting">
+            <option value="score-desc" selected>🏆 Leaderboard: Total Score (Highest first)</option>
+            <option value="score-asc">Total Score (Lowest first)</option>
+            <option value="r1-desc">Round 1 Score (Highest first)</option>
+            <option value="r2-desc">Round 2 Score (Highest first)</option>
+            <option value="r3-desc">Round 3 Score (Highest first)</option>
+            <option value="r4-desc">Round 4 Score (Highest first)</option>
             <option value="num-asc">Team Number (Lowest first)</option>
             <option value="num-desc">Team Number (Highest first)</option>
-            <option value="score-desc">Highest Score First</option>
-            <option value="time-desc">Recently Updated</option>
             <option value="name-asc">Team Name (A - Z)</option>
+            <option value="time-desc">Recently Updated</option>
           </select>
         </div>
 
-        <button id="export-csv-btn" class="action-btn" title="Download spreadsheet of team submissions & scores">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
+        <!-- Download Data Dropdown Menu -->
+        <div class="export-dropdown">
+          <button type="button" id="download-menu-btn" class="action-btn" title="Download current data and score analytics">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>📥 Download Data</span>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div id="download-dropdown-menu" class="export-dropdown-content">
+            <button type="button" id="export-leaderboard-csv-btn" class="export-dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+              <div>
+                <div style="font-weight: 600;">Leaderboard Summary (CSV)</div>
+                <div style="font-size: 0.72rem; color: #94a3b8;">Rankings, team info & round scores</div>
+              </div>
+            </button>
+            <button type="button" id="export-prompts-csv-btn" class="export-dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+              </svg>
+              <div>
+                <div style="font-weight: 600;">Full Submissions & Prompts (CSV)</div>
+                <div style="font-size: 0.72rem; color: #94a3b8;">All scenario prompts and timestamps</div>
+              </div>
+            </button>
+            <button type="button" id="export-raw-json-btn" class="export-dropdown-item">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6"></polyline>
+                <polyline points="8 6 2 12 8 18"></polyline>
+              </svg>
+              <div>
+                <div style="font-weight: 600;">Raw Database Snapshot (JSON)</div>
+                <div style="font-size: 0.72rem; color: #94a3b8;">Full JSON backup of registrations collection</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Judge Finalize Action Button -->
+        <button type="button" id="judge-finalize-btn" class="action-btn" style="background: rgba(134, 239, 172, 0.18); border-color: rgba(134, 239, 172, 0.45); color: #86efac; font-weight: 700;" title="Open Judge Finalization and Official Results Certification">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="8" r="7"></circle>
+            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
           </svg>
-          <span>Export Submissions CSV</span>
+          <span>🏆 Finalize Results</span>
         </button>
 
         <button id="refresh-btn" class="action-btn icon-only" title="Force Refresh">
@@ -249,25 +335,42 @@
         <span id="admin-error-text">Failed to fetch registrations.</span>
       </div>
 
-      <!-- Table Structure: Submissions & Scores Alone -->
+      <!-- Table Structure: Submissions & Scores with Sortable Headers -->
       <div class="table-responsive">
         <table class="teams-table" id="teams-table">
           <thead>
             <tr>
-              <th class="col-num" style="width: 75px;">Team #</th>
-              <th class="col-name" style="min-width: 180px;">Team Name & ID</th>
-              <th class="col-lvl" style="min-width: 130px;">Round 1</th>
-              <th class="col-lvl" style="min-width: 130px;">Round 2</th>
-              <th class="col-lvl" style="min-width: 130px;">Round 3</th>
-              <th class="col-lvl" style="min-width: 130px;">Round 4</th>
-              <th class="col-score" style="width: 100px;">Total Score</th>
-              <th class="col-actions" style="width: 140px;">Admin Control</th>
+              <th class="col-rank sortable-th" data-sort-key="rank" style="width: 75px;" title="Sort by Rank">
+                <span>Rank</span> <span class="sort-indicator" id="sort-ind-rank">#</span>
+              </th>
+              <th class="col-num sortable-th" data-sort-key="num" style="width: 80px;" title="Sort by Team Number">
+                <span>Team #</span> <span class="sort-indicator" id="sort-ind-num">↕</span>
+              </th>
+              <th class="col-name sortable-th" data-sort-key="name" style="min-width: 180px;" title="Sort by Team Name">
+                <span>Team Name & ID</span> <span class="sort-indicator" id="sort-ind-name">↕</span>
+              </th>
+              <th class="col-lvl sortable-th" data-sort-key="r1" style="min-width: 125px;" title="Sort by Round 1 Score">
+                <span>Round 1</span> <span class="sort-indicator" id="sort-ind-r1">↕</span>
+              </th>
+              <th class="col-lvl sortable-th" data-sort-key="r2" style="min-width: 125px;" title="Sort by Round 2 Score">
+                <span>Round 2</span> <span class="sort-indicator" id="sort-ind-r2">↕</span>
+              </th>
+              <th class="col-lvl sortable-th" data-sort-key="r3" style="min-width: 125px;" title="Sort by Round 3 Score">
+                <span>Round 3</span> <span class="sort-indicator" id="sort-ind-r3">↕</span>
+              </th>
+              <th class="col-lvl sortable-th" data-sort-key="r4" style="min-width: 125px;" title="Sort by Round 4 Score">
+                <span>Round 4</span> <span class="sort-indicator" id="sort-ind-r4">↕</span>
+              </th>
+              <th class="col-score sortable-th active-sort" data-sort-key="score" style="width: 125px;" title="Sort by Total Score">
+                <span>Total Score</span> <span class="sort-indicator" id="sort-ind-score">▼</span>
+              </th>
+              <th class="col-actions" style="width: 135px;">Admin Control</th>
             </tr>
           </thead>
           <tbody id="teams-tbody">
             <!-- Loading placeholder rows -->
             <tr class="placeholder-row">
-              <td colspan="8">
+              <td colspan="9">
                 <div class="table-loader">
                   <div class="btn-loader"></div>
                   <span>Connecting to Firestore database...</span>
@@ -332,14 +435,18 @@
           <!-- Score Input -->
           <div class="score-input-group">
             <label for="eval-score-input" style="display: block; font-size: 0.75rem; font-weight: 700; color: #86efac; margin-bottom: 6px; text-transform: uppercase;">
-              Assign Score (0 - 100):
+              Assign Score (0.00 - 100.00):
             </label>
-            <div style="display: flex; gap: 8px;">
-              <input type="number" id="eval-score-input" min="0" max="100" placeholder="Score" style="width: 90px; padding: 8px 12px; background: rgba(10, 14, 18, 0.8); border: 1px solid rgba(134, 239, 172, 0.3); border-radius: 4px; color: #86efac; font-family: var(--font-mono); font-weight: 700; font-size: 1rem; outline: none;">
-              <button type="button" id="eval-save-score-btn" class="action-btn" style="padding: 8px 16px; background: #86efac; color: #0f172a; font-weight: 700; border: none; cursor: pointer;">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+              <input type="number" id="eval-score-input" min="0" max="100" step="0.01" placeholder="Score" style="width: 105px; padding: 8px 12px; background: rgba(10, 14, 18, 0.8); border: 1px solid rgba(134, 239, 172, 0.3); border-radius: 4px; color: #86efac; font-family: var(--font-mono); font-weight: 700; font-size: 1rem; outline: none;">
+              <button type="button" id="eval-auto-score-btn" class="action-btn" style="padding: 8px 14px; background: rgba(134, 239, 172, 0.15); border: 1px solid rgba(134, 239, 172, 0.4); color: #86efac; font-weight: 700; font-size: 0.8rem; cursor: pointer; border-radius: 4px;" title="Automatically evaluate keywords and relevance against benchmark answer">
+                ⚡ Auto-Score Keywords
+              </button>
+              <button type="button" id="eval-save-score-btn" class="action-btn" style="padding: 8px 16px; background: #86efac; color: #0f172a; font-weight: 700; border: none; cursor: pointer; border-radius: 4px;">
                 Save Score
               </button>
             </div>
+            <div id="eval-keyword-breakdown" style="font-size: 0.76rem; font-family: var(--font-mono); color: #94a3b8; margin-top: 8px; line-height: 1.4;"></div>
           </div>
 
           <!-- Unlock / Reset Control -->
@@ -379,6 +486,91 @@
       <div class="modal-footer">
         <button id="cancel-delete-btn" class="secondary-button">Cancel</button>
         <button id="confirm-delete-btn" class="danger-button">Delete Team</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Judge Finalize & Results Certification Modal -->
+  <div id="judge-modal" class="modal-backdrop hidden">
+    <div class="modal-card" style="max-width: 860px; width: 95%; max-height: 90vh; overflow-y: auto;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px;">
+        <div>
+          <div class="event-badge" style="margin-bottom: 6px;">
+            <span class="pulse-dot"></span>
+            <span>PROMPTATHON 2026 // OFFICIAL CERTIFICATION</span>
+          </div>
+          <h2 style="font-size: 1.4rem; color: #ffffff; margin: 0;">Judges' Final Decision & Standings</h2>
+          <span style="font-size: 0.8rem; color: #94a3b8;">Review official podium standings, sign off, and export results</span>
+        </div>
+        <button id="close-judge-modal-btn" style="background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; line-height: 1;">&times;</button>
+      </div>
+
+      <div class="judge-modal-body" style="padding: 16px 0;">
+        <!-- Top 3 Podium Cards -->
+        <div class="judge-podium-grid" id="judge-podium-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px;">
+          <!-- Dynamically populated 1st, 2nd, 3rd place -->
+        </div>
+
+        <!-- Overall Competition Analytics Bar -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 14px; margin-bottom: 20px;">
+          <div>
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase;">Total Evaluated</div>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #ffffff;" id="judge-summary-teams">0 Teams</div>
+          </div>
+          <div>
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase;">Top Winning Score</div>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #fde047;" id="judge-summary-top">0.00 pts</div>
+          </div>
+          <div>
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase;">Event Average</div>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #86efac;" id="judge-summary-avg">0.00 pts</div>
+          </div>
+          <div>
+            <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase;">Total Submissions</div>
+            <div style="font-size: 1.15rem; font-weight: 700; color: #38bdf8;" id="judge-summary-subs">0 / 0</div>
+          </div>
+        </div>
+
+        <!-- Final Standings Mini Table -->
+        <div style="max-height: 240px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; margin-bottom: 20px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+            <thead style="background: rgba(255,255,255,0.05); position: sticky; top: 0;">
+              <tr>
+                <th style="padding: 8px 12px; color: #94a3b8;">Rank</th>
+                <th style="padding: 8px 12px; color: #94a3b8;">Team</th>
+                <th style="padding: 8px 12px; color: #94a3b8;">R1</th>
+                <th style="padding: 8px 12px; color: #94a3b8;">R2</th>
+                <th style="padding: 8px 12px; color: #94a3b8;">R3</th>
+                <th style="padding: 8px 12px; color: #94a3b8;">R4</th>
+                <th style="padding: 8px 12px; color: #86efac;">Total</th>
+              </tr>
+            </thead>
+            <tbody id="judge-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Judge Sign-off Box -->
+        <div style="background: rgba(134, 239, 172, 0.05); border: 1px dashed rgba(134, 239, 172, 0.3); border-radius: 6px; padding: 14px; margin-bottom: 20px;">
+          <label style="display: block; font-size: 0.78rem; font-weight: 700; color: #86efac; margin-bottom: 6px; text-transform: uppercase;">
+            Official Judge Verification & Sign-off:
+          </label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <input type="text" id="judge-sign-name" placeholder="Enter Lead Judge Name (e.g. Dr. A. Sharma)" style="padding: 8px 12px; background: rgba(10, 14, 18, 0.8); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #ffffff; font-size: 0.85rem;">
+            <input type="text" id="judge-sign-notes" placeholder="Notes (e.g. All rounds verified & approved)" style="padding: 8px 12px; background: rgba(10, 14, 18, 0.8); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #ffffff; font-size: 0.85rem;">
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+          <button type="button" id="judge-print-btn" class="action-btn" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2);">
+            🖨 Print Official Sheet
+          </button>
+          <button type="button" id="judge-export-csv-btn" class="action-btn" style="background: #86efac; color: #0f172a; border: none; font-weight: 700;">
+            📥 Download Final Results CSV
+          </button>
+        </div>
       </div>
     </div>
   </div>

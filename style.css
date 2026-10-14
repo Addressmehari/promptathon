@@ -3435,6 +3435,189 @@ input[type=number] {
   font-weight: 700;
 }
 
+/* =========================================================
+   ADMIN JUDGE ANALYTICS, RANK BADGES & EXPORT SYSTEM
+   ========================================================= */
 
+/* Sortable Table Headers */
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
 
+.sortable-th:hover {
+  color: #86efac;
+  background: rgba(134, 239, 172, 0.05);
+}
 
+.sort-indicator {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  opacity: 0.6;
+  vertical-align: middle;
+}
+
+.sortable-th.active-sort {
+  color: #86efac;
+}
+
+.sortable-th.active-sort .sort-indicator {
+  color: #86efac;
+  opacity: 1;
+  font-weight: 800;
+}
+
+/* Leaderboard Rank Badges */
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.rank-badge.rank-1 {
+  background: rgba(234, 179, 8, 0.18);
+  border: 1px solid rgba(234, 179, 8, 0.45);
+  color: #fde047;
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.2);
+}
+
+.rank-badge.rank-2 {
+  background: rgba(203, 213, 225, 0.18);
+  border: 1px solid rgba(203, 213, 225, 0.45);
+  color: #f1f5f9;
+}
+
+.rank-badge.rank-3 {
+  background: rgba(217, 119, 6, 0.18);
+  border: 1px solid rgba(217, 119, 6, 0.45);
+  color: #fdba74;
+}
+
+.rank-badge.rank-other {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+}
+
+/* Download Dropdown */
+.export-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.export-dropdown-content {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: #0b1016;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  min-width: 270px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  padding: 6px;
+  display: none;
+}
+
+.export-dropdown-content.show {
+  display: block;
+  animation: fadeInDown 0.15s ease-out;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.export-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.export-dropdown-item:hover {
+  background: rgba(99, 102, 241, 0.18);
+  color: #ffffff;
+}
+
+.export-dropdown-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: #86efac;
+}
+
+/* Judge Podium Cards */
+.judge-podium-card {
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.judge-podium-card.first {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(234, 179, 8, 0.05));
+  border: 1.5px solid rgba(234, 179, 8, 0.45);
+}
+
+.judge-podium-card.second {
+  background: linear-gradient(135deg, rgba(203, 213, 225, 0.15), rgba(203, 213, 225, 0.05));
+  border: 1.5px solid rgba(203, 213, 225, 0.45);
+}
+
+.judge-podium-card.third {
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.15), rgba(217, 119, 6, 0.05));
+  border: 1.5px solid rgba(217, 119, 6, 0.45);
+}
+
+/* Printable Sheet styles for Judges */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #judge-modal, #judge-modal * {
+    visibility: visible;
+  }
+  #judge-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  #judge-modal .modal-card {
+    border: none !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+    background: #ffffff !important;
+    max-width: 100% !important;
+  }
+  #judge-modal button, #close-judge-modal-btn {
+    display: none !important;
+  }
+}

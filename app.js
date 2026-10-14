@@ -423,13 +423,13 @@ async function findTeamInDb(inputIdentifier) {
 let teamDocUnsubscribe = null;
 
 function calculateTeamScore(data) {
-  if (!data) return 0;
+  if (!data) return "0.00";
   let total = 0;
   for (let lvl = 1; lvl <= 4; lvl++) {
     const s = data[`lvl${lvl}`]?.score;
     if (typeof s === "number") total += s;
   }
-  return total;
+  return Number(total.toFixed(2)).toFixed(2);
 }
 
 // Switch to Workspace

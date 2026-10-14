@@ -8,6 +8,7 @@ import {
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { initFirebaseFromEnv } from "./firebase-config.js";
+import { evaluateLevelSubmission } from "./scoring-engine.js";
 
 /**
  * Initializes Level Page session, previous response loading, and multi-scenario Firestore submission
@@ -933,16 +934,30 @@ export async function initLevelPage(levelNumber) {
       ? s1Val 
       : `[SCENARIO 1]\n${s1Val}\n\n[SCENARIO 2]\n${s2Val}\n\n[SCENARIO 3]\n${s3Val}`;
 
+    const scenariosMap = isSinglePromptMode 
+      ? { scenario_1: s1Val } 
+      : {
+          scenario_1: s1Val,
+          scenario_2: s2Val,
+          scenario_3: s3Val
+        };
+
+    // Automatically calculate keyword relevance score with 2-decimal accuracy
+    let evaluatedScore = existingScore || 0;
+    try {
+      const evalResult = evaluateLevelSubmission(levelNumber, scenariosMap);
+      if (evalResult && typeof evalResult.levelScore === "number") {
+        evaluatedScore = evalResult.levelScore;
+        console.log(`Calculated keyword relevance score for Level ${levelNumber}:`, evaluatedScore);
+      }
+    } catch (err) {
+      console.warn("Auto-score calculation note:", err.message);
+    }
+
     const lvlPayload = {
-      scenarios: isSinglePromptMode 
-        ? { scenario_1: s1Val } 
-        : {
-            scenario_1: s1Val,
-            scenario_2: s2Val,
-            scenario_3: s3Val
-          },
+      scenarios: scenariosMap,
       resp: consolidatedResp,
-      score: existingScore,
+      score: evaluatedScore,
       time: new Date().toLocaleString(),
       autoSubmitted: isAutoSubmit
     };
